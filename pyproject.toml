@@ -7,7 +7,6 @@ name = "anglo-defects"
 version = "1.6.20"
 requires-python = ">=3.10"
 dependencies = [
-    # django 4.1 not supported by mssql-django package
     'django>=4.1,<4.2',
     'pytz==2022.6',
     'python-dotenv==0.21.0',
@@ -17,6 +16,7 @@ dependencies = [
     'django-lifecycle==1.0.0',
     'redis==4.3.4',
     'sentry_sdk==1.10.1',
+    'django-import-export==3.0.1',
 ]
 
 [project.scripts]

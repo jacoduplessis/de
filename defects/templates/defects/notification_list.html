@@ -1,36 +1,41 @@
 {% extends 'defects/base.html' %}
 
 {% block content %}
-<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 mt-3">
+  <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 mt-3">
 
-  <h2>Notifications</h2>
-  <hr>
-  <div class="my-3">
-    <a href="#" class="btn btn-primary">Create Notification</a>
-  </div>
-  <table class="table">
-    <thead>
-    <tr>
-      <th>Date</th>
-      <th>Section</th>
-      <th>Section Engineer</th>
-      <th>Equipment</th>
-      <th>Description</th>
-      <th>ID</th>
-    </tr>
-    </thead>
-  <tbody>
-    {% for notification in notifications %}
-    <tr>
-      <td>{{ notification.date }}</td>
-      <td>{{ notification.section }}</td>
-      <td>{{ notification.section_engineer_name }}</td>
-      <td>{{ notification.equipment_name }}</td>
-      <td>{{ notification.description }}</td>
-      <td>{{ notification.id }}</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-  </table>
-</main>
+    <h2>Notifications</h2>
+    <hr>
+    <div class="my-3">
+      <a href="#" class="btn btn-primary">Create Notification</a>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-sm table-striped table-hover">
+        <thead>
+        <tr>
+          <th>Status</th>
+          <th>ID</th>
+          <th>Date</th>
+          <th>Section</th>
+          <th>Section Engineer</th>
+          <th>Equipment</th>
+          <th>Description</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for notification, status in notifications %}
+          <tr>
+            <td class="text-nowrap"><span class="badge {{ status.class }}">{{ status.name }}</span></td>
+            <td class="text-nowrap">{{ notification.id }}</td>
+            <td class="font-monospace text-nowrap">{{ notification.date }}</td>
+            <td class="text-nowrap">{{ notification.section }}</td>
+            <td class="text-nowrap">{{ notification.section_engineer_name }}</td>
+            <td class="text-nowrap">{{ notification.equipment_name }}</td>
+            <td class="text-nowrap">{{ notification.description }}</td>
+
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </main>
 {% endblock %}

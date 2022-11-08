@@ -1,3 +1,4 @@
+{% load static %}
 <!doctype html>
 <html lang="en">
 <head>
@@ -7,9 +8,7 @@
   <meta name="author" content="Vetasi">
   <title>Anglo - Defect Elimination</title>
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.2/css/bootstrap.min.css"
-        integrity="sha512-CpIKUSyh9QX2+zSdfGP+eWLx23C8Dj9/XmHjZY2uDtfkdLGo0uY12jgcnkX9vXOgYajEKb/jiw67EYm+kBf+6g=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"/>
+  <link rel="stylesheet" href="{% static 'bootstrap.min.css' %}"/>
 
   {#  <!-- Favicons -->#}
   {#  <link rel="apple-touch-icon" href="/docs/5.2/assets/img/favicons/apple-touch-icon.png" sizes="180x180">#}
@@ -192,13 +191,17 @@
 </div>
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.2/js/bootstrap.bundle.min.js"
-        integrity="sha512-BOsvKbLb0dB1IVplOL9ptU1EYA+LuCKEluZWRUYG73hxqNBU85JBIBhPGwhQl7O633KtkjMv8lvxZcWP+N3V3w=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="{% static 'bootstrap.bundle.min.js' %}"></script>
 
-<script src="https://cdn.jsdelivr.net/npm/feather-icons@4.28.0/dist/feather.min.js"
-        integrity="sha384-uO3SXW5IuS1ZpFPKugNNWqTZRRglnUJK6UAZ/gxOX80nxEkN9NcGZTftn6RzhGWE"
-        crossorigin="anonymous"></script>
+<script src="{% static 'feather.min.js' %}"></script>
+
+<script>
+  document.querySelectorAll('.nav-link').forEach(el => {
+    if (el.getAttribute('href') === window.location.pathname) {
+      el.classList.add('active')
+    }
+  })
+</script>
 
 <script>
   /* globals Chart:false, feather:false */

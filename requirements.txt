@@ -10,19 +10,34 @@ async-timeout==4.0.2
     # via redis
 certifi==2022.9.24
     # via sentry-sdk
+defusedxml==0.7.1
+    # via odfpy
 deprecated==1.2.13
     # via redis
+diff-match-patch==20200713
+    # via django-import-export
 dj-database-url==1.0.0
     # via anglo-defects (pyproject.toml)
 django==4.1.3
     # via
     #   anglo-defects (pyproject.toml)
     #   dj-database-url
+    #   django-import-export
     #   django-lifecycle
+django-import-export==3.0.1
+    # via anglo-defects (pyproject.toml)
 django-lifecycle==1.0.0
     # via anglo-defects (pyproject.toml)
+et-xmlfile==1.1.0
+    # via openpyxl
 gunicorn==20.1.0
     # via anglo-defects (pyproject.toml)
+markuppy==1.14
+    # via tablib
+odfpy==1.4.1
+    # via tablib
+openpyxl==3.0.10
+    # via tablib
 packaging==21.3
     # via
     #   django-lifecycle
@@ -33,12 +48,16 @@ python-dotenv==0.21.0
     # via anglo-defects (pyproject.toml)
 pytz==2022.6
     # via anglo-defects (pyproject.toml)
+pyyaml==6.0
+    # via tablib
 redis==4.3.4
     # via anglo-defects (pyproject.toml)
 sentry-sdk==1.10.1
     # via anglo-defects (pyproject.toml)
 sqlparse==0.4.3
     # via django
+tablib[html,ods,xls,xlsx,yaml]==3.2.1
+    # via django-import-export
 urllib3==1.26.12
     # via sentry-sdk
 urlman==2.0.1
@@ -47,6 +66,10 @@ whitenoise==6.2.0
     # via anglo-defects (pyproject.toml)
 wrapt==1.14.1
     # via deprecated
+xlrd==2.0.1
+    # via tablib
+xlwt==1.3.0
+    # via tablib
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
