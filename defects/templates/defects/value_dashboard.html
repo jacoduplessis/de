@@ -41,6 +41,7 @@
         'Oct',
         'Nov',
         'Des',
+        'Total',
       ]
 
       const randInt = function (min, max) {
@@ -53,16 +54,18 @@
         const deltas = Array(n).fill(0).map(x => randInt(min, max))
         const totals = Array(n).fill(0)
         console.log('deltas', deltas)
-        return deltas.map((d, ix) => {
+        const series = deltas.map((d, ix) => {
           if (ix === 0) {
-              totals[0] = d
-              return [0, d]
+            totals[0] = d
+            return [0, d]
           }
           const prevEnd = totals[ix - 1]
           const newEnd = prevEnd + d
           totals[ix] = newEnd
           return [prevEnd, newEnd]
         })
+        series.push([totals[totals.length - 1], 0])
+        return series
       }
 
       const myChart = new Chart(ctx, {
@@ -71,8 +74,10 @@
           labels: labels,
           datasets: [{
             label: 'Series A',
-            data: waterfallSeries(labels.length, -100, 100),
+            data: waterfallSeries(labels.length - 1, -100, 100),
             backgroundColor: function (ctx) {
+              if (ctx.dataIndex === labels.length - 1) return 'blue'
+              console.log(ctx)
               const [begin, end] = ctx.raw
               if (begin > end) return 'red'
               return 'green'
