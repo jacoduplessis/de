@@ -1,11 +1,17 @@
 import random
 
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django.urls import reverse
 
-from defects.models import Solution
+from defects.models import Solution, ReliabilityIncident
 
 
 def index(request):
+    return HttpResponseRedirect(reverse('login'))
+
+
+def home(request):
     return render(request, 'defects/index.html')
 
 
@@ -26,7 +32,7 @@ def _badge_generator():
         yield random.choice(badges)
 
 
-def notification_list(request):
+def incident_list(request):
     notifications = [
         {
             "section": "UG2 #2",
@@ -215,10 +221,22 @@ def notification_list(request):
     ]
 
     context = {
-        'notifications': zip(notifications, _badge_generator())
+        'incidents': zip(notifications, _badge_generator())
     }
 
-    return render(request, 'defects/notification_list.html', context)
+    return render(request, 'defects/incident_list.html', context)
+
+
+def incident_detail(request):
+    return render(request, 'defects/incident_detail.html')
+
+
+def anniversary_list(request):
+    return render(request, 'defects/incident_list.html')
+
+
+def value_dashboard(request):
+    return render(request, 'defects/value_dashboard.html')
 
 
 def solution_list(request):
@@ -227,3 +245,7 @@ def solution_list(request):
     }
 
     return render(request, 'defects/solutions_list.html', context)
+
+
+def login(request):
+    return render(request, 'defects/login.html')

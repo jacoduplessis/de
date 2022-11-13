@@ -1,5 +1,5 @@
 {% load static %}
-<header class="navbar navbar-dark sticky-top flex-md-nowrap p-0 shadow">
+<header class="navbar navbar-dark sticky-top flex-md-nowrap p-0 shadow" style="height: 45px">
   <a class="col-md-3 col-lg-2 me-0 px-3 fs-6" href="#">
     <img src="{% static 'anglo-american-logo-white.svg' %}" style="width: 140px">
   </a>
@@ -8,11 +8,12 @@
           aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
-  <input class="form-control form-control-dark w-100 rounded-0 border-0" type="text" placeholder="Search"
-         aria-label="Search">
-  <div class="navbar-nav">
-    <div class="nav-item text-nowrap">
-      <a class="nav-link px-3" href="#">Sign out</a>
+  <div class="navbar-nav flex-row">
+    <div class="nav-item px-3">
+      <a href="#" class="nav-link text-white">john.doe@angloamerican.com</a>
+    </div>
+    <div class="nav-item px-3">
+      <a class="nav-link text-white" href="{% url 'login' %}">Sign out</a>
     </div>
   </div>
 </header>

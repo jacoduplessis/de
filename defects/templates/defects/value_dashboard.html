@@ -1,0 +1,100 @@
+{% extends 'defects/base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+  <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 mt-3">
+
+    <div class="d-flex justify-content-between mb-3">
+      <h2>Value Dashboard</h2>
+    </div>
+
+    <canvas class="my-4 w-100" id="myChart" width="900" height="380"></canvas>
+
+  </main>
+
+{% endblock %}
+
+
+{% block extra_scripts %}
+
+
+  <script src="{% static 'chart.min.js' %}"></script>
+  <script>
+    /* globals Chart:false, feather:false */
+
+    (() => {
+      // Graphs
+      const ctx = document.getElementById('myChart')
+      // eslint-disable-next-line no-unused-vars
+
+      const labels = [
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Des',
+      ]
+
+      const randInt = function (min, max) {
+        const val = min + (max - min) * Math.random()
+        return Math.floor(val)
+      }
+
+
+      function waterfallSeries(n, min, max) {
+        const deltas = Array(n).fill(0).map(x => randInt(min, max))
+        const totals = Array(n).fill(0)
+        console.log('deltas', deltas)
+        return deltas.map((d, ix) => {
+          if (ix === 0) {
+              totals[0] = d
+              return [0, d]
+          }
+          const prevEnd = totals[ix - 1]
+          const newEnd = prevEnd + d
+          totals[ix] = newEnd
+          return [prevEnd, newEnd]
+        })
+      }
+
+      const myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Series A',
+            data: waterfallSeries(labels.length, -100, 100),
+            backgroundColor: function (ctx) {
+              const [begin, end] = ctx.raw
+              if (begin > end) return 'red'
+              return 'green'
+            }
+          }]
+        },
+        options: {
+          /* scales: {
+             yAxes: [{
+               ticks: {
+                 beginAtZero: false
+               }
+             }]
+           }, */
+          plugins: {
+            legend: {
+              display: false,
+            }
+          }
+        }
+      })
+    })()
+
+  </script>
+{% endblock %}

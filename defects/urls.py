@@ -19,8 +19,13 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('notifications/', views.notification_list, name='notification_list'),
+    path('home/', views.home, name='home'),
+    path('incidents/', views.incident_list, name='incident_list'),
+    path('incidents/detail/', views.incident_detail, name='incident_detail'),
     path('solutions/', views.solution_list, name='solution_list'),
     path('about/', views.about, name='about'),
+    path('anniversaries/', views.anniversary_list, name='anniversary_list'),
+    path('value/', views.value_dashboard, name='value_dashboard'),
+    path('login/', views.login, name='login'),
     path('admin/', admin.site.urls),
 ]

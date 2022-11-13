@@ -8,7 +8,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-
         count = 0
         for obj in Solution.objects.exclude(actual_completion_date_string='').filter(actual_completion_date=None):
             try:

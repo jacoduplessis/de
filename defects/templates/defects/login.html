@@ -1,0 +1,25 @@
+{% extends 'defects/base.html' %}
+
+{% load static %}
+
+{% block header %}{% endblock %}
+{% block sidebar %}{% endblock %}
+
+{% block extra_styles %}
+  <style>
+    .container-fluid {
+      background-color: #021795;;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+
+  <div class="text-center text-white d-flex align-items-center vh-100 flex-column">
+    <img src="{% static 'anglo-american-logo-white.svg' %}" alt="Anglo Logo" style="width: 300px" class="my-4">
+    <h4>Sign In</h4>
+    <div class="my-5 py-5"></div>
+    <a href="{% url 'home' %}" class="btn btn-light">Authenticate with SSO</a>
+  </div>
+
+{% endblock %}

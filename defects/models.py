@@ -4,6 +4,7 @@ from django.db import models
 
 
 class ReliabilityIncident(models.Model):
+    mine = models.CharField(max_length=200, default='AMB')
     section = models.CharField(max_length=200, blank=True)
     section_engineer = models.CharField(max_length=200)
     time_start = models.DateTimeField()

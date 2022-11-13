@@ -1,0 +1,176 @@
+{% extends 'defects/base.html' %}
+
+{% block content %}
+  <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 mt-3">
+
+    <h2>Reliability Incident TUM_2022_009</h2>
+    <hr>
+
+    <div class="row">
+      <div class="col-12 col-lg-6">
+        <h4>Timeline</h4>
+        {% include 'defects/_timeline_plain.html' %}
+      </div>
+      <div class="col-12 col-lg-6">
+        <h4>Description</h4>
+        {% lorem 1 p %}
+        <table class="table table-bordered">
+          <tbody>
+          <tr>
+            <th>RI Number</th>
+            <td>TUM_2022_009</td>
+          </tr>
+          <tr>
+            <th>Mine</th>
+            <td>AMB</td>
+          </tr>
+          <tr>
+            <th>Section</th>
+            <td>Tumela</td>
+          </tr>
+          <tr>
+            <th>Section Engineer</th>
+            <td>John Doe</td>
+          </tr>
+          <tr>
+            <th>Time</th>
+            <td>2022-10-14 13:20</td>
+          </tr>
+          <tr>
+            <th>Equipment</th>
+            <td>Man Winder</td>
+          </tr>
+          <tr>
+            <th>Significant</th>
+            <td>Yes</td>
+          </tr>
+          <tr>
+            <th>Production Cost</th>
+            <td>1089 Pt Oz</td>
+          </tr>
+          <tr>
+            <th>Rand Cost</th>
+            <td>R38m</td>
+          </tr>
+          <tr>
+            <th>Close Out</th>
+            <td><a href="#">Template</a> / <a href="#">Upload</a></td>
+          </tr>
+          <tr>
+            <th>Report</th>
+            <td><a href="#">Download</a></td>
+          </tr>
+          <tr>
+            <th>RCA Report</th>
+            <td><a href="#">Upload</a></td>
+          </tr>
+
+          </tbody>
+        </table>
+
+        <div class="d-flex mt-4 justify-content-between">
+          <h4>Solutions</h4>
+          <div>
+            <a href="{% url 'solution_list' %}" class="btn btn-sm btn-outline-secondary me-2">View in Solution Tracker</a>
+            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+              Add
+            </button>
+          </div>
+        </div>
+
+        <table class="table table-bordered mt-2">
+          <tbody>
+          <tr>
+            <th colspan="2">Short-Term</th>
+          </tr>
+          <tr>
+            <td>{% lorem 3 w random %}</td>
+            <td class="table-success" style="width: 100px">Complete</td>
+          </tr>
+          <tr>
+            <td>{% lorem 3 w random %}</td>
+            <td class="table-success" style="width: 100px">Complete</td>
+          </tr>
+          <tr>
+            <th colspan="2">Mid-Term</th>
+          </tr>
+          <tr>
+            <td>{% lorem 3 w random %}</td>
+            <td class="table-success" style="width: 100px">Completed</td>
+          </tr>
+          <tr>
+            <td>{% lorem 3 w random %}</td>
+            <td class="table-light" style="width: 100px">In-Progress</td>
+          </tr>
+          <tr>
+            <th colspan="2">Long-Term</th>
+          </tr>
+          <tr>
+            <td>{% lorem 3 w random %}</td>
+            <td class="table-light" style="width: 100px">In-Progress</td>
+          </tr>
+          <tr>
+            <td>{% lorem 3 w random %}</td>
+            <td class="table-success" style="width: 100px">Complete</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+  </main>
+
+
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Add Solution</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="mb-3">
+              <label for="solution-type" class="form-label">Timeframe</label>
+              <select class="form-select" id="solution-type" aria-label="Default select example">
+                <option value="1" selected>Short-Term</option>
+                <option value="2">Mid-Term</option>
+                <option value="3">Long-Term</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="priority" class="form-label">Priority</label>
+              <select class="form-select" id="priority" aria-label="Default select example">
+                <option value="1" selected>A</option>
+                <option value="2">B</option>
+                <option value="3">C</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="solution-description" class="form-label">Description</label>
+              <input type="text" class="form-control" id="solution-description">
+            </div>
+            <div class="mb-3">
+              <label for="person-responsible" class="form-label">Person Responsible</label>
+              <input type="text" class="form-control" id="person-responsible">
+            </div>
+            <div class="mb-3">
+              <label for="planned-completion-date" class="form-label">Planned Completion Date</label>
+              <input type="text" class="form-control" id="planned-completion-date" placeholder="YYYY-MM-DD">
+            </div>
+            <div class="mb-3">
+              <label for="notes" class="form-label">Notes</label>
+              <textarea class="form-control" id="notes" rows="8" placeholder="Add any notes or remarks."></textarea>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
