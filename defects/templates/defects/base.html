@@ -180,14 +180,17 @@
 <body>
 
 {% block header %}
-{% include 'defects/_header.html' %}
+  {% include 'defects/_header.html' %}
 {% endblock %}
 
 <div class="container-fluid">
   <div class="row">
     {% block sidebar %}
-    {% include 'defects/_sidebar.html' %}
+      {% include 'defects/_sidebar.html' %}
     {% endblock sidebar %}
+    {% block messages %}
+      {% include 'defects/_messages.html' %}
+    {% endblock messages %}
 
     {% block content %}
 

@@ -10,6 +10,7 @@
       <h2>Value Dashboard</h2>
     </div>
 
+    <p>Value of Defect Elimination for Amandelbult Mine, Section Tumela, for the past 52 weeks.</p>
     <canvas class="my-4 w-100" id="myChart" width="900" height="380"></canvas>
 
   </main>
@@ -27,22 +28,12 @@
     (() => {
       // Graphs
       const ctx = document.getElementById('myChart')
-      // eslint-disable-next-line no-unused-vars
 
-      const labels = [
-        'Jan',
-        'Feb',
-        'Mar',
-        'Apr',
-        'Jun',
-        'Jul',
-        'Aug',
-        'Sep',
-        'Oct',
-        'Nov',
-        'Des',
-        'Total',
-      ]
+
+      const labels = Array(52).fill(0).map((x, ix) => {
+        return 'Week ' + ix
+      })
+      labels.push('Total')
 
       const randInt = function (min, max) {
         const val = min + (max - min) * Math.random()
@@ -73,11 +64,10 @@
         data: {
           labels: labels,
           datasets: [{
-            label: 'Series A',
-            data: waterfallSeries(labels.length - 1, -100, 100),
+            label: 'Value',
+            data: waterfallSeries(labels.length - 1, -100, 200),
             backgroundColor: function (ctx) {
               if (ctx.dataIndex === labels.length - 1) return 'blue'
-              console.log(ctx)
               const [begin, end] = ctx.raw
               if (begin > end) return 'red'
               return 'green'
