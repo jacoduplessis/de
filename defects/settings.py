@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
+import os
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,13 +22,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-15x5*9x3+++#m4n2#bx+1amx!)w-bi)j(3sr2u%zj*9f2+&f@g'
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-15x5*9x3+++#m4n2#bx+1amx!)w-bi)j(3sr2u%zj*9f2+&f@g')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DJANGO_DEBUG', '0') == '1'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['.hartebees.co.za', '.localhost', '127.0.0.1', '[::1]',]
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.hartebees.co.za',
+]
 
 # Application definition
 
@@ -41,8 +46,8 @@ INSTALLED_APPS = [
     'defects',
 
     'import_export',
-    "crispy_forms",
-    "crispy_bootstrap5",
+    'crispy_forms',
+    'crispy_bootstrap5',
 ]
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
@@ -51,6 +56,7 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -84,10 +90,7 @@ WSGI_APPLICATION = 'defects.wsgi.application'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config('DATABASE_URL', conn_max_age=600),
 }
 
 
@@ -125,7 +128,12 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = os.environ.get('STATIC_ROOT') or BASE_DIR / 'static/'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+
+MEDIA_ROOT = os.environ.get('MEDIA_ROOT') or BASE_DIR / 'media/'
+MEDIA_URL = os.environ.get('MEDIA_URL', '/media/')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
