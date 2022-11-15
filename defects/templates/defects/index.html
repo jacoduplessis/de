@@ -1,6 +1,17 @@
 {% extends 'defects/base.html' %}
 {% load static %}
 
+{% block extra_styles %}
+  <style>
+    .colored-dot {
+      width: 12px;
+      height: 12px;
+      display: inline-block;
+      border-radius: 6px;
+    }
+  </style>
+{% endblock %}
+
 {% block content %}
   <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
 
@@ -21,31 +32,107 @@
 
     <div class="row">
 
-      <div class="col-12 my-3">
+      <div class="col-12 col-lg-6 my-3">
         <h6 class="text-muted">Ongoing Reliability Incidents Per Section</h6>
+        <div class="row mt-4">
+          <div class="col col-lg-6 text-center">
+            <p class="display-6">Concentrator</p>
+            <p class="display-2 fw-bold">2</p>
+          </div>
+          <div class="col col-lg-6 text-center">
+            <p class="display-6">Dishaba</p>
+            <p class="display-2 fw-bold">3</p>
+          </div>
+          <div class="col col-lg-6 text-center">
+            <p class="display-6">Tumela</p>
+            <p class="display-2 fw-bold">3</p>
+          </div>
+          <div class="col col-lg-6 text-center">
+            <p class="display-6">AMS</p>
+            <p class="display-2 fw-bold">4</p>
+          </div>
+        </div>
       </div>
-      <div class="col col-lg-3 text-center">
-        <p class="display-6">Concentrator</p>
-        <p class="display-2 fw-bold">2</p>
+
+      <div class="col-12 col-lg-6 my-3">
+        <h6 class="text-muted">Actions Required</h6>
+
+        <table class="table table-sm table-striped">
+          <thead>
+          <tr>
+            <th>Incident</th>
+            <th>Action</th>
+            <th>Time Left</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td><a href="{% url 'incident_detail' %}" class="text-black">UG1_RI_2022_58</a></td>
+            <td><span class="colored-dot bg-danger"></span> Upload 48h notification</td>
+            <td>3h overdue</td>
+          </tr>
+          <tr>
+            <td><a href="{% url 'incident_detail' %}" class="text-black">UG2_RI_2022_31</a></td>
+            <td><span class="colored-dot bg-danger"></span> Upload final report</td>
+            <td>2d overdue</td>
+          </tr>
+          <tr>
+            <td><a href="{% url 'incident_detail' %}" class="text-black">Mer_RI_2022_37</a></td>
+            <td><span class="colored-dot bg-warning"></span> Review 1-year anniversary</td>
+            <td>2d</td>
+          </tr>
+          <tr>
+            <td><a href="{% url 'incident_detail' %}" class="text-black">UG1_RI_2022_55</a></td>
+            <td><span class="colored-dot bg-warning"></span> Upload 48h notification</td>
+            <td>14h</td>
+          </tr>
+          <tr>
+            <td><a href="{% url 'incident_detail' %}" class="text-black">UG1_RI_2022_12</a></td>
+            <td><span class="colored-dot bg-warning"></span> Distribute 48h notification</td>
+            <td>7h</td>
+          </tr>
+          <tr>
+            <td><a href="{% url 'incident_detail' %}" class="text-black">UG1_RI_2022_09</a></td>
+            <td><span class="colored-dot bg-warning"></span> Upload close-out slide</td>
+            <td>1d</td>
+          </tr>
+          <tr>
+            <td><a href="{% url 'incident_detail' %}" class="text-black">UG1_RI_2022_31</a></td>
+            <td><span class="colored-dot bg-info"></span> Update significant status</td>
+            <td>3d</td>
+          </tr>
+          <tr>
+            <td><a href="{% url 'incident_detail' %}" class="text-black">UG2_RI_2022_49</a></td>
+            <td><span class="colored-dot bg-info"></span> Sign-off required from SEM</td>
+            <td>4d</td>
+          </tr>
+          <tr>
+            <td><a href="{% url 'incident_detail' %}" class="text-black">UG1_RI_2022_02</a></td>
+            <td><span class="colored-dot bg-info"></span> 3 solutions to review</td>
+            <td>4d</td>
+          </tr>
+
+          <tr>
+            <td><a href="{% url 'incident_detail' %}" class="text-black">UG1_RI_2022_14</a></td>
+            <td><span class="colored-dot bg-info"></span> Record solution confidence</td>
+            <td>2w</td>
+          </tr>
+          <tr>
+            <td><a href="{% url 'incident_detail' %}" class="text-black">UG2_RI_2022_20</a></td>
+            <td><span class="colored-dot bg-info"></span> Confirm solution implementation</td>
+            <td>4w</td>
+          </tr>
+
+          </tbody>
+        </table>
       </div>
-      <div class="col col-lg-3 text-center">
-        <p class="display-6">Dishaba</p>
-        <p class="display-2 fw-bold">3</p>
-      </div>
-      <div class="col col-lg-3 text-center">
-        <p class="display-6">Tumela</p>
-        <p class="display-2 fw-bold">3</p>
-      </div>
-      <div class="col col-lg-3 text-center">
-        <p class="display-6">AMS</p>
-        <p class="display-2 fw-bold">4</p>
-      </div>
+
     </div>
 
     <div class="row mt-4">
 
       <div class="col-12">
-        <h6 class="text-muted">Number of Solutions to be implemented</h6>
+        <h6 class="text-muted">Actions Required</h6>
       </div>
       <div class="col-12">
         <canvas class="w-100" id="myChart" width="900" height="300"></canvas>
