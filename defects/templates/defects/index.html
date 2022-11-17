@@ -131,11 +131,13 @@
 
     <div class="row mt-4">
 
-      <div class="col-12">
-        <h6 class="text-muted">Actions Required</h6>
+      <div class="col-12 col-lg-6">
+        <h6 class="text-muted">Number of Ongoing Solutions</h6>
+        <canvas class="w-100" id="myChart" width="900" height="250"></canvas>
       </div>
-      <div class="col-12">
-        <canvas class="w-100" id="myChart" width="900" height="300"></canvas>
+      <div class="col-12 col-lg-6">
+        <h6 class="text-muted">Number of Upcoming Anniversaries</h6>
+        <canvas class="w-100" id="bar-chart" width="900" height="250"></canvas>
       </div>
     </div>
   </main>
@@ -176,6 +178,64 @@
             ],
             lineTension: 0,
             backgroundColor: 'transparent',
+            borderColor: '#007bff',
+            borderWidth: 4,
+            pointBackgroundColor: '#007bff'
+          }]
+        },
+        options: {
+          scales: {
+            yAxes: [{
+              ticks: {
+                beginAtZero: false
+              }
+            }]
+          },
+          plugins: {
+            title: {
+              display: false
+            },
+            legend: {
+              display: false,
+            }
+          }
+        }
+      })
+    })()
+
+  </script>
+
+   <script>
+    /* globals Chart:false, feather:false */
+
+    (() => {
+      // Graphs
+      const ctx = document.getElementById('bar-chart')
+      // eslint-disable-next-line no-unused-vars
+      const myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: [
+            '2022-04',
+            '2022-05',
+            '2022-06',
+            '2022-07',
+            '2022-08',
+            '2022-09',
+            '2022-10'
+          ],
+          datasets: [{
+            data: [
+              6,
+              5,
+              4,
+              15,
+              7,
+              8,
+              9
+            ],
+            lineTension: 0,
+            backgroundColor: '#007bff',
             borderColor: '#007bff',
             borderWidth: 4,
             pointBackgroundColor: '#007bff'
