@@ -44,7 +44,6 @@
       function waterfallSeries(n, min, max) {
         const deltas = Array(n).fill(0).map(x => randInt(min, max))
         const totals = Array(n).fill(0)
-        console.log('deltas', deltas)
         const series = deltas.map((d, ix) => {
           if (ix === 0) {
             totals[0] = d

@@ -27,7 +27,12 @@ urlpatterns = [
     path('solutions/', views.solution_list, name='solution_list'),
     path('about/', views.about, name='about'),
     path('anniversaries/', views.anniversary_list, name='anniversary_list'),
+    path('compliance/', views.compliance_dashboard, name='compliance_dashboard'),
     path('value/', views.value_dashboard, name='value_dashboard'),
     path('login/', views.login, name='login'),
     path('admin/', admin.site.urls),
 ]
+
+""""
+
+"""

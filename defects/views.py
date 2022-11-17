@@ -77,7 +77,7 @@ def incident_create(request):
             'section': widgets.Select(
                 choices=(
                     ('ams', 'AMS'),
-                    ('concentrator', 'Concentrator'),
+                    ('concentrators', 'Concentrators'),
                     ('dishaba', 'Dishaba'),
                     ('tumela', 'Tumela'),
                 )
@@ -105,6 +105,10 @@ def anniversary_list(request):
 
 def value_dashboard(request):
     return render(request, 'defects/value_dashboard.html')
+
+
+def compliance_dashboard(request):
+    return render(request, 'defects/compliance_dashboard.html')
 
 
 def solution_list(request):
