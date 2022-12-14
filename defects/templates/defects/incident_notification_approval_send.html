@@ -1,0 +1,28 @@
+{% extends 'defects/base.html' %}
+
+{% load crispy_forms_filters static %}
+
+{% block content %}
+  <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 mt-3 mb-4">
+
+    <div class="d-flex justify-content-between">
+      <h2>Reliability Incident Approval</h2>
+
+    </div>
+
+    <hr>
+
+    <div>
+      <form method="post">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <input type="submit" value="Submit 48-hr Notification Report for approval and circulation to AS&R Team" class="btn btn-primary">
+      </form>
+    </div>
+    <div>
+
+    </div>
+
+  </main>
+{% endblock %}
+

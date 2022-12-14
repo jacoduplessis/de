@@ -48,7 +48,7 @@
             <p class="display-2 fw-bold">3</p>
           </div>
           <div class="col col-lg-6 text-center">
-            <p class="display-6">AMS</p>
+            <p class="display-6">APS</p>
             <p class="display-2 fw-bold">4</p>
           </div>
         </div>
@@ -140,6 +140,66 @@
         <canvas class="w-100" id="bar-chart" width="900" height="250"></canvas>
       </div>
     </div>
+
+    <div class="row mt-4">
+
+      <div class="col-12 col-lg-6 my-3">
+        <h6 class="text-muted">Equipment Types With Multiple RIs (past 12 months)</h6>
+        <p><small class="text-muted">Click Equipment Type to show incidents</small></p>
+        <table class="table table-sm table-striped">
+          <thead>
+          <tr>
+            <th>Equipment Type</th>
+            <th>Incidents</th>
+          </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><a href="#" class="text-black">Mills</a></td>
+              <td>4</td>
+            </tr>
+            <tr>
+              <td><a href="#" class="text-black">Motors</a></td>
+              <td>7</td>
+            </tr>
+            <tr>
+              <td><a href="#" class="text-black">Pumps</a></td>
+              <td>2</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="col-12 col-lg-6 my-3">
+        <h6 class="text-muted">Equipment With Multiple RIs (past 12 months)</h6>
+        <p><small class="text-muted">Click Equipment ID to show incidents</small></p>
+        <table class="table table-sm table-striped">
+          <thead>
+          <tr>
+            <th>Equipment ID</th>
+            <th>Name</th>
+            <th>Location</th>
+            <th>Incidents</th>
+          </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><a href="#" class="text-black">MI-D-12</a></td>
+              <td>Mill #44</td>
+              <td>xxx</td>
+              <td>3</td>
+            </tr>
+             <tr>
+               <td><a href="#" class="text-black">PM-K-998</a></td>
+              <td>Oil Pump #12</td>
+              <td>xxx</td>
+              <td>5</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
   </main>
 {% endblock %}
 
@@ -205,7 +265,7 @@
 
   </script>
 
-   <script>
+  <script>
     /* globals Chart:false, feather:false */
 
     (() => {

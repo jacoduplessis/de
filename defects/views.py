@@ -3,10 +3,12 @@ import random
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
-from django.forms import modelform_factory
 from defects.models import Solution, ReliabilityIncident
-from django.forms import widgets
 from django.contrib import messages
+from .forms import RILogForm, RINotificationForm, RINotificationApprovalSendForm
+from django.utils.timezone import now
+from datetime import timedelta
+from django.utils.lorem_ipsum import words
 
 
 def index(request):
@@ -49,7 +51,19 @@ def incident_list(request):
 
 
 def incident_detail(request):
-    return render(request, 'defects/incident_detail.html')
+    """
+    Possible States:
+
+    0 - as in initial demo
+    1 - after initial log of RI
+
+    """
+
+    state = request.GET.get('state', '0')
+
+    template_name = f'defects/incident_detail_{state}.html'
+
+    return render(request, template_name=template_name)
 
 
 def incident_create(request):
@@ -57,46 +71,31 @@ def incident_create(request):
         messages.success(request, 'Incident created with RI Number TUM_2022_009')
 
         return HttpResponseRedirect(
-            reverse('incident_detail')
+            reverse('incident_detail') + '?state=1'
         )
 
-    form_class = modelform_factory(
-        ReliabilityIncident,
-        fields=[
-            'description',
-            'time_start',
-            'time_end',
-            'significant',
-            'section',
-            'section_engineer',
-            'equipment',
-            'production_value_loss',
-            'rand_value_loss',
-        ],
-        widgets={
-            'section': widgets.Select(
-                choices=(
-                    ('ams', 'AMS'),
-                    ('concentrators', 'Concentrators'),
-                    ('dishaba', 'Dishaba'),
-                    ('tumela', 'Tumela'),
-                )
-            ),
-            'description': widgets.Textarea(
-                attrs={
-                    'rows': 3,
-                }
-            )
-        },
-        help_texts={
-            'significant': 'Is this a significant incident?'
-        }
-    )
-
     context = {
-        'form': form_class(),
+        'form': RILogForm(),
     }
     return render(request, 'defects/incident_create.html', context)
+
+
+def incident_notification_form(request):
+    if request.method == 'POST':
+        return HttpResponseRedirect(
+            reverse('incident_detail') + '?state=2'
+        )
+
+    initial = {
+        'time_start': now() - timedelta(hours=5),
+        'time_end': now(),
+        'short_description': words(8)
+    }
+
+    context = {
+        'form': RINotificationForm(initial=initial),
+    }
+    return render(request, 'defects/incident_notification_form.html', context)
 
 
 def anniversary_list(request):
@@ -117,6 +116,23 @@ def solution_list(request):
     }
 
     return render(request, 'defects/solutions_list.html', context)
+
+
+def incident_notification_approval_send(request):
+
+    if request.method == 'POST':
+        messages.success(request, 'Notification report has be sent to SEM for approval.')
+
+        return HttpResponseRedirect(
+            reverse('incident_detail') + '?state=3'
+        )
+
+    context = {
+        'form': RINotificationApprovalSendForm()
+    }
+
+    return render(request, 'defects/incident_notification_approval_send.html', context)
+
 
 
 def login(request):

@@ -9,10 +9,68 @@
     <div class="row">
       <div class="col-12 col-lg-6">
         <h4>Timeline</h4>
-        {% include 'defects/_timeline_plain.html' %}
+        <section class="py-3">
+  <ul class="timeline-with-icons">
+    <li class="timeline-item mb-5">
+
+      <span class="timeline-icon" data-feather="alert-circle"></span>
+      <h6>Incident Logged</h6>
+      <p class="mb-2">2022-10-14 18:30</p>
+      <p class="text-muted">Created by Name Surname.</p>
+    </li>
+
+    <li class="timeline-item mb-5">
+
+      <span class="timeline-icon" data-feather="clock"></span>
+      <h6>Notification Created</h6>
+      <p class="mb-2">2022-10-14 21:30</p>
+      <p class="text-muted">Notification with ID 123-ABC created by Name Surname</p>
+    </li>
+
+    <li class="timeline-item mb-5">
+
+      <span class="timeline-icon" data-feather="file"></span>
+      <h6>Report Uploaded</h6>
+      <p class="mb-2">2022-10-14 18:30</p>
+      <p class="text-muted">Report uploaded by Name Surname.</p>
+      <p><a href="#" class="btn btn-sm btn-primary">View Report</a></p>
+    </li>
+
+    <li class="timeline-item mb-5">
+      <span class="timeline-icon" data-feather="layers"></span>
+      <h6>Solutions Reviewed</h6>
+      <p class="mb-2">2022-10-16 18:30</p>
+      <p class="text-muted">During regular weekly meeting. Signed
+      off by User A, User B & User C.</p>
+    </li>
+
+    <li class="timeline-item mb-5">
+      <span class="timeline-icon bg-success text-white" data-feather="check"></span>
+      <h6>Incident Closed</h6>
+      <p class="mb-2">2022-10-16 18:30</p>
+      <p class="text-muted">{% lorem 20 w random %}</p>
+    </li>
+
+    <li class="timeline-item mb-5">
+      <span class="timeline-icon bg-light text-black" data-feather="fast-forward"></span>
+      <h6>Future Actions</h6>
+    </li>
+
+    <li class="timeline-item mb-5">
+      <span class="timeline-icon" data-feather="clock"></span>
+      <h6>One-Year Anniversary Review</h6>
+      <p class="mb-2">2023-10-16</p>
+      <p class="text-muted">{% lorem 20 w random %}</p>
+    </li>
+
+  </ul>
+</section>
+
       </div>
       <div class="col-12 col-lg-6">
-        <h4>Description</h4>
+        <h4>Short Description</h4>
+        {% lorem 8 w %}
+        <h4>Long Description</h4>
         {% lorem 1 p %}
         <table class="table table-bordered">
           <tbody>

@@ -1,0 +1,33 @@
+{% extends 'defects/base.html' %}
+
+{% load crispy_forms_filters %}
+
+{% block content %}
+  <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 mt-3 mb-4">
+
+    <div class="d-flex justify-content-between">
+      <h2>Reliability Incident Notification Data</h2>
+
+    </div>
+
+    <hr>
+
+    <div>
+      <form method="post">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <input type="submit" value="Save" class="btn btn-primary">
+        <input type="submit" value="Save & Publish" class="btn btn-danger">
+        <button role="button" class="btn btn-secondary">Open Value Calculator</button>
+      </form>
+    </div>
+    <div>
+
+    </div>
+
+  </main>
+
+  <!-- Modal -->
+  {% include 'defects/_modal_calculator.html' %}
+
+{% endblock %}

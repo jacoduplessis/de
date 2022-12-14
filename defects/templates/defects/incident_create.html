@@ -1,18 +1,13 @@
 {% extends 'defects/base.html' %}
 
-{% load crispy_forms_filters %}
+{% load crispy_forms_filters static %}
 
 {% block content %}
   <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 mt-3 mb-4">
 
     <div class="d-flex justify-content-between">
       <h2>Log Reliability Incident</h2>
-      <div>
-        <button role="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModal">
-          Open Value
-          Calculator
-        </button>
-      </div>
+
     </div>
 
     <hr>
@@ -21,6 +16,7 @@
       <form method="post">
         {% csrf_token %}
         {{ form|crispy }}
+        <p><small class="text-muted">RI number will be generated upon submission.</small></p>
         <input type="submit" value="Submit" class="btn btn-primary">
       </form>
     </div>
@@ -31,39 +27,32 @@
   </main>
 
   <!-- Modal -->
-  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h1 class="modal-title fs-5" id="exampleModalLabel">Value Calculator</h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form>
-            <div class="mb-3">
-              <label for="solution-type" class="form-label">Mineral</label>
-              <select class="form-select" id="solution-type" aria-label="Default select example">
-                <option value="1" selected>A</option>
-                <option value="2">B</option>
-                <option value="3">C</option>
-              </select>
-            </div>
-            <div class="mb-3">
-              <label for="solution-description" class="form-label">Amount</label>
-              <input type="text" class="form-control" id="solution-description">
-            </div>
-          </form>
-          <div>
-            <p>Calculated Production Value: <strong>xxx.xxxxx</strong></p>
-            <p>Calculated Rand Value: <strong>xxxxxxxx.xx</strong></p>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Use Values</button>
-        </div>
-      </div>
-    </div>
-  </div>
+  {% include 'defects/_modal_calculator.html' %}
 
+{% endblock %}
+
+{% block extra_styles %}
+<link rel="stylesheet" href="{% static 'tom-select.bootstrap5.min.css' %}">
+<link rel="stylesheet" href="{% static 'flatpickr.min.css' %}">
+{% endblock %}
+
+
+{% block extra_scripts %}
+<script src="{% static 'tom-select.complete.min.js' %}"></script>
+  <script>
+  document.querySelectorAll('select').forEach(el => {
+    const settings = { create: false }
+    const ts = new TomSelect(el , settings);
+  })
+  </script>
+  <script src="{% static 'flatpickr.js' %}"></script>
+  <script>
+  document.querySelectorAll('.datetimeinput').forEach(el => {
+    flatpickr(el, {
+      enableTime: true,
+      time_24hr: true,
+      minuteIncrement: 1,
+    });
+  })
+  </script>
 {% endblock %}

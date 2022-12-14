@@ -24,6 +24,8 @@ urlpatterns = [
     path('incidents/', views.incident_list, name='incident_list'),
     path('incidents/create/', views.incident_create, name='incident_create'),
     path('incidents/detail/', views.incident_detail, name='incident_detail'),
+    path('incidents/notification/form/', views.incident_notification_form, name='incident_notification_form'),
+    path('incidents/notification/approval/', views.incident_notification_approval_send, name='incident_notification_approval_send'),
     path('solutions/', views.solution_list, name='solution_list'),
     path('about/', views.about, name='about'),
     path('anniversaries/', views.anniversary_list, name='anniversary_list'),
@@ -33,6 +35,3 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 ]
 
-""""
-
-"""

@@ -1,0 +1,43 @@
+<div class="modal fade" id="calculator-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Value Calculator</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="mb-3">
+            <label for="solution-type" class="form-label">Mineral</label>
+            <select class="form-select" id="solution-type" aria-label="Default select example">
+              <option value="1" selected>A</option>
+              <option value="2">B</option>
+              <option value="3">C</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="solution-description" class="form-label">Amount</label>
+            <input type="text" class="form-control" id="solution-description">
+          </div>
+        </form>
+        <div>
+          <p>Calculated Production Value: <strong>xxx.xxxxx</strong></p>
+          <p>Calculated Rand Value: <strong>xxxxxxxx.xx</strong></p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Use Values</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--
+<div>
+  <button role="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#calculator-modal">
+    Open Value
+    Calculator
+  </button>
+</div>
+-->
