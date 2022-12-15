@@ -166,10 +166,42 @@ class RINotificationForm(forms.ModelForm):
 
 
 class RINotificationApprovalSendForm(forms.Form):
-
     sem = forms.ChoiceField(
         choices=SECTION_ENGINEER_CHOICES,
         required=False,
         label='Section Engineering Manager'
     )
 
+
+class RICloseForm(forms.Form):
+    """
+    Incident description headline	Greyed out field. (from Log Notification.)
+    Date of Incident Ocurrance	    Greyed out field. (from Log Notification.)
+    Immediate Cause	                Freeform text input field. Info pop up icon showing "Incident Description (Production Loss, Asset Damage, Theft, Fire, Etc.)" (from Create 48H Notification Report). Ability to upload photos or pull in  photo(s) from Create 48H Notification Report.
+    Root Cause	                    Freeform text input field.
+    Downtime & Repair Cost	        "Precalculate downtime from incident start and end times in Create 48H Notification Report.
+                                    Precaculate ounces values lost and rand value lost from Create 48H Notification Report.
+                                    Ability to override if necessary for some additional cost / downtime to be incorporated."
+    Short Term Action	            Bullet list entries with accompanying date when to implement dd:mm
+    Medium Term Action	            Bullet list entries with accompanying date when to implement dd:mm
+    Long Term Action	            Bullet list entries with accompanying date when to implement dd:mm
+    Reliability Engineering
+    Close Out Confidence	        Rating out of 5 Stars
+    Email the following people
+    to rate Close out confidience	Dropdown searchable list of other SE and SEM to complete close out rating
+    """
+    short_description = forms.CharField(required=False)
+    incident_date = forms.DateField(required=False)
+    immediate_cause = forms.CharField(widget=widgets.Textarea(), required=False)
+    root_cause = forms.CharField(widget=widgets.Textarea(), required=False)
+    downtime_repair_cost = forms.CharField(widget=widgets.Textarea(), required=False)
+    short_term_action = forms.CharField(widget=widgets.Textarea(), required=False)
+    medium_term_action = forms.CharField(widget=widgets.Textarea(), required=False)
+    long_term_action = forms.CharField(widget=widgets.Textarea(), required=False)
+    re_close_out_confidence_rating = forms.ChoiceField(
+        choices=[(f'{x}', f'{x}') for x in range(1, 6)],
+    )
+    re_close_out_confidence_raters = forms.MultipleChoiceField(
+        choices=SECTION_ENGINEER_CHOICES,
+        required=False
+    )

@@ -1,0 +1,29 @@
+{% extends 'defects/base.html' %}
+
+{% load crispy_forms_filters %}
+
+{% block content %}
+  <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 mt-3 mb-4">
+
+    <div class="d-flex justify-content-between">
+      <h2>Reliability Incident Close Out Data</h2>
+
+    </div>
+
+    <hr>
+
+    <div>
+      <form method="post">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <input type="submit" value="Save" class="btn btn-primary">
+        <input type="submit" value="Save & Publish" class="btn btn-danger">
+      </form>
+    </div>
+    <div>
+
+    </div>
+
+  </main>
+
+{% endblock %}

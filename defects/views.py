@@ -5,7 +5,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from defects.models import Solution, ReliabilityIncident
 from django.contrib import messages
-from .forms import RILogForm, RINotificationForm, RINotificationApprovalSendForm
+from .forms import RILogForm, RINotificationForm, RINotificationApprovalSendForm, RICloseForm
 from django.utils.timezone import now
 from datetime import timedelta
 from django.utils.lorem_ipsum import words
@@ -96,6 +96,24 @@ def incident_notification_form(request):
         'form': RINotificationForm(initial=initial),
     }
     return render(request, 'defects/incident_notification_form.html', context)
+
+
+def incident_close_form(request):
+    if request.method == 'POST':
+
+        return HttpResponseRedirect(
+            reverse('incident_detail')  # todo: add state
+        )
+
+    initial = {
+        'incident_date': now(),
+        'short_description': words(8)
+    }
+
+    context = {
+        'form': RICloseForm(initial=initial),
+    }
+    return render(request, 'defects/incident_close_form.html', context)
 
 
 def anniversary_list(request):
