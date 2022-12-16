@@ -60,24 +60,12 @@ class TimelineEntry:
     icon_classes: str = ''
     link_url: str = '#'
     link_text: str = ''
+    secondary_link_text: str = ''
     text: str = ''
 
 
 def incident_detail(request):
     """
-    Possible States:
-
-    1 - after initial log of RI
-    2 - after 48-hour notification data added
-    3 - after 48-hour notification sent for SEM approval
-    4 - after response from SEM approval
-    5 - incident marked as significant / requiring RCA
-    6 - RCA report uploaded or dismissed
-    7 - RCA report submitted for SEM approval
-    8 - RCA report submitted for senior AM approval
-    9 - close out submitted
-    10 - incident closed
-    11 - incident close-out sent to scheduler
     """
 
     state = request.GET.get('state', '0')
@@ -211,7 +199,8 @@ def incident_detail(request):
                 title='Is a full RCA Report required?',
                 text='Note that full RCA investigation must be scheduled, conducted and the full RCA report must be submitted within 14 days of submitting the 48-hr Notification Report.',
                 link_text='Mark incident as requiring RCA',
-                link_url=reverse('incident_detail') + '?state=5'
+                link_url=reverse('incident_detail') + '?state=5',
+                secondary_link_text='RCA Report not required'
             )
         ]
 

@@ -6,7 +6,11 @@
     <p class="text-muted">{{ entry.text }}</p>
   {% endif %}
   {% if entry.link_text and entry.link_url %}
-    <p><a href="{{ entry.link_url }}" class="btn btn-sm btn-primary">{{ entry.link_text }}</a>
+    <p>
+      <a href="{{ entry.link_url }}" class="btn btn-sm btn-primary">{{ entry.link_text }}</a>
+    {% if entry.secondary_link_text %}
+      <a href="#" class="btn btn-sm btn-secondary">{{ entry.secondary_link_text }}</a>
+    {% endif %}
     </p>
   {% endif %}
 </li>
