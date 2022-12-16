@@ -10,67 +10,32 @@
       <div class="col-12 col-lg-6">
         <h4>Timeline</h4>
         <section class="py-3">
-  <ul class="timeline-with-icons">
-    <li class="timeline-item mb-5">
+          <ul class="timeline-with-icons">
 
-      <span class="timeline-icon" data-feather="alert-circle"></span>
-      <h6>Incident Logged</h6>
-      <p class="mb-2">2022-10-14 18:30</p>
-      <p class="text-muted">Created by Name Surname.</p>
-    </li>
+            {% for entry in timeline %}
+              {% include 'defects/_timeline_entry.html' with entry=entry %}
+            {% endfor %}
 
-    <li class="timeline-item mb-5">
 
-      <span class="timeline-icon" data-feather="clock"></span>
-      <h6>Notification Created</h6>
-      <p class="mb-2">2022-10-14 21:30</p>
-      <p class="text-muted">Notification with ID 123-ABC created by Name Surname</p>
-    </li>
+            {% if actions %}
+            <li class="timeline-item mb-5">
+              <span class="timeline-icon bg-light text-black" data-feather="fast-forward"></span>
+              <h6>Future Actions</h6>
+            </li>
+            {% endif %}
 
-    <li class="timeline-item mb-5">
+            {% for entry in actions %}
+              {% include 'defects/_timeline_entry.html' with entry=entry %}
+            {% endfor %}
 
-      <span class="timeline-icon" data-feather="file"></span>
-      <h6>Report Uploaded</h6>
-      <p class="mb-2">2022-10-14 18:30</p>
-      <p class="text-muted">Report uploaded by Name Surname.</p>
-      <p><a href="#" class="btn btn-sm btn-primary">View Report</a></p>
-    </li>
-
-    <li class="timeline-item mb-5">
-      <span class="timeline-icon" data-feather="layers"></span>
-      <h6>Solutions Reviewed</h6>
-      <p class="mb-2">2022-10-16 18:30</p>
-      <p class="text-muted">During regular weekly meeting. Signed
-      off by User A, User B & User C.</p>
-    </li>
-
-    <li class="timeline-item mb-5">
-      <span class="timeline-icon bg-success text-white" data-feather="check"></span>
-      <h6>Incident Closed</h6>
-      <p class="mb-2">2022-10-16 18:30</p>
-      <p class="text-muted">{% lorem 20 w random %}</p>
-    </li>
-
-    <li class="timeline-item mb-5">
-      <span class="timeline-icon bg-light text-black" data-feather="fast-forward"></span>
-      <h6>Future Actions</h6>
-    </li>
-
-    <li class="timeline-item mb-5">
-      <span class="timeline-icon" data-feather="clock"></span>
-      <h6>One-Year Anniversary Review</h6>
-      <p class="mb-2">2023-10-16</p>
-      <p class="text-muted">{% lorem 20 w random %}</p>
-    </li>
-
-  </ul>
-</section>
+          </ul>
+        </section>
 
       </div>
       <div class="col-12 col-lg-6">
         <h4>Short Description</h4>
         {% lorem 8 w %}
-        <h4>Long Description</h4>
+        <h4 class="mt-3">Long Description</h4>
         {% lorem 1 p %}
         <table class="table table-bordered">
           <tbody>
@@ -112,33 +77,32 @@
           </tr>
           <tr>
             <th>48h Notification</th>
-            <td><a href="#">Template</a> / <a href="#">Upload</a></td>
+            <td>{% if reports.notification %}<a href="#">Download</a>{% else %}---{% endif %}</td>
           </tr>
           <tr>
             <th>Close Out</th>
-            <td><a href="#">Template</a> / <a href="#">Upload</a></td>
-          </tr>
-          <tr>
-            <th>Report</th>
-            <td><a href="#">Download</a></td>
+            <td>{% if reports.close %}<a href="#">Download</a>{% else %}---{% endif %}</td>
           </tr>
           <tr>
             <th>RCA Report</th>
-            <td><a href="#">Upload</a></td>
+            <td>{% if reports.rca %}<a href="#">Download</a>{% else %}---{% endif %}</td>
           </tr>
 
           </tbody>
         </table>
 
+        {% comment %}
         <div class="d-flex mt-4 justify-content-between">
           <h4>Solutions</h4>
           <div>
-            <a href="{% url 'solution_list' %}" class="btn btn-sm btn-outline-secondary me-2">View in Solution Tracker</a>
+            <a href="{% url 'solution_list' %}" class="btn btn-sm btn-outline-secondary me-2">View in Solution
+              Tracker</a>
             <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
               Add
             </button>
           </div>
         </div>
+
 
         <table class="table table-bordered mt-2">
           <tbody>
@@ -177,6 +141,7 @@
           </tr>
           </tbody>
         </table>
+        {% endcomment %}
       </div>
 
     </div>

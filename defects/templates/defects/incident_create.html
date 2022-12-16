@@ -41,7 +41,7 @@
 <script src="{% static 'tom-select.complete.min.js' %}"></script>
   <script>
   document.querySelectorAll('select').forEach(el => {
-    const settings = { create: false }
+    const settings = { create: false, placeholder: 'Start typing to search...' }
     const ts = new TomSelect(el , settings);
   })
   </script>

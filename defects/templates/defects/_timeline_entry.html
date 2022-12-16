@@ -1,0 +1,12 @@
+<li class="timeline-item mb-5">
+  <span class="timeline-icon {{ entry.icon_classes }}" data-feather="{{ entry.icon }}"></span>
+  <h6>{{ entry.title }}</h6>
+  <p class="mb-2">{{ entry.time|date:'Y-m-d H:i' }}{% if entry.until %} – {{ entry.until|date:'Y-m-d H:i' }}{% endif %}</p>
+  {% if entry.text %}
+    <p class="text-muted">{{ entry.text }}</p>
+  {% endif %}
+  {% if entry.link_text and entry.link_url %}
+    <p><a href="{{ entry.link_url }}" class="btn btn-sm btn-primary">{{ entry.link_text }}</a>
+    </p>
+  {% endif %}
+</li>

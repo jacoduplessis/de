@@ -3,6 +3,7 @@ from django.forms import widgets
 from .models import ReliabilityIncident
 
 EQUIPMENT_CHOICES = (
+    ('', ''),
     ('x-123-abc', 'Pump #12 (ID xxx)'),
     ('x-234-abc', 'Mill #6 (ID xxx)'),
     ('x-345-abc', 'Motor #44 (ID xxx)'),
@@ -122,9 +123,9 @@ class RINotificationForm(forms.ModelForm):
             'long_description',
             'possible_effect',
             'production_value_loss',
+            'rand_value_loss',
             'immediate_action_taken',
             'remaining_risk',
-            'rand_value_loss',
             'significant',
         ]
         labels = {
@@ -200,8 +201,19 @@ class RICloseForm(forms.Form):
     long_term_action = forms.CharField(widget=widgets.Textarea(), required=False)
     re_close_out_confidence_rating = forms.ChoiceField(
         choices=[(f'{x}', f'{x}') for x in range(1, 6)],
+        label='RE Close-Out Confidence rating',
+        required=False,
+        help_text='Provide confidence rating out of 5.'
     )
-    re_close_out_confidence_raters = forms.MultipleChoiceField(
+    se_close_out_confidence = forms.ChoiceField(
         choices=SECTION_ENGINEER_CHOICES,
-        required=False
+        required=False,
+        label='SE Close-Out Confidence',
+        help_text='The SE selected here will be notified and asked to provide a confidence rating.',
+    )
+    sem_close_out_confidence = forms.ChoiceField(
+        choices=SECTION_ENGINEER_CHOICES,
+        required=False,
+        label='SEM Close-Out Confidence',
+        help_text='The SEM selected here will be notified and asked to provide a confidence rating.'
     )
