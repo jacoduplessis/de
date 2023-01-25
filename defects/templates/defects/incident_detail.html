@@ -91,7 +91,7 @@
           </tbody>
         </table>
 
-        {% comment %}
+        {% if request.GET.solutions == '1' %}
         <div class="d-flex mt-4 justify-content-between">
           <h4>Solutions</h4>
           <div>
@@ -141,7 +141,7 @@
           </tr>
           </tbody>
         </table>
-        {% endcomment %}
+        {% endif %}
       </div>
 
     </div>
