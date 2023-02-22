@@ -18,10 +18,23 @@
       </div>
     </div>
 
+    <div class="d-flex align-items-center">
+      <span>With selected:</span>
+      <form method="post" class="d-flex">
+        {% csrf_token %}
+        <select name="action" class="form-select form-select-sm mx-2" style="max-width: 150px">
+          <option value="schedule">Schedule</option>
+          <option value="completion">Mark As Complete</option>
+        </select>
+        <input type="submit" class="btn btn-sm btn-outline-secondary" value="Execute">
+      </form>
+    </div>
+
     <div class="table-responsive">
       <table class="table table-striped table-hover">
         <thead>
         <tr>
+          <th><input type="checkbox" class="checkbox-toggle-all"></th>
           <th>Status</th>
           <th>Description</th>
           <th>Timeframe</th>
@@ -35,6 +48,7 @@
         <tbody>
         {% for solution in solutions %}
           <tr>
+            <td><input type="checkbox" class="checkbox-table-row"></td>
             <td class="text-nowrap solution-status">{{ solution.status }}</td>
             <td class="text-nowrap">{{ solution.description|truncatewords:'4' }}</td>
             <td class="text-nowrap">Short-Term</td>
@@ -55,6 +69,13 @@
 {% block extra_scripts %}
 
   <script>
+
+    document.querySelector('.checkbox-toggle-all').addEventListener('click', e => {
+      document.querySelectorAll('.checkbox-table-row').forEach(el => {
+        el.checked = e.target.checked
+      })
+    })
+
     document.querySelectorAll('.solution-status').forEach(el => {
 
       const badge = document.createElement('span')

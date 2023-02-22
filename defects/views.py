@@ -420,8 +420,45 @@ def incident_close_form(request):
 
 
 def anniversary_list(request):
-    return render(request, 'defects/anniversary_list.html')
+    incidents = ReliabilityIncident.objects.all()[:10]
 
+    context = {
+        'incidents': incidents
+    }
+
+    return render(request, 'defects/anniversary_list.html', context=context)
+
+def solution_schedule(request):
+
+    if request.method == 'GET':
+
+        context = {
+            'solutions': Solution.objects.all()[:5]
+        }
+
+        return render(request, 'defects/solutions_schedule.html', context=context)
+
+    if request.method == 'POST':
+        messages.success(request, '5 solutions have been scheduled.')
+        return HttpResponseRedirect(
+            reverse('solution_list')
+        )
+
+def solution_completion(request):
+
+    if request.method == 'GET':
+
+        context = {
+            'solutions': Solution.objects.all()[:5]
+        }
+
+        return render(request, 'defects/solutions_completion.html', context=context)
+
+    if request.method == 'POST':
+        messages.success(request, '5 solutions have been processed.')
+        return HttpResponseRedirect(
+            reverse('solution_list')
+        )
 
 def value_dashboard(request):
     return render(request, 'defects/value_dashboard.html')
@@ -432,6 +469,21 @@ def compliance_dashboard(request):
 
 
 def solution_list(request):
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        print('action', action)
+
+        if action == 'completion':
+            return HttpResponseRedirect(
+                reverse('solution_completion')
+            )
+
+        if action == 'schedule':
+            return HttpResponseRedirect(
+                reverse('solution_schedule')
+            )
+
     context = {
         'solutions': Solution.objects.all()
     }

@@ -1,0 +1,80 @@
+{% extends 'defects/base.html' %}
+
+{% block content %}
+
+  <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 mt-3">
+
+    <div class="d-flex justify-content-between mb-3">
+      <h2>Schedule Solutions</h2>
+    </div>
+
+    <div class="d-flex justify-content-between">
+      <p>The following solutions have been selected for scheduling. Please add dates and submit.</p>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-striped table-hover">
+        <thead>
+        <tr>
+          <th>Status</th>
+          <th>Description</th>
+          <th>Timeframe</th>
+          <th>Priority</th>
+          <th>Planned Completion Date</th>
+          <th>Remarks</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for solution in solutions %}
+          <tr>
+            <td class="text-nowrap solution-status">Identified</td>
+            <td class="text-nowrap">{{ solution.description|truncatewords:'4' }}</td>
+            <td class="text-nowrap">Short-Term</td>
+            <td class="text-nowrap">A</td>
+            <td class="text-nowrap"><input type="date" class="form-control"></td>
+            <td class="text-nowrap">{{ solution.remarks }}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <form method="post">
+        {% csrf_token %}
+        <input type="submit" class="btn btn-primary" value="Submit">
+      </form>
+    </div>
+  </main>
+
+{% endblock %}
+
+{% block extra_scripts %}
+
+  <script>
+
+    document.querySelectorAll('.solution-status').forEach(el => {
+
+      const badge = document.createElement('span')
+      badge.classList.add('badge')
+      const text = el.textContent.toLowerCase()
+      switch (text) {
+        case 'complete': {
+          badge.classList.add('text-bg-success')
+          break
+        }
+        case 'identified': {
+          badge.classList.add('text-bg-secondary')
+          break
+        }
+        default: {
+          return
+        }
+      }
+
+      badge.textContent = text
+      el.textContent = ''
+      el.appendChild(badge)
+
+    })
+  </script>
+{% endblock %}
