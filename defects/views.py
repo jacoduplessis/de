@@ -441,7 +441,7 @@ def solution_schedule(request):
     if request.method == 'POST':
         messages.success(request, '5 solutions have been scheduled.')
         return HttpResponseRedirect(
-            reverse('solution_list')
+            reverse('solution_list') + '?filter=1&solution_status=scheduled'
         )
 
 def solution_completion(request):
@@ -457,7 +457,7 @@ def solution_completion(request):
     if request.method == 'POST':
         messages.success(request, '5 solutions have been processed.')
         return HttpResponseRedirect(
-            reverse('solution_list')
+            reverse('solution_list') + '?filter=1&solution_status=complete'
         )
 
 def value_dashboard(request):
@@ -472,7 +472,6 @@ def solution_list(request):
 
     if request.method == 'POST':
         action = request.POST.get('action')
-        print('action', action)
 
         if action == 'completion':
             return HttpResponseRedirect(
@@ -484,8 +483,12 @@ def solution_list(request):
                 reverse('solution_schedule')
             )
 
+    qs = Solution.objects.all()
+    if request.GET.get('filter'):
+        qs = qs[:6]
+
     context = {
-        'solutions': Solution.objects.all()
+        'solutions': qs
     }
 
     return render(request, 'defects/solutions_list.html', context)

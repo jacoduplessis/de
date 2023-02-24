@@ -21,17 +21,19 @@
           <th>Timeframe</th>
           <th>Priority</th>
           <th>Planned Completion Date</th>
+          <th>DR Number</th>
           <th>Remarks</th>
         </tr>
         </thead>
         <tbody>
         {% for solution in solutions %}
           <tr>
-            <td class="text-nowrap solution-status">Identified</td>
+            <td class="text-nowrap solution-status">identified</td>
             <td class="text-nowrap">{{ solution.description|truncatewords:'4' }}</td>
             <td class="text-nowrap">Short-Term</td>
             <td class="text-nowrap">A</td>
             <td class="text-nowrap"><input type="date" class="form-control"></td>
+            <td><input type="text" class="form-control" style="min-width: 120px"></td>
             <td class="text-nowrap">{{ solution.remarks }}</td>
           </tr>
         {% endfor %}
@@ -64,6 +66,10 @@
         }
         case 'identified': {
           badge.classList.add('text-bg-secondary')
+          break
+        }
+        case 'scheduled': {
+          badge.classList.add('text-bg-primary')
           break
         }
         default: {

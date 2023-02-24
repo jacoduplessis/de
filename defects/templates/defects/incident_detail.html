@@ -18,10 +18,10 @@
 
 
             {% if actions %}
-            <li class="timeline-item mb-5">
-              <span class="timeline-icon bg-light text-black" data-feather="fast-forward"></span>
-              <h6>Future Actions</h6>
-            </li>
+              <li class="timeline-item mb-5">
+                <span class="timeline-icon bg-light text-black" data-feather="fast-forward"></span>
+                <h6>Future Actions</h6>
+              </li>
             {% endif %}
 
             {% for entry in actions %}
@@ -92,55 +92,56 @@
         </table>
 
         {% if request.GET.solutions == '1' %}
-        <div class="d-flex mt-4 justify-content-between">
-          <h4>Solutions</h4>
-          <div>
-            <a href="{% url 'solution_list' %}" class="btn btn-sm btn-outline-secondary me-2">View in Solution
-              Tracker</a>
-            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-              Add
-            </button>
+          <div class="d-flex mt-4 justify-content-between">
+            <h4>Solutions</h4>
+            <div>
+              <a href="{% url 'solution_list' %}?filter=1&solution_status=identified" class="btn btn-sm btn-outline-secondary me-2">View in Solution
+                Tracker</a>
+              <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                      data-bs-target="#exampleModal">
+                Add
+              </button>
+            </div>
           </div>
-        </div>
 
 
-        <table class="table table-bordered mt-2">
-          <tbody>
-          <tr>
-            <th colspan="2">Short-Term</th>
-          </tr>
-          <tr>
-            <td>{% lorem 3 w random %}</td>
-            <td class="table-success" style="width: 100px">Complete</td>
-          </tr>
-          <tr>
-            <td>{% lorem 3 w random %}</td>
-            <td class="table-success" style="width: 100px">Complete</td>
-          </tr>
-          <tr>
-            <th colspan="2">Mid-Term</th>
-          </tr>
-          <tr>
-            <td>{% lorem 3 w random %}</td>
-            <td class="table-success" style="width: 100px">Completed</td>
-          </tr>
-          <tr>
-            <td>{% lorem 3 w random %}</td>
-            <td class="table-light" style="width: 100px">Identified</td>
-          </tr>
-          <tr>
-            <th colspan="2">Long-Term</th>
-          </tr>
-          <tr>
-            <td>{% lorem 3 w random %}</td>
-            <td class="table-light" style="width: 100px">Identified</td>
-          </tr>
-          <tr>
-            <td>{% lorem 3 w random %}</td>
-            <td class="table-primary" style="width: 100px">Scheduled</td>
-          </tr>
-          </tbody>
-        </table>
+          <table class="table table-bordered mt-2">
+            <tbody>
+            <tr>
+              <th colspan="2">Short-Term</th>
+            </tr>
+            <tr>
+              <td data-toggle="tooltip" title="Section Engineer: {% lorem 30 w random %}">{% lorem 3 w random %}</td>
+              <td class="table-success" style="width: 100px">Complete</td>
+            </tr>
+            <tr>
+              <td>{% lorem 3 w random %}</td>
+              <td class="table-success" style="width: 100px">Complete</td>
+            </tr>
+            <tr>
+              <th colspan="2">Mid-Term</th>
+            </tr>
+            <tr>
+              <td>{% lorem 3 w random %}</td>
+              <td class="table-success" style="width: 100px">Completed</td>
+            </tr>
+            <tr>
+              <td>{% lorem 3 w random %}</td>
+              <td class="table-light" style="width: 100px">Identified</td>
+            </tr>
+            <tr>
+              <th colspan="2">Long-Term</th>
+            </tr>
+            <tr>
+              <td>{% lorem 3 w random %}</td>
+              <td class="table-light" style="width: 100px">Identified</td>
+            </tr>
+            <tr>
+              <td>{% lorem 3 w random %}</td>
+              <td class="table-primary" style="width: 100px">Scheduled</td>
+            </tr>
+            </tbody>
+          </table>
         {% endif %}
       </div>
 
@@ -200,4 +201,10 @@
       </div>
     </div>
   </div>
+
+  <script>
+    $(function () {
+      $('[data-toggle="tooltip"]').tooltip()
+    })
+  </script>
 {% endblock %}

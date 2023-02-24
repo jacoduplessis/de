@@ -9,7 +9,11 @@
     </div>
 
     <div class="d-flex justify-content-between">
-      <p>Viewing Solutions for Amandelbult Mine, Section: Concentrators.</p>
+      {% if request.GET.filter == '1' %}
+        <p>Viewing solutions for Reliability Incident <strong>TUM_2022_009</strong>.</p>
+      {% else %}
+        <p>Viewing solutions for <strong>Amandelbult Mine, Section: Concentrators</strong>.</p>
+      {% endif %}
       <div>
         <a href="#" class="btn btn-outline-secondary btn-sm">Export</a>
         <a href="#" class="btn btn-outline-secondary btn-sm">Filter</a>
@@ -49,7 +53,7 @@
         {% for solution in solutions %}
           <tr>
             <td><input type="checkbox" class="checkbox-table-row"></td>
-            <td class="text-nowrap solution-status">{{ solution.status }}</td>
+            <td class="text-nowrap solution-status">{% if request.GET.solution_status %}{{ request.GET.solution_status }}{% else %}{{ solution.status }}{% endif %}</td>
             <td class="text-nowrap">{{ solution.description|truncatewords:'4' }}</td>
             <td class="text-nowrap">Short-Term</td>
             <td class="text-nowrap">A</td>
@@ -86,8 +90,12 @@
           badge.classList.add('text-bg-success')
           break
         }
-        case 'in progress': {
+        case 'identified': {
           badge.classList.add('text-bg-secondary')
+          break
+        }
+        case 'scheduled': {
+          badge.classList.add('text-bg-primary')
           break
         }
         default: {
