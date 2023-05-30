@@ -1,6 +1,37 @@
 from decimal import Decimal
 
 from django.db import models
+from django.contrib.auth.models import User
+
+
+class Section(models.Model):
+    name = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.name
+
+
+class SectionEngineer(models.Model):
+    name = models.CharField(max_length=200)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+
+
+class SectionEngineeringManager(models.Model):
+    name = models.CharField(max_length=200)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+
+
+class SeniorAssetManager(models.Model):
+    name = models.CharField(max_length=200)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+
+
+class Equipment(models.Model):
+    code = models.CharField(unique=True)
+    name = models.CharField(max_length=200)
+
+    def __str__(self):
+        return f'{self.code} – {self.name}'
 
 
 class ReliabilityIncident(models.Model):
@@ -43,3 +74,42 @@ class Solution(models.Model):
     dr_number = models.CharField(max_length=200, blank=True)
     remarks = models.TextField(blank=True)
     area = models.CharField(max_length=200, blank=True)
+
+
+class Approval(models.Model):
+    ACCEPTED = 'accepted'
+    REJECTED = 'rejected'
+
+    OUTCOME_CHOICES = (
+        (ACCEPTED, "Accepted"),
+        (REJECTED, "Rejected"),
+    )
+
+    NOTIFICATION = 'notification'
+    RCA = 'rca'
+
+    TYPE_CHOICES = (
+        (NOTIFICATION, "Notification"),
+        (RCA, "RCA"),
+    )
+
+    ENGINEERING_MANAGER = "engineering_manager"
+    SECTION_ENGINEERING_MANAGER = "section_engineering_manager"
+    SENIOR_ASSET_MANAGER = "senior_asset_manager"
+
+    ROLE_CHOICES = (
+        (ENGINEERING_MANAGER, "EM"),
+        (SECTION_ENGINEERING_MANAGER, "SEM"),
+        (SENIOR_ASSET_MANAGER, "Senior AM"),
+    )
+
+    reliability_incident = models.ForeignKey(ReliabilityIncident, on_delete=models.SET_NULL, null=True)
+
+    time_created = models.DateTimeField(auto_now_add=True)
+    time_modified = models.DateTimeField(auto_now=True)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    name = models.CharField(max_length=200)
+    role = models.CharField(max_length=200, choices=ROLE_CHOICES)
+    type = models.CharField(max_length=100, choices=TYPE_CHOICES)
+    outcome = models.CharField(max_length=100, choices=OUTCOME_CHOICES)
+    comment = models.TextField(blank=True)
