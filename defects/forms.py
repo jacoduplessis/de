@@ -75,13 +75,15 @@ class RILogForm(forms.ModelForm):
         }
 
 
+class MultipleFileInput(forms.ClearableFileInput):
+    allow_multiple_selected = True
+
+
 class RINotificationForm(forms.ModelForm):
     pictures = forms.FileField(
         required=False,
         help_text="If applicable.",
-        widget=widgets.FileInput(
-            attrs={"multiple": True},
-        ),
+        widget=MultipleFileInput()
     )
 
     """
