@@ -3,36 +3,36 @@ from django.forms import widgets
 from .models import ReliabilityIncident
 
 EQUIPMENT_CHOICES = (
-    ('', ''),
-    ('x-123-abc', 'Pump #12 (ID xxx)'),
-    ('x-234-abc', 'Mill #6 (ID xxx)'),
-    ('x-345-abc', 'Motor #44 (ID xxx)'),
-    ('x-456-abc', 'Hoist #1 (ID xxx)'),
+    ("", ""),
+    ("x-123-abc", "Pump #12 (ID xxx)"),
+    ("x-234-abc", "Mill #6 (ID xxx)"),
+    ("x-345-abc", "Motor #44 (ID xxx)"),
+    ("x-456-abc", "Hoist #1 (ID xxx)"),
 )
 
 AREA_CHOICES = (
-    ('aps', 'APS'),
-    ('concentrators', 'Concentrators'),
-    ('dishaba', 'Dishaba'),
-    ('tumela', 'Tumela'),
+    ("aps", "APS"),
+    ("concentrators", "Concentrators"),
+    ("dishaba", "Dishaba"),
+    ("tumela", "Tumela"),
 )
 
 SECTION_CHOICES = (
-    ('phoko', 'Phoko Substation'),
-    ('merensky-bunkers', 'Merensky Bunkers'),
+    ("phoko", "Phoko Substation"),
+    ("merensky-bunkers", "Merensky Bunkers"),
 )
 
 SECTION_ENGINEER_CHOICES = (
-    ('a', 'Alice'),
-    ('b', 'Bob'),
-    ('c', 'Chris'),
-    ('d', 'Dennis'),
+    ("a", "Alice"),
+    ("b", "Bob"),
+    ("c", "Chris"),
+    ("d", "Dennis"),
 )
 
 EFFECT_CHOICES = (
-    ('repair', 'Estimated cost of Repair > R 250K'),
-    ('production_loss', 'Production Loss > 3 hours'),
-    ('shift_loss', 'Loss of Full Production shift or Evacuation of shift'),
+    ("repair", "Estimated cost of Repair > R 250K"),
+    ("production_loss", "Production Loss > 3 hours"),
+    ("shift_loss", "Loss of Full Production shift or Evacuation of shift"),
 )
 
 
@@ -54,40 +54,35 @@ class RILogForm(forms.ModelForm):
     class Meta:
         model = ReliabilityIncident
         fields = [
-            'short_description',
-            'equipment',
-            'section',
-            'section_engineer',
-            'time_start',
-            'time_end',
+            "short_description",
+            "equipment",
+            "section",
+            "section_engineer",
+            "time_start",
+            "time_end",
         ]
         labels = {
-            'short_description': 'Short Description',
-            'section_engineer': 'Section Engineer',
-            'time_start': 'Incident Start Time',
-            'time_end': 'Incident End Time',
-            'equipment': 'Equipment (from SAP)'
+            "short_description": "Short Description",
+            "section_engineer": "Section Engineer",
+            "time_start": "Incident Start Time",
+            "time_end": "Incident End Time",
+            "equipment": "Equipment (from SAP)",
         }
         widgets = {
-            'section': widgets.Select(
-                choices=SECTION_CHOICES
-            ),
-            'section_engineer': widgets.Select(
-                choices=SECTION_ENGINEER_CHOICES
-            ),
-            'equipment': widgets.Select(
-                choices=EQUIPMENT_CHOICES
-            ),
+            "section": widgets.Select(choices=SECTION_CHOICES),
+            "section_engineer": widgets.Select(choices=SECTION_ENGINEER_CHOICES),
+            "equipment": widgets.Select(choices=EQUIPMENT_CHOICES),
         }
 
 
 class RINotificationForm(forms.ModelForm):
     pictures = forms.FileField(
         required=False,
-        help_text='If applicable.',
+        help_text="If applicable.",
         widget=widgets.FileInput(
-            attrs={'multiple': True},
-        ))
+            attrs={"multiple": True},
+        ),
+    )
 
     """
     Operation	                                Greyed out field (Prepoulated with Amandelbult Complex)	Non-negotiable?
@@ -113,65 +108,51 @@ class RINotificationForm(forms.ModelForm):
     class Meta:
         model = ReliabilityIncident
         fields = [
-            'area',
-            'section',
-            'section_engineer',
-            'equipment',
-            'time_start',
-            'time_end',
-            'short_description',
-            'long_description',
-            'possible_effect',
-            'production_value_loss',
-            'rand_value_loss',
-            'immediate_action_taken',
-            'remaining_risk',
-            'significant',
+            "area",
+            "section",
+            "section_engineer",
+            "equipment",
+            "time_start",
+            "time_end",
+            "short_description",
+            "long_description",
+            "possible_effect",
+            "production_value_loss",
+            "rand_value_loss",
+            "immediate_action_taken",
+            "remaining_risk",
+            "significant",
         ]
         labels = {
-            'short_description': 'Short Description',
-            'long_description': 'Incident Description',
-            'section_engineer': 'Section Engineer',
-            'time_start': 'Incident Start Time',
-            'time_end': 'Incident End Time',
-            'equipment': 'Equipment (from SAP)',
+            "short_description": "Short Description",
+            "long_description": "Incident Description",
+            "section_engineer": "Section Engineer",
+            "time_start": "Incident Start Time",
+            "time_end": "Incident End Time",
+            "equipment": "Equipment (from SAP)",
         }
         help_texts = {
-            'significant': 'Is this a significant incident?',
-            'remaining_risk': 'Indicate the remaining risk after immediate action was taken.',
-            'immediate_action_taken': 'Describe the immediate action taken.',
-            'long_description': 'Production Loss, Asset Damage, Theft, Fire, Etc.',
+            "significant": "Is this a significant incident?",
+            "remaining_risk": "Indicate the remaining risk after immediate action was taken.",
+            "immediate_action_taken": "Describe the immediate action taken.",
+            "long_description": "Production Loss, Asset Damage, Theft, Fire, Etc.",
         }
         widgets = {
-            'area': widgets.Select(
-                choices=AREA_CHOICES
-            ),
-            'section': widgets.Select(
-                choices=SECTION_CHOICES
-            ),
-            'section_engineer': widgets.Select(
-                choices=SECTION_ENGINEER_CHOICES
-            ),
-            'long_description': widgets.Textarea(
+            "area": widgets.Select(choices=AREA_CHOICES),
+            "section": widgets.Select(choices=SECTION_CHOICES),
+            "section_engineer": widgets.Select(choices=SECTION_ENGINEER_CHOICES),
+            "long_description": widgets.Textarea(
                 attrs={
-                    'rows': 10,
+                    "rows": 10,
                 }
             ),
-            'equipment': widgets.Select(
-                choices=EQUIPMENT_CHOICES
-            ),
-            'possible_effect': widgets.CheckboxSelectMultiple(
-                choices=EFFECT_CHOICES
-            )
+            "equipment": widgets.Select(choices=EQUIPMENT_CHOICES),
+            "possible_effect": widgets.CheckboxSelectMultiple(choices=EFFECT_CHOICES),
         }
 
 
 class RINotificationApprovalSendForm(forms.Form):
-    sem = forms.ChoiceField(
-        choices=SECTION_ENGINEER_CHOICES,
-        required=False,
-        label='Section Engineering Manager'
-    )
+    sem = forms.ChoiceField(choices=SECTION_ENGINEER_CHOICES, required=False, label="Section Engineering Manager")
 
 
 class RICloseForm(forms.Form):
@@ -191,6 +172,7 @@ class RICloseForm(forms.Form):
     Email the following people
     to rate Close out confidience	Dropdown searchable list of other SE and SEM to complete close out rating
     """
+
     short_description = forms.CharField(required=False)
     incident_date = forms.DateField(required=False)
     immediate_cause = forms.CharField(widget=widgets.Textarea(), required=False)
@@ -200,20 +182,20 @@ class RICloseForm(forms.Form):
     medium_term_action = forms.CharField(widget=widgets.Textarea(), required=False)
     long_term_action = forms.CharField(widget=widgets.Textarea(), required=False)
     re_close_out_confidence_rating = forms.ChoiceField(
-        choices=[(f'{x}', f'{x}') for x in range(1, 6)],
-        label='RE Close-Out Confidence rating',
+        choices=[(f"{x}", f"{x}") for x in range(1, 6)],
+        label="RE Close-Out Confidence rating",
         required=False,
-        help_text='Provide confidence rating out of 5.'
+        help_text="Provide confidence rating out of 5.",
     )
     se_close_out_confidence = forms.ChoiceField(
         choices=SECTION_ENGINEER_CHOICES,
         required=False,
-        label='SE Close-Out Confidence',
-        help_text='The SE selected here will be notified and asked to provide a confidence rating.',
+        label="SE Close-Out Confidence",
+        help_text="The SE selected here will be notified and asked to provide a confidence rating.",
     )
     sem_close_out_confidence = forms.ChoiceField(
         choices=SECTION_ENGINEER_CHOICES,
         required=False,
-        label='SEM Close-Out Confidence',
-        help_text='The SEM selected here will be notified and asked to provide a confidence rating.'
+        label="SEM Close-Out Confidence",
+        help_text="The SEM selected here will be notified and asked to provide a confidence rating.",
     )

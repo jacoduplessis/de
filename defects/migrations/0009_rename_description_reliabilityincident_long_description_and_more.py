@@ -4,20 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('defects', '0008_alter_reliabilityincident_notification_time_received'),
+        ("defects", "0008_alter_reliabilityincident_notification_time_received"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='reliabilityincident',
-            old_name='description',
-            new_name='long_description',
+            model_name="reliabilityincident",
+            old_name="description",
+            new_name="long_description",
         ),
         migrations.AddField(
-            model_name='reliabilityincident',
-            name='short_description',
+            model_name="reliabilityincident",
+            name="short_description",
             field=models.CharField(blank=True, max_length=200),
         ),
     ]

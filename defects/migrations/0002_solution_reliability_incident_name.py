@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('defects', '0001_initial'),
+        ("defects", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='solution',
-            name='reliability_incident_name',
+            model_name="solution",
+            name="reliability_incident_name",
             field=models.CharField(blank=True, max_length=500),
         ),
     ]

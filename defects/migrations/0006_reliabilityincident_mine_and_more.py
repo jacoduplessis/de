@@ -4,20 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('defects', '0005_solution_area'),
+        ("defects", "0005_solution_area"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='reliabilityincident',
-            name='mine',
-            field=models.CharField(default='AMB', max_length=200),
+            model_name="reliabilityincident",
+            name="mine",
+            field=models.CharField(default="AMB", max_length=200),
         ),
         migrations.AddField(
-            model_name='reliabilityincident',
-            name='significant',
+            model_name="reliabilityincident",
+            name="significant",
             field=models.BooleanField(default=False),
         ),
     ]

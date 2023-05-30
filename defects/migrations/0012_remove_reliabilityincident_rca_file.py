@@ -4,14 +4,13 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('defects', '0011_reliabilityincident_area'),
+        ("defects", "0011_reliabilityincident_area"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='reliabilityincident',
-            name='rca_file',
+            model_name="reliabilityincident",
+            name="rca_file",
         ),
     ]

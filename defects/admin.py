@@ -18,17 +18,17 @@ class SolutionResource(ModelResource):
 class SolutionAdmin(ImportExportModelAdmin):
     resource_class = SolutionResource
     search_fields = [
-        'planned_completion_date_string',
-        'actual_completion_date_string',
-        'dr_number',
+        "planned_completion_date_string",
+        "actual_completion_date_string",
+        "dr_number",
     ]
 
     list_display = [
-        'reliability_incident_name',
-        'description',
-        'status',
-        'planned_completion_date_string',
-        'planned_completion_date',
-        'area',
-        'dr_number'
+        "reliability_incident_name",
+        "description",
+        "status",
+        "planned_completion_date_string",
+        "planned_completion_date",
+        "area",
+        "dr_number",
     ]

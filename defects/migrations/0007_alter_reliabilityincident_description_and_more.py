@@ -4,35 +4,34 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('defects', '0006_reliabilityincident_mine_and_more'),
+        ("defects", "0006_reliabilityincident_mine_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='reliabilityincident',
-            name='description',
+            model_name="reliabilityincident",
+            name="description",
             field=models.TextField(blank=True),
         ),
         migrations.AlterField(
-            model_name='reliabilityincident',
-            name='equipment',
+            model_name="reliabilityincident",
+            name="equipment",
             field=models.CharField(blank=True, max_length=200),
         ),
         migrations.AlterField(
-            model_name='reliabilityincident',
-            name='section_engineer',
+            model_name="reliabilityincident",
+            name="section_engineer",
             field=models.CharField(blank=True, max_length=200),
         ),
         migrations.AlterField(
-            model_name='reliabilityincident',
-            name='time_end',
+            model_name="reliabilityincident",
+            name="time_end",
             field=models.DateTimeField(blank=True, null=True),
         ),
         migrations.AlterField(
-            model_name='reliabilityincident',
-            name='time_start',
+            model_name="reliabilityincident",
+            name="time_start",
             field=models.DateTimeField(blank=True, null=True),
         ),
     ]

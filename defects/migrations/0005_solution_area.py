@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('defects', '0004_alter_solution_actual_completion_date_and_more'),
+        ("defects", "0004_alter_solution_actual_completion_date_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='solution',
-            name='area',
+            model_name="solution",
+            name="area",
             field=models.CharField(blank=True, max_length=200),
         ),
     ]

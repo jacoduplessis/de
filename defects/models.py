@@ -4,7 +4,7 @@ from django.db import models
 
 
 class ReliabilityIncident(models.Model):
-    operation = models.CharField(max_length=200, default='AMB')
+    operation = models.CharField(max_length=200, default="AMB")
     area = models.CharField(max_length=200, blank=True)
     section = models.CharField(max_length=200, blank=True)
     section_engineer = models.CharField(max_length=200, blank=True)
@@ -21,11 +21,12 @@ class ReliabilityIncident(models.Model):
     notification_file = models.FileField(blank=True)
     close_out_file = models.FileField(blank=True)
     report_file = models.FileField(blank=True)
-    production_value_loss = models.DecimalField(blank=True, max_digits=20, decimal_places=10, default=Decimal('0.00'))
-    rand_value_loss = models.DecimalField(blank=True, max_digits=20, decimal_places=2, default=Decimal('0.00'))
+    production_value_loss = models.DecimalField(blank=True, max_digits=20, decimal_places=10, default=Decimal("0.00"))
+    rand_value_loss = models.DecimalField(blank=True, max_digits=20, decimal_places=2, default=Decimal("0.00"))
     possible_effect = models.TextField(blank=True)
     immediate_action_taken = models.TextField(blank=True)
     remaining_risk = models.TextField(blank=True)
+
 
 class Solution(models.Model):
     reliability_incident = models.ForeignKey(ReliabilityIncident, on_delete=models.SET_NULL, null=True, blank=True)

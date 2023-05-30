@@ -4,25 +4,24 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('defects', '0012_remove_reliabilityincident_rca_file'),
+        ("defects", "0012_remove_reliabilityincident_rca_file"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='reliabilityincident',
-            name='immediate_action_taken',
+            model_name="reliabilityincident",
+            name="immediate_action_taken",
             field=models.TextField(blank=True),
         ),
         migrations.AddField(
-            model_name='reliabilityincident',
-            name='possible_effect',
+            model_name="reliabilityincident",
+            name="possible_effect",
             field=models.TextField(blank=True),
         ),
         migrations.AddField(
-            model_name='reliabilityincident',
-            name='remaining_risk',
+            model_name="reliabilityincident",
+            name="remaining_risk",
             field=models.TextField(blank=True),
         ),
     ]

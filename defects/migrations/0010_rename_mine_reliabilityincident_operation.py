@@ -4,15 +4,14 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('defects', '0009_rename_description_reliabilityincident_long_description_and_more'),
+        ("defects", "0009_rename_description_reliabilityincident_long_description_and_more"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='reliabilityincident',
-            old_name='mine',
-            new_name='operation',
+            model_name="reliabilityincident",
+            old_name="mine",
+            new_name="operation",
         ),
     ]

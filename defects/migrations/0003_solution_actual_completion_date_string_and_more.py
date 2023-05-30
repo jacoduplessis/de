@@ -4,25 +4,24 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('defects', '0002_solution_reliability_incident_name'),
+        ("defects", "0002_solution_reliability_incident_name"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='solution',
-            name='actual_completion_date_string',
+            model_name="solution",
+            name="actual_completion_date_string",
             field=models.CharField(blank=True, max_length=200),
         ),
         migrations.AddField(
-            model_name='solution',
-            name='incident_date_string',
+            model_name="solution",
+            name="incident_date_string",
             field=models.CharField(blank=True, max_length=200),
         ),
         migrations.AddField(
-            model_name='solution',
-            name='planned_completion_date_string',
+            model_name="solution",
+            name="planned_completion_date_string",
             field=models.CharField(blank=True, max_length=200),
         ),
     ]
