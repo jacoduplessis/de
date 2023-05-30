@@ -3,7 +3,7 @@ stages:
   - build
 
 test:
-  image: python:3.10-slim-bullseye
+  image: python:3.11-slim-bullseye
   stage: test
   variables:
     DATABASE_URL: "sqlite://:memory:"
@@ -23,7 +23,7 @@ build:
   variables:
     IMAGE_NAME: $CI_REGISTRY_IMAGE
   script:
-    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker build -t $IMAGE_NAME:latest -t $IMAGE_NAME:$CI_COMMIT_TAG .
     - docker push -a $IMAGE_NAME
   only:
