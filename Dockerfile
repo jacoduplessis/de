@@ -1,4 +1,4 @@
-FROM python:3.10-bullseye
+FROM python:3.11-bullseye
 
 ENV STATIC_ROOT /app/static/
 WORKDIR /app
