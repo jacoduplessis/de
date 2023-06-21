@@ -80,11 +80,7 @@ class MultipleFileInput(forms.ClearableFileInput):
 
 
 class RINotificationForm(forms.ModelForm):
-    pictures = forms.FileField(
-        required=False,
-        help_text="If applicable.",
-        widget=MultipleFileInput()
-    )
+    pictures = forms.FileField(required=False, help_text="If applicable.", widget=MultipleFileInput())
 
     """
     Operation	                                Greyed out field (Prepoulated with Amandelbult Complex)	Non-negotiable?
