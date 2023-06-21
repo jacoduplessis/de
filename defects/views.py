@@ -3,27 +3,57 @@ import random
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
-from defects.models import Solution, ReliabilityIncident
+from .models import Solution, Incident, UserAction, Section, Equipment
 from django.contrib import messages
 from .forms import RILogForm, RINotificationForm, RINotificationApprovalSendForm, RICloseForm
 from django.utils.timezone import now
 from datetime import timedelta, datetime
 from django.utils.lorem_ipsum import words
 from dataclasses import dataclass
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import LoginView as BaseLoginView, LogoutView as BaseLogoutView
+from django.db.models.aggregates import Count
+from django.db.models.query_utils import Q
 
 
 def index(request):
     return HttpResponseRedirect(reverse("login"))
 
 
+@login_required()
 def apps(request):
     return render(request, "defects/apps.html")
 
 
+@login_required()
 def home(request):
-    return render(request, "defects/index.html")
+
+    context = {
+        "sections": (
+            Section.objects
+            .annotate(count=Count("incidents"))
+            .all()
+            .values_list("name", "count", named=True)
+        ),
+        "equipment": (
+            Equipment.objects
+            .filter(incidents__time_start__gte=now() - timedelta(days=365))
+            .annotate(count=Count("incidents"))
+            .filter(count__gte=1)
+            .values_list("name", "count", named=True)
+        ),
+        "user_actions": (
+            UserAction.objects
+            .select_related("incident")
+            .filter(user=request.user, time_dismissed=None)
+            .order_by('time_required')
+        )
+    }
+
+    return render(request, template_name="defects/index.html", context=context)
 
 
+@login_required()
 def about(request):
     return render(request, "defects/about.html")
 
@@ -41,8 +71,9 @@ def _badge_generator():
         yield random.choice(badges)
 
 
+@login_required()
 def incident_list(request):
-    incidents = ReliabilityIncident.objects.all()
+    incidents = Incident.objects.all()
 
     context = {"incidents": zip(incidents, _badge_generator())}
 
@@ -62,7 +93,17 @@ class TimelineEntry:
     text: str = ""
 
 
-def incident_detail(request):
+@login_required()
+def incident_detail(request, pk):
+    context = {
+        "incident": Incident.objects.get(pk=pk)
+    }
+
+    return render(request, template_name="defects/incident_detail.html", context=context)
+
+
+@login_required()
+def incident_detail_demo(request):
     """ """
 
     state = request.GET.get("state", "0")
@@ -170,7 +211,7 @@ def incident_detail(request):
             TimelineEntry(
                 title="Demo: Mark as Approved from SEM",
                 time=datetime.fromisoformat("2022-10-16 09:00"),
-                link_url=reverse("incident_detail") + "?state=4",
+                link_url=reverse("incident_detail_demo") + "?state=4",
                 link_text="Proceed",
             )
         ]
@@ -192,7 +233,7 @@ def incident_detail(request):
                 title="Is a full RCA Report required?",
                 text="Note that full RCA investigation must be scheduled, conducted and the full RCA report must be submitted within 14 days of submitting the 48-hr Notification Report.",
                 link_text="Mark incident as requiring RCA",
-                link_url=reverse("incident_detail") + "?state=5",
+                link_url=reverse("incident_detail_demo") + "?state=5",
                 secondary_link_text="RCA Report not required",
             )
         ]
@@ -200,7 +241,7 @@ def incident_detail(request):
     if state >= 5:
         timeline.append(TimelineEntry(title="Incident marked as requiring an RCA report"))
     if state == 5:
-        actions = [TimelineEntry(title="Upload RCA report", link_text="Upload report", link_url=reverse("incident_detail") + "?state=6")]
+        actions = [TimelineEntry(title="Upload RCA report", link_text="Upload report", link_url=reverse("incident_detail_demo") + "?state=6")]
 
     if state >= 6:
         timeline.append(
@@ -215,7 +256,7 @@ def incident_detail(request):
     if state == 6:
         actions = [
             TimelineEntry(
-                title="Send full RCA Report to SE and SEM for approval", link_text="Send Report", link_url=reverse("incident_detail") + "?state=7"
+                title="Send full RCA Report to SE and SEM for approval", link_text="Send Report", link_url=reverse("incident_detail_demo") + "?state=7"
             )
         ]
 
@@ -224,7 +265,7 @@ def incident_detail(request):
             TimelineEntry(title="RCA report sent to SE and SEM for approval", text="Status: awaiting approval. SE: John Smith. SEM: Jane Doe.")
         )
     if state == 7:
-        actions = [TimelineEntry(title="Demo: Mark as approved", link_text="Proceed", link_url=reverse("incident_detail") + "?state=8")]
+        actions = [TimelineEntry(title="Demo: Mark as approved", link_text="Proceed", link_url=reverse("incident_detail_demo") + "?state=8")]
 
     if state >= 8:
         timeline.append(
@@ -240,7 +281,7 @@ def incident_detail(request):
             TimelineEntry(
                 title="Send RCA Report to Snr AM to approve and forward to the Snr EM for review",
                 link_text="Send report",
-                link_url=reverse("incident_detail") + "?state=9",
+                link_url=reverse("incident_detail_demo") + "?state=9",
             )
         ]
 
@@ -248,7 +289,7 @@ def incident_detail(request):
         timeline.append(TimelineEntry(title="RCA Report submitted to Snr AM for approval"))
 
     if state == 9:
-        actions = [TimelineEntry(title="Demo: Mark as approved", link_text="Proceed", link_url=reverse("incident_detail") + "?state=10")]
+        actions = [TimelineEntry(title="Demo: Mark as approved", link_text="Proceed", link_url=reverse("incident_detail_demo") + "?state=10")]
 
     if state >= 10:
         timeline.append(TimelineEntry(icon="check", title="RCA Report approved by senior AM"))
@@ -264,7 +305,7 @@ def incident_detail(request):
         actions = [
             TimelineEntry(
                 title="Demo: Mark as approved",
-                link_url=reverse("incident_detail") + "?state=12",
+                link_url=reverse("incident_detail_demo") + "?state=12",
                 link_text="Proceed",
             )
         ]
@@ -279,7 +320,7 @@ def incident_detail(request):
             )
         )
     if state == 12:
-        actions = [TimelineEntry(title="Send Close Out Slide to Scheduler", link_text="Send", link_url=reverse("incident_detail") + "?state=13")]
+        actions = [TimelineEntry(title="Send Close Out Slide to Scheduler", link_text="Send", link_url=reverse("incident_detail_demo") + "?state=13")]
 
     if state >= 13:
         timeline.append(
@@ -307,7 +348,7 @@ def incident_create(request):
     if request.method == "POST":
         messages.success(request, "Incident created with RI Number TUM_2022_009")
 
-        return HttpResponseRedirect(reverse("incident_detail") + "?state=1")
+        return HttpResponseRedirect(reverse("incident_detail_demo") + "?state=1")
 
     context = {
         "form": RILogForm(),
@@ -318,7 +359,7 @@ def incident_create(request):
 def incident_notification_form(request):
     if request.method == "POST":
         messages.success(request, message="48-hour Notification Report created.")
-        return HttpResponseRedirect(reverse("incident_detail") + "?state=2")
+        return HttpResponseRedirect(reverse("incident_detail_demo") + "?state=2")
 
     initial = {"time_start": now() - timedelta(hours=5), "time_end": now(), "short_description": words(8)}
 
@@ -331,7 +372,7 @@ def incident_notification_form(request):
 def incident_close_form(request):
     if request.method == "POST":
         messages.success(request, "Close-out slide created.")
-        return HttpResponseRedirect(reverse("incident_detail") + "?state=11")
+        return HttpResponseRedirect(reverse("incident_detail_demo") + "?state=11")
 
     initial = {"incident_date": now(), "short_description": words(8)}
 
@@ -342,7 +383,7 @@ def incident_close_form(request):
 
 
 def anniversary_list(request):
-    incidents = ReliabilityIncident.objects.all()[:10]
+    incidents = Incident.objects.all()[:10]
 
     context = {"incidents": incidents}
 
@@ -360,6 +401,7 @@ def solution_schedule(request):
         return HttpResponseRedirect(reverse("solution_list") + "?filter=1&solution_status=scheduled")
 
 
+@login_required()
 def solution_completion(request):
     if request.method == "GET":
         context = {"solutions": Solution.objects.all()[:5]}
@@ -371,14 +413,17 @@ def solution_completion(request):
         return HttpResponseRedirect(reverse("solution_list") + "?filter=1&solution_status=complete")
 
 
+@login_required()
 def value_dashboard(request):
     return render(request, "defects/value_dashboard.html")
 
 
+@login_required()
 def compliance_dashboard(request):
     return render(request, "defects/compliance_dashboard.html")
 
 
+@login_required()
 def solution_list(request):
     if request.method == "POST":
         action = request.POST.get("action")
@@ -398,15 +443,25 @@ def solution_list(request):
     return render(request, "defects/solutions_list.html", context)
 
 
+@login_required()
 def incident_notification_approval_send(request):
     if request.method == "POST":
         messages.success(request, "Notification report has be sent to SEM for approval.")
 
-        return HttpResponseRedirect(reverse("incident_detail") + "?state=3")
+        return HttpResponseRedirect(reverse("incident_detail_demo") + "?state=3")
 
     context = {"form": RINotificationApprovalSendForm()}
 
     return render(request, "defects/incident_notification_approval_send.html", context)
+
+
+class LoginView(BaseLoginView):
+    template_name = "defects/login.html"
+    redirect_authenticated_user = True
+
+
+class LogoutView(BaseLogoutView):
+    pass
 
 
 def login(request):

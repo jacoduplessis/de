@@ -1,10 +1,10 @@
 from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
 from import_export.resources import ModelResource
-from .models import Solution, ReliabilityIncident
+from .models import Solution, Incident
 
 
-@admin.register(ReliabilityIncident)
+@admin.register(Incident)
 class ReliabilityIncidentAdmin(ImportExportModelAdmin):
     pass
 

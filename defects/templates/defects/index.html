@@ -18,117 +18,41 @@
     <div
       class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
       <h1 class="h2">Dashboard</h1>
-      <div class="btn-toolbar mb-2 mb-md-0">
-        <div class="btn-group me-2">
-          <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>
-          <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
-        </div>
-        <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle">
-          <span data-feather="calendar" class="align-text-bottom"></span>
-          This week
-        </button>
-      </div>
     </div>
 
     <div class="row">
 
       <div class="col-12 col-lg-6 my-3">
-        <h6 class="text-muted">Ongoing Reliability Incidents Per Section</h6>
+        <h6 class="text-body-secondary">Ongoing Reliability Incidents Per Section</h6>
         <div class="row mt-4">
-          <div class="col col-lg-6 text-center">
-            <p class="display-6">Concentrators</p>
-            <p class="display-2 fw-bold">2</p>
-          </div>
-          <div class="col col-lg-6 text-center">
-            <p class="display-6">Dishaba</p>
-            <p class="display-2 fw-bold">3</p>
-          </div>
-          <div class="col col-lg-6 text-center">
-            <p class="display-6">Tumela</p>
-            <p class="display-2 fw-bold">3</p>
-          </div>
-          <div class="col col-lg-6 text-center">
-            <p class="display-6">APS</p>
-            <p class="display-2 fw-bold">4</p>
-          </div>
+          {% for row in sections %}
+            <div class="col col-lg-6 text-center">
+              <p class="display-6">{{ row.name }}</p>
+              <p class="display-2 fw-bold">{{ row.count }}</p>
+            </div>
+          {% endfor %}
         </div>
       </div>
 
       <div class="col-12 col-lg-6 my-3">
-        <h6 class="text-muted">Actions Required</h6>
+        <h6 class="text-body-secondary">Actions Required</h6>
 
         <table class="table table-sm table-striped">
           <thead>
           <tr>
             <th>Incident</th>
             <th>Action</th>
-            <th>Time Left</th>
+            <th>Required By</th>
           </tr>
           </thead>
           <tbody>
-           <tr>
-            <td><a href="{% url 'incident_detail' %}?state=17&solutions=1" class="text-black">UG2_RI_2022_20</a></td>
-            <td><span class="colored-dot bg-danger"></span> Confirm solution implementation</td>
-            <td>1w overdue</td>
-          </tr>
-          <tr>
-            <td><a href="{% url 'incident_detail' %}" class="text-black">UG1_RI_2022_58</a></td>
-            <td><span class="colored-dot bg-danger"></span> Upload 48h notification</td>
-            <td>3h overdue</td>
-          </tr>
-          <tr>
-            <td><a href="{% url 'incident_detail' %}" class="text-black">UG2_RI_2022_31</a></td>
-            <td><span class="colored-dot bg-danger"></span> Upload final report</td>
-            <td>2d overdue</td>
-          </tr>
-          <tr>
-            <td><a href="{% url 'incident_detail' %}" class="text-black">Mer_RI_2022_37</a></td>
-            <td><span class="colored-dot bg-warning"></span> Review 1-year anniversary</td>
-            <td>2d</td>
-          </tr>
-          <tr>
-            <td><a href="{% url 'incident_detail' %}" class="text-black">UG1_RI_2022_55</a></td>
-            <td><span class="colored-dot bg-warning"></span> Upload 48h notification</td>
-            <td>14h</td>
-          </tr>
-          <tr>
-            <td><a href="{% url 'incident_detail' %}" class="text-black">UG1_RI_2022_12</a></td>
-            <td><span class="colored-dot bg-warning"></span> Distribute 48h notification</td>
-            <td>7h</td>
-          </tr>
-          <tr>
-            <td><a href="{% url 'incident_detail' %}" class="text-black">UG1_RI_2022_09</a></td>
-            <td><span class="colored-dot bg-warning"></span> Upload close-out slide</td>
-            <td>1d</td>
-          </tr>
-          <tr>
-            <td><a href="{% url 'incident_detail' %}" class="text-black">UG1_RI_2022_31</a></td>
-            <td><span class="colored-dot bg-info"></span> Update significant status</td>
-            <td>3d</td>
-          </tr>
-          <tr>
-            <td><a href="{% url 'incident_detail' %}" class="text-black">UG2_RI_2022_49</a></td>
-            <td><span class="colored-dot bg-info"></span> Sign-off required from SEM</td>
-            <td>4d</td>
-          </tr>
-          <tr>
-            <td><a href="{% url 'incident_detail' %}" class="text-black">UG1_RI_2022_02</a></td>
-            <td><span class="colored-dot bg-info"></span> 3 solutions to review</td>
-            <td>4d</td>
-          </tr>
-
-          <tr>
-            <td><a href="{% url 'incident_detail' %}" class="text-black">UG1_RI_2022_14</a></td>
-            <td><span class="colored-dot bg-info"></span> Record solution confidence</td>
-            <td>2w</td>
-          </tr>
-          <tr>
-            <td><a href="{% url 'incident_detail' %}" class="text-black">UG2_RI_2022_20</a></td>
-            <td><span class="colored-dot bg-info"></span> Confirm solution implementation</td>
-            <td>4w</td>
-          </tr>
-
-
+          {% for obj in user_actions %}
+            <tr>
+              <td><a href="{% url 'incident_detail' obj.incident_id %}" class="text-black">{{ obj.incident.code}}</a></td>
+              <td><span class="colored-dot bg-{{ obj.urgency }}"></span> {{ obj.description}}</td>
+              <td>{{ obj.time_required|date:'Y-m-d' }}</td>
+            </tr>
+          {% endfor %}
           </tbody>
         </table>
       </div>
@@ -138,11 +62,11 @@
     <div class="row mt-4">
 
       <div class="col-12 col-lg-6">
-        <h6 class="text-muted">Number of Ongoing Solutions</h6>
+        <h6 class="text-body-secondary">Number of Ongoing Solutions</h6>
         <canvas class="w-100" id="myChart" width="900" height="250"></canvas>
       </div>
       <div class="col-12 col-lg-6">
-        <h6 class="text-muted">Number of Upcoming Anniversaries</h6>
+        <h6 class="text-body-secondary">Number of Upcoming Anniversaries</h6>
         <canvas class="w-100" id="bar-chart" width="900" height="250"></canvas>
       </div>
     </div>
@@ -150,35 +74,35 @@
     <div class="row mt-4">
 
       <div class="col-12 col-lg-6 my-3">
-        <h6 class="text-muted">Equipment Types With Multiple RIs (past 12 months)</h6>
-        <p><small class="text-muted">Click Equipment Type to show incidents</small></p>
+        <h6 class="text-body-secondary">Equipment With Multiple RIs (past 12 months)</h6>
+        <p><small class="text-body-secondary">Click Equipment to show incidents</small></p>
         <table class="table table-sm table-striped">
           <thead>
           <tr>
-            <th>Equipment Type</th>
+            <th>Equipment</th>
             <th>Incidents</th>
           </tr>
           </thead>
           <tbody>
-            <tr>
-              <td><a href="#" class="text-black">Mills</a></td>
-              <td>4</td>
-            </tr>
-            <tr>
-              <td><a href="#" class="text-black">Motors</a></td>
-              <td>7</td>
-            </tr>
-            <tr>
-              <td><a href="#" class="text-black">Pumps</a></td>
-              <td>2</td>
-            </tr>
+          <tr>
+            <td><a href="#" class="text-black">Mills</a></td>
+            <td>4</td>
+          </tr>
+          <tr>
+            <td><a href="#" class="text-black">Motors</a></td>
+            <td>7</td>
+          </tr>
+          <tr>
+            <td><a href="#" class="text-black">Pumps</a></td>
+            <td>2</td>
+          </tr>
           </tbody>
         </table>
       </div>
 
       <div class="col-12 col-lg-6 my-3">
-        <h6 class="text-muted">Equipment With Multiple RIs (past 12 months)</h6>
-        <p><small class="text-muted">Click Equipment ID to show incidents</small></p>
+        <h6 class="text-body-secondary">Equipment With Multiple RIs (past 12 months)</h6>
+        <p><small class="text-body-secondary">Click Equipment ID to show incidents</small></p>
         <table class="table table-sm table-striped">
           <thead>
           <tr>
@@ -189,18 +113,18 @@
           </tr>
           </thead>
           <tbody>
-            <tr>
-              <td><a href="#" class="text-black">MI-D-12</a></td>
-              <td>Mill #44</td>
-              <td>xxx</td>
-              <td>3</td>
-            </tr>
-             <tr>
-               <td><a href="#" class="text-black">PM-K-998</a></td>
-              <td>Oil Pump #12</td>
-              <td>xxx</td>
-              <td>5</td>
-            </tr>
+          <tr>
+            <td><a href="#" class="text-black">MI-D-12</a></td>
+            <td>Mill #44</td>
+            <td>xxx</td>
+            <td>3</td>
+          </tr>
+          <tr>
+            <td><a href="#" class="text-black">PM-K-998</a></td>
+            <td>Oil Pump #12</td>
+            <td>xxx</td>
+            <td>5</td>
+          </tr>
           </tbody>
         </table>
       </div>

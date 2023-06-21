@@ -23,7 +23,8 @@ urlpatterns = [
     path("home/", views.home, name="home"),
     path("incidents/", views.incident_list, name="incident_list"),
     path("incidents/create/", views.incident_create, name="incident_create"),
-    path("incidents/detail/", views.incident_detail, name="incident_detail"),
+    path("incidents/detail/", views.incident_detail_demo, name="incident_detail_demo"),
+    path("incidents/<int:pk>/", views.incident_detail, name="incident_detail"),
     path("incidents/notification/form/", views.incident_notification_form, name="incident_notification_form"),
     path("incidents/notification/approval/", views.incident_notification_approval_send, name="incident_notification_approval_send"),
     path("incidents/close/form/", views.incident_close_form, name="incident_close_form"),
@@ -34,6 +35,7 @@ urlpatterns = [
     path("anniversaries/", views.anniversary_list, name="anniversary_list"),
     path("compliance/", views.compliance_dashboard, name="compliance_dashboard"),
     path("value/", views.value_dashboard, name="value_dashboard"),
-    path("login/", views.login, name="login"),
+    path("login/", views.LoginView.as_view(), name="login"),
+    path("logout/", views.LogoutView.as_view(), name="logout"),
     path("admin/", admin.site.urls),
 ]

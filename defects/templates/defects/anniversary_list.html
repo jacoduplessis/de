@@ -8,7 +8,7 @@
     </div>
     <div class="d-flex justify-content-between">
       <p>Viewing significant RIs for <strong>Amandelbult Mine, Section: Concentrators</strong>.<br>
-        Time period: <strong>2023-03-01 – 2023-04-30</strong>. <small class="text-muted">Change period using filter.</small>
+        Time period: <strong>2023-03-01 – 2023-04-30</strong>. <small class="text-body-secondary">Change period using filter.</small>
       </p>
       <div>
         <a href="#" class="btn btn-outline-secondary btn-sm">Export</a>
@@ -34,7 +34,7 @@
         {% for incident in incidents %}
           <tr>
             <td class="text-nowrap"><a class="text-black"
-                                       href="{% url 'incident_detail' %}?state=17">{{ incident.ri_number }}</a></td>
+                                       href="{% url 'incident_detail_demo' %}?state=17">{{ incident.ri_number }}</a></td>
             <td>6 / 6</td>
             <td class="font-monospace text-nowrap">{{ incident.time_start|date:'Y-m-d' }}</td>
             <td class="text-nowrap">{{ incident.section }}</td>

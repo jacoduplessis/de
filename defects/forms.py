@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import widgets
-from .models import ReliabilityIncident
+from .models import Incident
 
 EQUIPMENT_CHOICES = (
     ("", ""),
@@ -52,7 +52,7 @@ class RILogForm(forms.ModelForm):
     """
 
     class Meta:
-        model = ReliabilityIncident
+        model = Incident
         fields = [
             "short_description",
             "equipment",
@@ -104,7 +104,7 @@ class RINotificationForm(forms.ModelForm):
     """
 
     class Meta:
-        model = ReliabilityIncident
+        model = Incident
         fields = [
             "area",
             "section",

@@ -3,7 +3,7 @@
   <h6>{{ entry.title }}</h6>
   <p class="mb-2">{{ entry.time|date:'Y-m-d H:i' }}{% if entry.until %} – {{ entry.until|date:'Y-m-d H:i' }}{% endif %}</p>
   {% if entry.text %}
-    <p class="text-muted">{{ entry.text }}</p>
+    <p class="text-body-secondary">{{ entry.text }}</p>
   {% endif %}
   {% if entry.link_text and entry.link_url %}
     <p>

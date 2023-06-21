@@ -16,7 +16,7 @@
       <form method="post">
         {% csrf_token %}
         {{ form|crispy }}
-        <p><small class="text-muted">RI number will be generated upon submission.</small></p>
+        <p><small class="text-body-secondary">RI number will be generated upon submission.</small></p>
         <input type="submit" value="Submit" class="btn btn-primary">
       </form>
     </div>

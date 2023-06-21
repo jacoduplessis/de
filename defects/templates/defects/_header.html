@@ -10,10 +10,10 @@
   </button>
   <div class="navbar-nav flex-row">
     <div class="nav-item px-3">
-      <a href="#" class="nav-link text-white">john.doe@angloamerican.com</a>
+      <a href="#" class="nav-link text-white">{{ request.user.email }}</a>
     </div>
     <div class="nav-item px-3">
-      <a class="nav-link text-white" href="{% url 'login' %}">Sign out</a>
+      <a class="nav-link text-white" href="{% url 'logout' %}">Sign out</a>
     </div>
   </div>
 </header>
