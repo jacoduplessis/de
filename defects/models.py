@@ -64,7 +64,6 @@ class Incident(models.Model):
     immediate_action_taken = models.TextField(blank=True)
     remaining_risk = models.TextField(blank=True)
 
-
     @classmethod
     def generate_incident_code(cls):
         return get_random_string(length=12)

@@ -13,7 +13,6 @@ from dataclasses import dataclass
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView as BaseLoginView, LogoutView as BaseLogoutView
 from django.db.models.aggregates import Count
-from django.db.models.query_utils import Q
 
 
 def index(request):
@@ -27,27 +26,15 @@ def apps(request):
 
 @login_required()
 def home(request):
-
     context = {
-        "sections": (
-            Section.objects
-            .annotate(count=Count("incidents"))
-            .all()
-            .values_list("name", "count", named=True)
-        ),
+        "sections": (Section.objects.annotate(count=Count("incidents")).all().values_list("name", "count", named=True)),
         "equipment": (
-            Equipment.objects
-            .filter(incidents__time_start__gte=now() - timedelta(days=365))
+            Equipment.objects.filter(incidents__time_start__gte=now() - timedelta(days=365))
             .annotate(count=Count("incidents"))
             .filter(count__gte=1)
             .values_list("name", "count", named=True)
         ),
-        "user_actions": (
-            UserAction.objects
-            .select_related("incident")
-            .filter(user=request.user, time_dismissed=None)
-            .order_by('time_required')
-        )
+        "user_actions": (UserAction.objects.select_related("incident").filter(user=request.user, time_dismissed=None).order_by("time_required")),
     }
 
     return render(request, template_name="defects/index.html", context=context)
@@ -95,9 +82,7 @@ class TimelineEntry:
 
 @login_required()
 def incident_detail(request, pk):
-    context = {
-        "incident": Incident.objects.get(pk=pk)
-    }
+    context = {"incident": Incident.objects.get(pk=pk)}
 
     return render(request, template_name="defects/incident_detail.html", context=context)
 
@@ -256,7 +241,9 @@ def incident_detail_demo(request):
     if state == 6:
         actions = [
             TimelineEntry(
-                title="Send full RCA Report to SE and SEM for approval", link_text="Send Report", link_url=reverse("incident_detail_demo") + "?state=7"
+                title="Send full RCA Report to SE and SEM for approval",
+                link_text="Send Report",
+                link_url=reverse("incident_detail_demo") + "?state=7",
             )
         ]
 

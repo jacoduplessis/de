@@ -4,6 +4,7 @@ from django.utils.timezone import now
 from datetime import timedelta
 from django.db import transaction
 
+
 class Command(BaseCommand):
 
     """
@@ -83,12 +84,10 @@ class Command(BaseCommand):
           </tr>
     """
 
-
     def add_arguments(self, parser):
         parser.add_argument("--user", type=int, default=1)
 
     def execute(self, *args, **options):
-
         with transaction.atomic():
             tumela = Section.objects.create(name="Tumela")
             dishaba = Section.objects.create(name="Dishaba")
@@ -99,7 +98,7 @@ class Command(BaseCommand):
                 Incident(code="UG2_RI_2022_20", section=tumela),
                 Incident(code="UG1_RI_2022_58", section=tumela),
                 Incident(code="UG2_RI_2022_31", section=tumela),
-                Incident(code="Mer_RI_2022_37", section=concentrators)
+                Incident(code="Mer_RI_2022_37", section=concentrators),
             ]
 
             Incident.objects.bulk_create(incidents)
@@ -110,33 +109,26 @@ class Command(BaseCommand):
                 user_id=user_id,
                 incident=Incident.objects.get(code="UG2_RI_2022_20"),
                 description="Confirm solution implementation",
-                time_required=now() - timedelta(days=7)
+                time_required=now() - timedelta(days=7),
             )
 
             UserAction.objects.create(
                 user_id=user_id,
                 incident=Incident.objects.get(code="UG2_RI_2022_20"),
                 description="Upload 48h notification",
-                time_required=now() - timedelta(hours=3)
+                time_required=now() - timedelta(hours=3),
             )
 
             UserAction.objects.create(
                 user_id=user_id,
                 incident=Incident.objects.get(code="UG2_RI_2022_31"),
                 description="Upload final report",
-                time_required=now() + timedelta(days=1)
+                time_required=now() + timedelta(days=1),
             )
 
             UserAction.objects.create(
                 user_id=user_id,
                 incident=Incident.objects.get(code="Mer_RI_2022_37"),
                 description="Review 1-year anniversary",
-                time_required=now() + timedelta(days=21)
+                time_required=now() + timedelta(days=21),
             )
-
-
-
-
-
-
-
