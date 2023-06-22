@@ -3,8 +3,13 @@ from decimal import Decimal
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.timezone import now
-from datetime import timedelta
+from datetime import timedelta, datetime
 from django.utils.crypto import get_random_string
+
+from defects.timelines import TimelineEntry
+
+from auditlog.models import AuditlogHistoryField
+from auditlog.registry import auditlog
 
 
 class Section(models.Model):
@@ -38,9 +43,24 @@ class Equipment(models.Model):
 
 
 class Incident(models.Model):
+    ACTIVE = "active"
+    ONGOING = "ongoing"
+    COMPLETE = "complete"
+    OVERDUE = "overdue"
+    INCOMPLETE = "incomplete"
+
+    STATUS_CHOICES = (
+        (ACTIVE, "Active"),
+        (ONGOING, "Ongoing"),
+        (COMPLETE, "Complete"),
+        (OVERDUE, "Overdue"),
+        (INCOMPLETE, "Incomplete"),
+    )
+
     code = models.CharField(unique=True, max_length=200)  # also known as RI_Number
     time_created = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    status = models.CharField(max_length=100, choices=STATUS_CHOICES, default=ACTIVE)
     operation = models.CharField(max_length=200, default="AMB")
     area = models.CharField(max_length=200, blank=True)
     section = models.ForeignKey(Section, blank=True, null=True, on_delete=models.SET_NULL, related_name="incidents")
@@ -64,9 +84,45 @@ class Incident(models.Model):
     immediate_action_taken = models.TextField(blank=True)
     remaining_risk = models.TextField(blank=True)
 
+    class Meta:
+        verbose_name = "Incident"
+        verbose_name_plural = "Incidents"
+
+    def __str__(self):
+        return self.code
+
     @classmethod
     def generate_incident_code(cls):
-        return get_random_string(length=12)
+        allowed_chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
+        return now().strftime("%Y%m") + "_" + get_random_string(length=6, allowed_chars=allowed_chars)
+
+    @property
+    def status_class(self):
+        _map = {self.ACTIVE: "primary", self.ONGOING: "secondary", self.COMPLETE: "success", self.OVERDUE: "danger", self.INCOMPLETE: "warning"}
+
+        return _map.get(self.status)
+
+    @property
+    def timeline(self):
+        """
+        select_related: created_by
+        """
+
+        return [
+            TimelineEntry(
+                icon="alert-triangle",
+                title="Incident Occurrence",
+                time=self.time_start,
+                until=self.time_end,
+                text="Downtime",
+            ),
+            TimelineEntry(
+                icon="log-in",
+                title="Incident Logged",
+                time=self.time_created,
+                text=f"Created by {self.created_by.email}.",
+            ),
+        ]
 
 
 class Solution(models.Model):
@@ -156,3 +212,24 @@ class UserAction(models.Model):
             return "warning"
 
         return "danger"
+
+
+auditlog.register(
+    Incident,
+    include_fields=[
+        "status",
+        "production_value_loss",
+        "rand_value_loss",
+        "short_description",
+        "long_description",
+        "significant",
+        "time_start",
+        "time_end",
+        "section_engineer",
+        "notification_time_received",
+        "immediate_action_taken",
+        "equipment",
+    ],
+    serialize_data=True,
+    serialize_auditlog_fields_only=True
+)

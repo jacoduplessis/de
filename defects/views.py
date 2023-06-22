@@ -9,10 +9,12 @@ from .forms import RILogForm, RINotificationForm, RINotificationApprovalSendForm
 from django.utils.timezone import now
 from datetime import timedelta, datetime
 from django.utils.lorem_ipsum import words
-from dataclasses import dataclass
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView as BaseLoginView, LogoutView as BaseLogoutView
 from django.db.models.aggregates import Count
+from auditlog.signals import accessed
+
+from .timelines import TimelineEntry
 
 
 def index(request):
@@ -45,44 +47,26 @@ def about(request):
     return render(request, "defects/about.html")
 
 
-def _badge_generator():
-    badges = [
-        {"class": "text-bg-primary", "name": "active"},
-        {"class": "text-bg-secondary", "name": "ongoing"},
-        {"class": "text-bg-success", "name": "complete"},
-        {"class": "text-bg-danger", "name": "overdue"},
-        {"class": "text-bg-warning", "name": "incomplete"},
-    ]
-
-    while True:
-        yield random.choice(badges)
-
-
 @login_required()
 def incident_list(request):
-    incidents = Incident.objects.all()
+    incidents = Incident.objects.select_related("created_by", "equipment", "section", "section_engineer").all()
 
-    context = {"incidents": zip(incidents, _badge_generator())}
+    context = {"incidents": incidents}
 
     return render(request, "defects/incident_list.html", context)
 
 
-@dataclass
-class TimelineEntry:
-    time: datetime = now()
-    until: datetime = None
-    title: str = ""
-    icon: str = "clock"
-    icon_classes: str = ""
-    link_url: str = "#"
-    link_text: str = ""
-    secondary_link_text: str = ""
-    text: str = ""
-
-
 @login_required()
 def incident_detail(request, pk):
-    context = {"incident": Incident.objects.get(pk=pk)}
+    incident = (
+        Incident.objects
+        .select_related("section", "created_by", "section_engineer", "equipment")
+        .get(pk=pk)
+    )
+
+    accessed.send(Incident, instance=incident)
+
+    context = {"incident": incident}
 
     return render(request, template_name="defects/incident_detail.html", context=context)
 
@@ -328,7 +312,7 @@ def incident_detail_demo(request):
         "reports": reports,
     }
 
-    return render(request, "defects/incident_detail.html", context=context)
+    return render(request, "defects/incident_detail_demo.html", context=context)
 
 
 def incident_create(request):

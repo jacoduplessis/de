@@ -1,12 +1,13 @@
 from django.core.management.base import BaseCommand
-from defects.models import UserAction, Incident, Section
+from defects.models import UserAction, Incident, Section, SectionEngineer, Equipment
 from django.utils.timezone import now
+from django.utils.crypto import get_random_string
 from datetime import timedelta
 from django.db import transaction
+from django.utils.lorem_ipsum import words, paragraphs
 
 
 class Command(BaseCommand):
-
     """
     UG2_RI_2022_20 	Confirm solution implementation 	1w overdue
     UG1_RI_2022_58 	Upload 48h notification 	3h overdue
@@ -88,47 +89,98 @@ class Command(BaseCommand):
         parser.add_argument("--user", type=int, default=1)
 
     def execute(self, *args, **options):
+        user_id = options["user"]
+
         with transaction.atomic():
             tumela = Section.objects.create(name="Tumela")
             dishaba = Section.objects.create(name="Dishaba")
             concentrators = Section.objects.create(name="Concentrators")
             aps = Section.objects.create(name="APS")
 
+            se_a = SectionEngineer.objects.create(name="Alice")
+            se_b = SectionEngineer.objects.create(name="Bob")
+
+            winder = Equipment.objects.create(name="Winder", code=get_random_string(length=8))
+            motor = Equipment.objects.create(name="Motor", code=get_random_string(length=8))
+            pump = Equipment.objects.create(name="pump", code=get_random_string(length=8))
+
             incidents = [
-                Incident(code="UG2_RI_2022_20", section=tumela),
-                Incident(code="UG1_RI_2022_58", section=tumela),
-                Incident(code="UG2_RI_2022_31", section=tumela),
-                Incident(code="Mer_RI_2022_37", section=concentrators),
+                Incident(
+                    code=Incident.generate_incident_code(),
+                    section=tumela,
+                    status=Incident.ACTIVE,
+                    created_by_id=user_id,
+                    section_engineer=se_a,
+                    equipment=motor,
+                    time_start=now()-timedelta(days=100, hours=5),
+                    time_end=now()-timedelta(days=100),
+                    short_description=words(8, common=False),
+                    long_description="\n\n".join(paragraphs(3, common=False)),
+                ),
+                Incident(
+                    code=Incident.generate_incident_code(),
+                    section=aps,
+                    status=Incident.ACTIVE,
+                    created_by_id=user_id,
+                    section_engineer=se_b,
+                    equipment=motor,
+                    time_start=now() - timedelta(days=50, hours=4),
+                    time_end=now() - timedelta(days=50),
+                    short_description=words(8, common=False),
+                    long_description="\n\n".join(paragraphs(3, common=False)),
+                ),
+                Incident(
+                    code=Incident.generate_incident_code(),
+                    section=dishaba,
+                    status=Incident.ONGOING,
+                    created_by_id=user_id,
+                    section_engineer=se_a,
+                    equipment=winder,
+                    time_start=now() - timedelta(days=20, hours=2),
+                    time_end=now() - timedelta(days=20),
+                    short_description=words(8, common=False),
+                    long_description="\n\n".join(paragraphs(3, common=False)),
+                ),
+                Incident(
+                    code=Incident.generate_incident_code(),
+                    section=concentrators,
+                    status=Incident.OVERDUE,
+                    created_by_id=user_id,
+                    section_engineer=se_b,
+                    equipment=pump,
+                    time_start=now() - timedelta(days=5, hours=20),
+                    time_end=now() - timedelta(days=5),
+                    short_description=words(8, common=False),
+                    long_description="\n\n".join(paragraphs(3, common=False)),
+                ),
             ]
 
             Incident.objects.bulk_create(incidents)
 
-            user_id = options["user"]
-
             UserAction.objects.create(
                 user_id=user_id,
-                incident=Incident.objects.get(code="UG2_RI_2022_20"),
+                incident_id=1,
                 description="Confirm solution implementation",
                 time_required=now() - timedelta(days=7),
             )
 
             UserAction.objects.create(
                 user_id=user_id,
-                incident=Incident.objects.get(code="UG2_RI_2022_20"),
+                incident_id=2,
                 description="Upload 48h notification",
                 time_required=now() - timedelta(hours=3),
             )
 
             UserAction.objects.create(
                 user_id=user_id,
-                incident=Incident.objects.get(code="UG2_RI_2022_31"),
+                incident_id=3,
                 description="Upload final report",
                 time_required=now() + timedelta(days=1),
             )
 
             UserAction.objects.create(
                 user_id=user_id,
-                incident=Incident.objects.get(code="Mer_RI_2022_37"),
+                incident_id=4,
                 description="Review 1-year anniversary",
                 time_required=now() + timedelta(days=21),
             )
