@@ -76,7 +76,9 @@ ROOT_URLCONF = "defects.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [
+            BASE_DIR / "defects" / "templates",
+        ],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -146,5 +148,5 @@ MEDIA_URL = os.environ.get("MEDIA_URL", "/media/")
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-LOGIN_REDIRECT_URL = "/home/"
+LOGIN_REDIRECT_URL = "/apps/"
 LOGOUT_REDIRECT_URL = "/login/"

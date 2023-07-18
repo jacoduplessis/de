@@ -1,0 +1,55 @@
+{% extends 'defects/base.html' %}
+
+{% load crispy_forms_filters static %}
+
+{% block content %}
+  <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 mt-3 mb-4">
+
+    <div class="d-flex justify-content-between">
+      <h2>Update Reliability Incident</h2>
+    </div>
+
+    <hr>
+    <div>
+      <form method="post">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <input type="submit" value="Submit" class="btn btn-primary">
+      </form>
+    </div>
+    <div>
+
+    </div>
+
+  </main>
+
+  <!-- Modal -->
+  {% include 'defects/_modal_calculator.html' %}
+
+{% endblock %}
+
+{% block extra_styles %}
+<link rel="stylesheet" href="{% static 'tom-select.bootstrap5.min.css' %}">
+<link rel="stylesheet" href="{% static 'flatpickr.min.css' %}">
+{% endblock %}
+
+
+{% block extra_scripts %}
+<script src="{% static 'tom-select.complete.min.js' %}"></script>
+  <script>
+  document.querySelectorAll('select').forEach(el => {
+    const settings = { create: false, placeholder: 'Start typing to search...' }
+    const ts = new TomSelect(el , settings);
+  })
+  </script>
+  <script src="{% static 'flatpickr.js' %}"></script>
+  <script>
+  document.querySelectorAll('.datetimeinput').forEach(el => {
+    flatpickr(el, {
+      enableTime: true,
+      time_24hr: true,
+      minuteIncrement: 1,
+    });
+  })
+  </script>
+{% endblock %}

@@ -20,4 +20,4 @@
 - application logging
 - edit locks
 - background tasks
--
+- add pagination to list views

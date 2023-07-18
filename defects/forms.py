@@ -36,7 +36,7 @@ EFFECT_CHOICES = (
 )
 
 
-class RILogForm(forms.ModelForm):
+class IncidentCreateForm(forms.ModelForm):
     preliminary_findings = forms.FileField(required=False)
     """
     Incident description headline	Freeform text input field
@@ -68,10 +68,27 @@ class RILogForm(forms.ModelForm):
             "time_end": "Incident End Time",
             "equipment": "Equipment (from SAP)",
         }
-        widgets = {
-            "section": widgets.Select(choices=SECTION_CHOICES),
-            "section_engineer": widgets.Select(choices=SECTION_ENGINEER_CHOICES),
-            "equipment": widgets.Select(choices=EQUIPMENT_CHOICES),
+
+
+class IncidentUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Incident
+        fields = [
+            "short_description",
+            "long_description",
+            "equipment",
+            "section",
+            "section_engineer",
+            "time_start",
+            "time_end",
+        ]
+        labels = {
+            "short_description": "Short Description",
+            "long_description": "Long Description",
+            "section_engineer": "Section Engineer",
+            "time_start": "Incident Start Time",
+            "time_end": "Incident End Time",
+            "equipment": "Equipment (from SAP)",
         }
 
 

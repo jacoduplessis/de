@@ -1,12 +1,24 @@
 from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
 from import_export.resources import ModelResource
-from .models import Solution, Incident
+from .models import Solution, Incident, Equipment
+
+
+admin.site.site_header = "Anglo DE Tool Admin"
+admin.site.site_title = "Anglo DE Tool"
+admin.site.index_title = "Administration"
+admin.site
 
 
 @admin.register(Incident)
 class ReliabilityIncidentAdmin(ImportExportModelAdmin):
     pass
+
+
+@admin.register(Equipment)
+class EquipmentAdmin(ImportExportModelAdmin):
+    pass
+
 
 
 class SolutionResource(ModelResource):

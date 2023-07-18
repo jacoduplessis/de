@@ -23,15 +23,24 @@ class SectionEngineer(models.Model):
     name = models.CharField(max_length=200)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 
+    def __str__(self):
+        return self.name
+
 
 class SectionEngineeringManager(models.Model):
     name = models.CharField(max_length=200)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 
+    def __str__(self):
+        return self.name
+
 
 class SeniorAssetManager(models.Model):
     name = models.CharField(max_length=200)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+
+    def __str__(self):
+        return self.name
 
 
 class Equipment(models.Model):
@@ -40,6 +49,10 @@ class Equipment(models.Model):
 
     def __str__(self):
         return f"{self.code} – {self.name}"
+
+    class Meta:
+        verbose_name = "Equipment"
+        verbose_name_plural = "Equipment"
 
 
 class Incident(models.Model):

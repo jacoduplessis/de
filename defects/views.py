@@ -1,11 +1,11 @@
 import random
 
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from .models import Solution, Incident, UserAction, Section, Equipment
 from django.contrib import messages
-from .forms import RILogForm, RINotificationForm, RINotificationApprovalSendForm, RICloseForm
+from .forms import IncidentCreateForm, RINotificationForm, RINotificationApprovalSendForm, RICloseForm, IncidentUpdateForm
 from django.utils.timezone import now
 from datetime import timedelta, datetime
 from django.utils.lorem_ipsum import words
@@ -314,20 +314,50 @@ def incident_detail_demo(request):
 
     return render(request, "defects/incident_detail_demo.html", context=context)
 
-
+@login_required
 def incident_create(request):
     if request.method == "POST":
-        messages.success(request, "Incident created with RI Number TUM_2022_009")
+        form = IncidentCreateForm(request.POST, request.FILES)
+        if not form.is_valid():
+            messages.error(request, "Please correct the form inputs and submit again.")
+            context = {"form": form}
+            return render(request, "defects/incident_create.html", context)
+        obj = form.save(commit=False)
+        obj.code = Incident.generate_incident_code()
+        obj.created_by = request.user
+        obj.save()
+        messages.success(request, f"Incident created with RI Number {obj.code}")
+        return HttpResponseRedirect(reverse("incident_detail", args=[obj.pk]))
 
-        return HttpResponseRedirect(reverse("incident_detail_demo") + "?state=1")
+    if request.method == "GET":
+        context = {
+            "form": IncidentCreateForm(),
+        }
+        return render(request, "defects/incident_create.html", context)
 
-    context = {
-        "form": RILogForm(),
-    }
-    return render(request, "defects/incident_create.html", context)
+@login_required
+def incident_update(request, pk):
+    incident = get_object_or_404(Incident, pk=pk)
+    if request.method == "POST":
+        form = IncidentUpdateForm(request.POST, request.FILES, instance=incident)
+        if not form.is_valid():
+            messages.error(request, "Please correct the form inputs and submit again.")
+            context = {"form": form}
+            return render(request, "defects/incident_update.html", context)
+        obj = form.save()
+        messages.success(request, "Incident updated.")
+        return HttpResponseRedirect(reverse("incident_detail", args=[obj.pk]))
 
+    if request.method == "GET":
+        context = {
+            "form": IncidentUpdateForm(instance=incident),
+        }
+        return render(request, "defects/incident_update.html", context)
 
-def incident_notification_form(request):
+def incident_notification_form(request, pk):
+
+    incident = get_object_or_404(Incident, pk=pk)
+
     if request.method == "POST":
         messages.success(request, message="48-hour Notification Report created.")
         return HttpResponseRedirect(reverse("incident_detail_demo") + "?state=2")
