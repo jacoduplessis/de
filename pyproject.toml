@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "anglo-defects"
-version = "23.5.300"
-requires-python = ">=3.10"
+version = "23.7.210"
+requires-python = ">=3.11"
 dependencies = [
     'django==4.2.2',
     'python-dotenv==1.0.0',
