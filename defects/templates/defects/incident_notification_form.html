@@ -1,6 +1,6 @@
 {% extends 'defects/base.html' %}
 
-{% load crispy_forms_filters %}
+{% load crispy_forms_filters static %}
 
 {% block content %}
   <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 mt-3 mb-4">
@@ -16,9 +16,10 @@
       <form method="post">
         {% csrf_token %}
         {{ form|crispy }}
-        <input type="submit" value="Save" class="btn btn-primary">
-        <input type="submit" value="Save & Publish" class="btn btn-danger">
+        <input type="submit" name="action" value="Save" class="btn btn-primary">
+        <input type="submit" name="action" value="Save & Download" class="btn btn-info">
         <button role="button" class="btn btn-secondary">Open Value Calculator</button>
+        <a href="{% url 'incident_detail' form.instance.pk %}" class="btn btn-secondary">Back</a>
       </form>
     </div>
     <div>
@@ -30,4 +31,26 @@
   <!-- Modal -->
   {% include 'defects/_modal_calculator.html' %}
 
+{% endblock %}
+
+
+{% block extra_styles %}
+  <link rel="stylesheet" href="{% static 'tom-select.bootstrap5.min.css' %}">
+  <link rel="stylesheet" href="{% static 'flatpickr.min.css' %}">
+{% endblock %}
+
+
+{% block extra_scripts %}
+  <script src="{% static 'tom-select.complete.min.js' %}"></script>
+  {% include "defects/_select_equipment.html" %}
+  <script src="{% static 'flatpickr.js' %}"></script>
+  <script>
+    document.querySelectorAll('.datetimeinput').forEach(el => {
+      flatpickr(el, {
+        enableTime: true,
+        time_24hr: true,
+        minuteIncrement: 1,
+      });
+    })
+  </script>
 {% endblock %}

@@ -21,3 +21,13 @@
 - edit locks
 - background tasks
 - add pagination to list views
+
+
+## Demo
+
+- add incident
+- equipment select
+- admin dashboard
+- audit log
+- edit incident
+-

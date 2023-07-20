@@ -1,11 +1,10 @@
-import random
-
-from django.http import HttpResponseRedirect
+from django.db.models import Q
+from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from .models import Solution, Incident, UserAction, Section, Equipment
 from django.contrib import messages
-from .forms import IncidentCreateForm, RINotificationForm, RINotificationApprovalSendForm, RICloseForm, IncidentUpdateForm
+from .forms import IncidentCreateForm, IncidentNotificationForm, RINotificationApprovalSendForm, RICloseForm, IncidentUpdateForm
 from django.utils.timezone import now
 from datetime import timedelta, datetime
 from django.utils.lorem_ipsum import words
@@ -314,6 +313,7 @@ def incident_detail_demo(request):
 
     return render(request, "defects/incident_detail_demo.html", context=context)
 
+
 @login_required
 def incident_create(request):
     if request.method == "POST":
@@ -335,6 +335,7 @@ def incident_create(request):
         }
         return render(request, "defects/incident_create.html", context)
 
+
 @login_required
 def incident_update(request, pk):
     incident = get_object_or_404(Incident, pk=pk)
@@ -354,20 +355,34 @@ def incident_update(request, pk):
         }
         return render(request, "defects/incident_update.html", context)
 
-def incident_notification_form(request, pk):
 
+def incident_notification_form(request, pk):
     incident = get_object_or_404(Incident, pk=pk)
 
     if request.method == "POST":
-        messages.success(request, message="48-hour Notification Report created.")
-        return HttpResponseRedirect(reverse("incident_detail_demo") + "?state=2")
+        form = IncidentNotificationForm(request.POST, request.FILES, instance=incident)
+        if not form.is_valid():
+            messages.error(request, "Please correct the form inputs and submit again.")
+            context = {"form": form}
+            return render(request, "defects/incident_notification_form.html", context)
 
-    initial = {"time_start": now() - timedelta(hours=5), "time_end": now(), "short_description": words(8)}
+        form.save()
+        action = request.POST.get("action", "").lower()
+        if action == "save":
+            # redirect to self
+            return HttpResponseRedirect(reverse("incident_notification_form", args=[incident.pk]))
+        if "download" in action:
+            # todo: build a file
+            response = HttpResponse(content_type="")
+            response.headers["content-disposition"] = 'attachment; filename="filename.jpg"'
+            return
 
-    context = {
-        "form": RINotificationForm(initial=initial),
-    }
-    return render(request, "defects/incident_notification_form.html", context)
+
+    if request.method == "GET":
+        context = {
+            "form": IncidentNotificationForm(instance=incident),
+        }
+        return render(request, "defects/incident_notification_form.html", context)
 
 
 def incident_close_form(request):
@@ -467,3 +482,13 @@ class LogoutView(BaseLogoutView):
 
 def login(request):
     return render(request, "defects/login.html")
+
+
+def equipment_search(request):
+    query = request.GET.get("q")
+
+    qs = Equipment.objects.filter(Q(code=query) | Q(name__icontains=query))[:50]
+
+    return JsonResponse({
+        "items": [{"id": x.id, "name": str(x)} for x in qs],
+    })

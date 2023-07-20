@@ -20,14 +20,14 @@
               {% include 'defects/_timeline_entry.html' with entry=entry %}
             {% endfor %}
 
-            {% if actions %}
+            {% if incident.actions %}
               <li class="timeline-item mb-5">
                 <span class="timeline-icon bg-light text-black" data-feather="fast-forward"></span>
                 <h6>Future Actions</h6>
               </li>
             {% endif %}
 
-            {% for entry in actions %}
+            {% for entry in incident.actions %}
               {% include 'defects/_timeline_entry.html' with entry=entry %}
             {% endfor %}
 
@@ -64,7 +64,7 @@
           </tr>
           <tr>
             <th>Equipment</th>
-            <td>{{ incident.equipment.name }}</td>
+            <td>{{ incident.equipment.name }} ({{ incident.equipment.code }})</td>
           </tr>
           <tr>
             <th>Significant</th>

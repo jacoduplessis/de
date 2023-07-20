@@ -2,14 +2,6 @@ from django import forms
 from django.forms import widgets
 from .models import Incident
 
-EQUIPMENT_CHOICES = (
-    ("", ""),
-    ("x-123-abc", "Pump #12 (ID xxx)"),
-    ("x-234-abc", "Mill #6 (ID xxx)"),
-    ("x-345-abc", "Motor #44 (ID xxx)"),
-    ("x-456-abc", "Hoist #1 (ID xxx)"),
-)
-
 AREA_CHOICES = (
     ("aps", "APS"),
     ("concentrators", "Concentrators"),
@@ -69,6 +61,10 @@ class IncidentCreateForm(forms.ModelForm):
             "equipment": "Equipment (from SAP)",
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["equipment"].choices = []  # load options with ajax
+
 
 class IncidentUpdateForm(forms.ModelForm):
     class Meta:
@@ -91,12 +87,18 @@ class IncidentUpdateForm(forms.ModelForm):
             "equipment": "Equipment (from SAP)",
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        choices = [] if not self.instance else [(self.instance.equipment_id, str(self.instance.equipment))]
+        self.fields["equipment"].choices = choices  # load options with ajax
+
+
 
 class MultipleFileInput(forms.ClearableFileInput):
     allow_multiple_selected = True
 
 
-class RINotificationForm(forms.ModelForm):
+class IncidentNotificationForm(forms.ModelForm):
     pictures = forms.FileField(required=False, help_text="If applicable.", widget=MultipleFileInput())
 
     """
@@ -161,7 +163,6 @@ class RINotificationForm(forms.ModelForm):
                     "rows": 10,
                 }
             ),
-            "equipment": widgets.Select(choices=EQUIPMENT_CHOICES),
             "possible_effect": widgets.CheckboxSelectMultiple(choices=EFFECT_CHOICES),
         }
 

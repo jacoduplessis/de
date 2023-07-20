@@ -3,12 +3,12 @@ from decimal import Decimal
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.timezone import now
-from datetime import timedelta, datetime
+from datetime import timedelta
 from django.utils.crypto import get_random_string
+from django.urls import reverse
 
 from defects.timelines import TimelineEntry
 
-from auditlog.models import AuditlogHistoryField
 from auditlog.registry import auditlog
 
 
@@ -120,7 +120,6 @@ class Incident(models.Model):
         """
         select_related: created_by
         """
-
         return [
             TimelineEntry(
                 icon="alert-triangle",
@@ -134,6 +133,20 @@ class Incident(models.Model):
                 title="Incident Logged",
                 time=self.time_created,
                 text=f"Created by {self.created_by.email}.",
+            ),
+        ]
+
+    @property
+    def actions(self):
+
+        return [
+            TimelineEntry(
+                icon="clock",
+                title="Create 48-hour notification report",
+                time=self.time_start + timedelta(hours=48),
+                text="xxx hours of deadline remaining.",  # TODO: implement
+                link_text="Add Information",
+                link_url=reverse("incident_notification_form", args=[self.pk])
             ),
         ]
 

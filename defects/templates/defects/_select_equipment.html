@@ -1,0 +1,20 @@
+<script>
+  new TomSelect('select#id_equipment', {
+    valueField: 'id',
+    labelField: 'name',
+    searchField: 'name',
+    // fetch remote data
+    load: function (query, callback) {
+
+      const url = '/search/equipment?q=' + encodeURIComponent(query);
+      fetch(url)
+        .then(response => response.json())
+        .then(data => {
+          callback(data.items);
+        }).catch(() => {
+        callback();
+      });
+
+    },
+  });
+</script>
