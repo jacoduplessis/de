@@ -21,9 +21,12 @@ django==4.2.2
     #   anglo-defects (pyproject.toml)
     #   crispy-bootstrap5
     #   dj-database-url
+    #   django-auditlog
     #   django-crispy-forms
     #   django-import-export
     #   django-lifecycle
+django-auditlog==2.3.0
+    # via anglo-defects (pyproject.toml)
 django-crispy-forms==2.0
     # via
     #   anglo-defects (pyproject.toml)
@@ -44,21 +47,25 @@ openpyxl==3.1.2
     # via tablib
 packaging==23.1
     # via django-lifecycle
+python-dateutil==2.8.2
+    # via django-auditlog
 python-dotenv==1.0.0
     # via anglo-defects (pyproject.toml)
-pyyaml==6.0
+pyyaml==6.0.1
     # via tablib
 redis==4.5.5
     # via anglo-defects (pyproject.toml)
 sentry-sdk==1.25.1
     # via anglo-defects (pyproject.toml)
+six==1.16.0
+    # via python-dateutil
 sqlparse==0.4.4
     # via django
 tablib[html,ods,xls,xlsx,yaml]==3.5.0
     # via django-import-export
-typing-extensions==4.6.3
+typing-extensions==4.7.1
     # via dj-database-url
-urllib3==2.0.3
+urllib3==2.0.4
     # via sentry-sdk
 urlman==2.0.1
     # via django-lifecycle
