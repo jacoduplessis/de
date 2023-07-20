@@ -355,7 +355,7 @@ def incident_update(request, pk):
         }
         return render(request, "defects/incident_update.html", context)
 
-
+@login_required
 def incident_notification_form(request, pk):
     incident = get_object_or_404(Incident, pk=pk)
 
@@ -384,7 +384,7 @@ def incident_notification_form(request, pk):
         }
         return render(request, "defects/incident_notification_form.html", context)
 
-
+@login_required
 def incident_close_form(request):
     if request.method == "POST":
         messages.success(request, "Close-out slide created.")
@@ -398,6 +398,7 @@ def incident_close_form(request):
     return render(request, "defects/incident_close_form.html", context)
 
 
+@login_required
 def anniversary_list(request):
     incidents = Incident.objects.all()[:10]
 
@@ -405,7 +406,7 @@ def anniversary_list(request):
 
     return render(request, "defects/anniversary_list.html", context=context)
 
-
+@login_required
 def solution_schedule(request):
     if request.method == "GET":
         context = {"solutions": Solution.objects.all()[:5]}
@@ -417,7 +418,7 @@ def solution_schedule(request):
         return HttpResponseRedirect(reverse("solution_list") + "?filter=1&solution_status=scheduled")
 
 
-@login_required()
+@login_required
 def solution_completion(request):
     if request.method == "GET":
         context = {"solutions": Solution.objects.all()[:5]}
@@ -429,17 +430,17 @@ def solution_completion(request):
         return HttpResponseRedirect(reverse("solution_list") + "?filter=1&solution_status=complete")
 
 
-@login_required()
+@login_required
 def value_dashboard(request):
     return render(request, "defects/value_dashboard.html")
 
 
-@login_required()
+@login_required
 def compliance_dashboard(request):
     return render(request, "defects/compliance_dashboard.html")
 
 
-@login_required()
+@login_required
 def solution_list(request):
     if request.method == "POST":
         action = request.POST.get("action")
@@ -459,7 +460,7 @@ def solution_list(request):
     return render(request, "defects/solutions_list.html", context)
 
 
-@login_required()
+@login_required
 def incident_notification_approval_send(request):
     if request.method == "POST":
         messages.success(request, "Notification report has be sent to SEM for approval.")
@@ -484,6 +485,7 @@ def login(request):
     return render(request, "defects/login.html")
 
 
+@login_required
 def equipment_search(request):
     query = request.GET.get("q")
 
