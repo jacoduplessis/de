@@ -10,7 +10,7 @@ black==23.7.0
     # via anglo-defects (pyproject.toml)
 build==0.10.0
     # via pip-tools
-certifi==2023.5.7
+certifi==2023.7.22
     # via sentry-sdk
 click==8.1.6
     # via
@@ -64,6 +64,8 @@ packaging==23.1
     #   django-lifecycle
 pathspec==0.11.1
     # via black
+pillow==10.0.0
+    # via anglo-defects (pyproject.toml)
 pip-tools==7.1.0
     # via anglo-defects (pyproject.toml)
 platformdirs==3.9.1
@@ -92,7 +94,7 @@ urllib3==2.0.4
     # via sentry-sdk
 urlman==2.0.1
     # via django-lifecycle
-wheel==0.40.0
+wheel==0.41.0
     # via pip-tools
 whitenoise==6.5.0
     # via anglo-defects (pyproject.toml)
