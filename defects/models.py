@@ -178,7 +178,7 @@ class Incident(models.Model):
                         icon="clock",
                         title="48-hour notification report approved by SEM",
                         time=self.notification_approval.time_modified,
-                        text=f"Comment: {self.notification_approval.comment}"
+                        text=f"Comment: {self.notification_approval.comment}",
                     )
                 )
             if self.notification_approval.outcome == Approval.REJECTED:
@@ -187,7 +187,7 @@ class Incident(models.Model):
                         icon="clock",
                         title="48-hour notification report rejected by SEM",
                         time=self.notification_approval.time_modified,
-                        text=f"Comment: {self.notification_approval.comment}"
+                        text=f"Comment: {self.notification_approval.comment}",
                     )
                 )
         return entries
@@ -216,7 +216,6 @@ class Incident(models.Model):
             )
 
         if self.notification_time_published is not None:
-
             if not self.notification_approval.outcome == Approval.ACCEPTED:
                 actions.append(
                     TimelineEntry(
@@ -224,7 +223,7 @@ class Incident(models.Model):
                         title="Awaiting SEM approval for 48h Notification",
                         text=f"SEM reviewing: {self.notification_approval.name}",
                         link_text="Approval Link",
-                        link_url=reverse("approval_detail", args=[self.notification_approval.id])
+                        link_url=reverse("approval_detail", args=[self.notification_approval.id]),
                     )
                 )
 
@@ -345,5 +344,5 @@ auditlog.register(
         "equipment",
     ],
     serialize_data=True,
-    serialize_auditlog_fields_only=True
+    serialize_auditlog_fields_only=True,
 )

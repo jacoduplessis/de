@@ -46,10 +46,7 @@ class SolutionAdmin(ImportExportModelAdmin):
 
 @admin.register(SectionEngineer)
 class SectionEngineerAdmin(admin.ModelAdmin):
-    list_display = [
-        "name",
-        "user"
-    ]
+    list_display = ["name", "user"]
 
     def get_queryset(self, request):
         return super().get_queryset(request).select_related("user")
@@ -57,10 +54,7 @@ class SectionEngineerAdmin(admin.ModelAdmin):
 
 @admin.register(SectionEngineeringManager)
 class SectionEngineeringManagerAdmin(admin.ModelAdmin):
-    list_display = [
-        "name",
-        "user"
-    ]
+    list_display = ["name", "user"]
 
     def get_queryset(self, request):
         return super().get_queryset(request).select_related("user")

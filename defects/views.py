@@ -6,7 +6,14 @@ from django.urls import reverse
 from django.forms import modelformset_factory
 from .models import Solution, Incident, UserAction, Section, Equipment, IncidentImage, Approval
 from django.contrib import messages
-from .forms import IncidentCreateForm, IncidentNotificationForm, IncidentNotificationApprovalSendForm, IncidentCloseForm, IncidentUpdateForm, ApprovalForm
+from .forms import (
+    IncidentCreateForm,
+    IncidentNotificationForm,
+    IncidentNotificationApprovalSendForm,
+    IncidentCloseForm,
+    IncidentUpdateForm,
+    ApprovalForm,
+)
 from django.utils.timezone import now
 from datetime import timedelta, datetime
 from django.utils.lorem_ipsum import words
@@ -60,10 +67,7 @@ def incident_list(request):
 @login_required
 def incident_detail(request, pk):
     incident = (
-        Incident.objects
-        .select_related("section", "created_by", "section_engineer", "equipment")
-        .prefetch_related("images", "approvals")
-        .get(pk=pk)
+        Incident.objects.select_related("section", "created_by", "section_engineer", "equipment").prefetch_related("images", "approvals").get(pk=pk)
     )
     accessed.send(Incident, instance=incident)
 
@@ -73,35 +77,17 @@ def incident_detail(request, pk):
 
 
 def incident_notification(request, pk):
-    incident = (
-        Incident.objects
-        .select_related("section", "created_by", "section_engineer", "equipment")
-        .prefetch_related("images")
-        .get(pk=pk)
-    )
+    incident = Incident.objects.select_related("section", "created_by", "section_engineer", "equipment").prefetch_related("images").get(pk=pk)
 
-    context = {
-        "incident": incident,
-        "images": incident.images.all().order_by("index")
-    }
+    context = {"incident": incident, "images": incident.images.all().order_by("index")}
 
-    LogEntry.objects.log_create(
-        instance=incident,
-        action=LogEntry.Action.ACCESS,
-        changes="View incident 48h-notification"
-
-    )
+    LogEntry.objects.log_create(instance=incident, action=LogEntry.Action.ACCESS, changes="View incident 48h-notification")
 
     return render(request, template_name="defects/incident_notification.html", context=context)
 
 
 def incident_notification_publish(request, pk):
-    incident = (
-        Incident.objects
-        .select_related("section", "created_by", "section_engineer", "equipment")
-        .prefetch_related("images")
-        .get(pk=pk)
-    )
+    incident = Incident.objects.select_related("section", "created_by", "section_engineer", "equipment").prefetch_related("images").get(pk=pk)
 
     if request.method == "GET":
         form = IncidentNotificationApprovalSendForm()
@@ -131,9 +117,7 @@ def incident_notification_publish(request, pk):
             # set notification time published
 
             messages.success(request, "Notification report has be sent to SEM for approval.")
-            return HttpResponseRedirect(
-                reverse("incident_detail", args=[incident.pk])
-            )
+            return HttpResponseRedirect(reverse("incident_detail", args=[incident.pk]))
 
 
 @login_required
@@ -433,7 +417,8 @@ def incident_images(request, pk):
             "description",
         ],
         extra=5,
-        can_delete=True, can_order=True
+        can_delete=True,
+        can_order=True,
     )
 
     if request.method == "GET":
@@ -444,7 +429,6 @@ def incident_images(request, pk):
         return render(request, "defects/incident_images.html", context=context)
 
     if request.method == "POST":
-
         formset = formset_class(request.POST, request.FILES)
 
         if not formset.is_valid():
@@ -603,17 +587,17 @@ def equipment_search(request):
 
     qs = Equipment.objects.filter(Q(code=query) | Q(name__icontains=query))[:50]
 
-    return JsonResponse({
-        "items": [{"id": x.id, "name": str(x)} for x in qs],
-    })
+    return JsonResponse(
+        {
+            "items": [{"id": x.id, "name": str(x)} for x in qs],
+        }
+    )
 
 
 @login_required
 def incident_history(request, pk):
     incident = get_object_or_404(Incident, pk=pk)
-    context = {
-        "history": incident.history
-    }
+    context = {"history": incident.history}
     return render(request, "defects/object_history.html", context=context)
 
 
@@ -634,7 +618,6 @@ def approval_detail(request, pk):
         return render(request, "defects/approval.html", context=context)
 
     if request.method == "POST":
-
         form = ApprovalForm(request.POST, instance=approval)
 
         if not form.is_valid():
@@ -649,6 +632,4 @@ def approval_detail(request, pk):
         else:
             form.save()
             messages.success(request, "Approval outcome has been saved. You can return to this page to edit the outcome.")
-            return HttpResponseRedirect(
-                reverse("approval_detail", args=[approval.pk])
-            )
+            return HttpResponseRedirect(reverse("approval_detail", args=[approval.pk]))

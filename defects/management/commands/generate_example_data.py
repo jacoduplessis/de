@@ -92,7 +92,6 @@ class Command(BaseCommand):
         user_id = options["user"]
 
         with transaction.atomic():
-
             amb = Operation.objects.create(name="AMB")
 
             tumela = Section.objects.create(name="Tumela")
@@ -119,8 +118,8 @@ class Command(BaseCommand):
                     created_by_id=user_id,
                     section_engineer=se_a,
                     equipment=motor,
-                    time_start=now()-timedelta(days=100, hours=5),
-                    time_end=now()-timedelta(days=100),
+                    time_start=now() - timedelta(days=100, hours=5),
+                    time_end=now() - timedelta(days=100),
                     short_description=words(8, common=False),
                     long_description="\n\n".join(paragraphs(3, common=False)),
                 ),

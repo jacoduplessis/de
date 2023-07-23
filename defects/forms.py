@@ -42,7 +42,7 @@ class IncidentCreateForm(forms.ModelForm):
             "time_start": "Incident Start Time",
             "time_end": "Incident End Time",
             "equipment": "Equipment (from SAP)",
-            "preliminary_findings": "Preliminary Findings"
+            "preliminary_findings": "Preliminary Findings",
         }
 
     def __init__(self, *args, **kwargs):
@@ -69,7 +69,6 @@ class IncidentUpdateForm(forms.ModelForm):
             "immediate_action_taken",
             "remaining_risk",
             "significant",
-
         ]
         labels = {
             "short_description": "Short Description",
@@ -215,7 +214,6 @@ class IncidentCloseForm(forms.Form):
 
 
 class ApprovalForm(forms.ModelForm):
-
     class Meta:
         model = Approval
         fields = [
