@@ -15,6 +15,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
+
 from . import views
 
 urlpatterns = [
@@ -26,9 +29,13 @@ urlpatterns = [
     path("incidents/demo/", views.incident_detail_demo, name="incident_detail_demo"),
     path("incidents/<int:pk>/", views.incident_detail, name="incident_detail"),
     path("incidents/<int:pk>/edit/", views.incident_update, name="incident_update"),
-    path("incidents/<int:pk>/notification/form/", views.incident_notification_form, name="incident_notification_form"),
+    path("incidents/<int:pk>/images/", views.incident_images, name="incident_images"),
+    path("incidents/<int:pk>/notification/", views.incident_notification, name="incident_notification"),
+    path("incidents/<int:pk>/notification/publish/", views.incident_notification_publish, name="incident_notification_publish"),
+    path("incidents/<int:pk>/history/", views.incident_history, name="incident_history"),
     path("incidents/notification/approval/", views.incident_notification_approval_send, name="incident_notification_approval_send"),
     path("incidents/close/form/", views.incident_close_form, name="incident_close_form"),
+    path("approvals/<int:pk>/", views.approval_detail, name="approval_detail"),
     path("solutions/", views.solution_list, name="solution_list"),
     path("solutions/schedule/", views.solution_schedule, name="solution_schedule"),
     path("solutions/completion/", views.solution_completion, name="solution_completion"),
@@ -41,3 +48,6 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("search/equipment/", views.equipment_search, name="equipment_search")
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

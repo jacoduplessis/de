@@ -13,6 +13,13 @@
 - storage
 - backups
 
+## Application Questions
+
+- "circulation to AS&R Team"
+- areas, sections
+- production cost
+- notifications / emails
+
 ## TODO
 
 - skin admin
@@ -21,7 +28,8 @@
 - edit locks
 - background tasks
 - add pagination to list views
-
+- add ordering, searching to list views
+- custom error templates
 
 ## Demo
 

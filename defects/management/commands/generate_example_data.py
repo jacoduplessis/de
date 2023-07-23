@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from defects.models import UserAction, Incident, Section, SectionEngineer, Equipment
+from defects.models import UserAction, Incident, Section, SectionEngineer, Equipment, Operation, Area, SectionEngineeringManager
 from django.utils.timezone import now
 from django.utils.crypto import get_random_string
 from datetime import timedelta
@@ -92,6 +92,9 @@ class Command(BaseCommand):
         user_id = options["user"]
 
         with transaction.atomic():
+
+            amb = Operation.objects.create(name="AMB")
+
             tumela = Section.objects.create(name="Tumela")
             dishaba = Section.objects.create(name="Dishaba")
             concentrators = Section.objects.create(name="Concentrators")
@@ -99,6 +102,9 @@ class Command(BaseCommand):
 
             se_a = SectionEngineer.objects.create(name="Alice")
             se_b = SectionEngineer.objects.create(name="Bob")
+
+            sem_c = SectionEngineeringManager.objects.create(name="Chris")
+            sem_d = SectionEngineeringManager.objects.create(name="Dolores")
 
             winder = Equipment.objects.create(name="Winder", code=get_random_string(length=8))
             motor = Equipment.objects.create(name="Motor", code=get_random_string(length=8))
@@ -108,6 +114,7 @@ class Command(BaseCommand):
                 Incident(
                     code=Incident.generate_incident_code(),
                     section=tumela,
+                    operation=amb,
                     status=Incident.ACTIVE,
                     created_by_id=user_id,
                     section_engineer=se_a,
@@ -120,6 +127,7 @@ class Command(BaseCommand):
                 Incident(
                     code=Incident.generate_incident_code(),
                     section=aps,
+                    operation=amb,
                     status=Incident.ACTIVE,
                     created_by_id=user_id,
                     section_engineer=se_b,
@@ -132,6 +140,7 @@ class Command(BaseCommand):
                 Incident(
                     code=Incident.generate_incident_code(),
                     section=dishaba,
+                    operation=amb,
                     status=Incident.ONGOING,
                     created_by_id=user_id,
                     section_engineer=se_a,
@@ -144,6 +153,7 @@ class Command(BaseCommand):
                 Incident(
                     code=Incident.generate_incident_code(),
                     section=concentrators,
+                    operation=amb,
                     status=Incident.OVERDUE,
                     created_by_id=user_id,
                     section_engineer=se_b,

@@ -1,25 +1,6 @@
 from django import forms
 from django.forms import widgets
-from .models import Incident
-
-AREA_CHOICES = (
-    ("aps", "APS"),
-    ("concentrators", "Concentrators"),
-    ("dishaba", "Dishaba"),
-    ("tumela", "Tumela"),
-)
-
-SECTION_CHOICES = (
-    ("phoko", "Phoko Substation"),
-    ("merensky-bunkers", "Merensky Bunkers"),
-)
-
-SECTION_ENGINEER_CHOICES = (
-    ("a", "Alice"),
-    ("b", "Bob"),
-    ("c", "Chris"),
-    ("d", "Dennis"),
-)
+from .models import Incident, SectionEngineeringManager, Approval
 
 EFFECT_CHOICES = (
     ("repair", "Estimated cost of Repair > R 250K"),
@@ -29,7 +10,6 @@ EFFECT_CHOICES = (
 
 
 class IncidentCreateForm(forms.ModelForm):
-    preliminary_findings = forms.FileField(required=False)
     """
     Incident description headline	Freeform text input field
     Equipment Type	                Dropdown searchable list (motor, pump, mill, etc)
@@ -48,10 +28,13 @@ class IncidentCreateForm(forms.ModelForm):
         fields = [
             "short_description",
             "equipment",
+            "operation",
+            "area",
             "section",
             "section_engineer",
             "time_start",
             "time_end",
+            "preliminary_findings",
         ]
         labels = {
             "short_description": "Short Description",
@@ -59,6 +42,7 @@ class IncidentCreateForm(forms.ModelForm):
             "time_start": "Incident Start Time",
             "time_end": "Incident End Time",
             "equipment": "Equipment (from SAP)",
+            "preliminary_findings": "Preliminary Findings"
         }
 
     def __init__(self, *args, **kwargs):
@@ -73,10 +57,19 @@ class IncidentUpdateForm(forms.ModelForm):
             "short_description",
             "long_description",
             "equipment",
+            "operation",
+            "area",
             "section",
             "section_engineer",
             "time_start",
             "time_end",
+            "possible_effect",
+            "production_value_loss",
+            "rand_value_loss",
+            "immediate_action_taken",
+            "remaining_risk",
+            "significant",
+
         ]
         labels = {
             "short_description": "Short Description",
@@ -87,11 +80,26 @@ class IncidentUpdateForm(forms.ModelForm):
             "equipment": "Equipment (from SAP)",
         }
 
+        help_texts = {
+            "significant": "Is this a significant incident?",
+            "remaining_risk": "Indicate the remaining risk after immediate action was taken.",
+            "immediate_action_taken": "Describe the immediate action taken.",
+            "long_description": "Production Loss, Asset Damage, Theft, Fire, Etc.",
+        }
+
+        widgets = {
+            "long_description": widgets.Textarea(
+                attrs={
+                    "rows": 10,
+                }
+            ),
+            "possible_effect": widgets.CheckboxSelectMultiple(choices=EFFECT_CHOICES),
+        }
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         choices = [] if not self.instance else [(self.instance.equipment_id, str(self.instance.equipment))]
         self.fields["equipment"].choices = choices  # load options with ajax
-
 
 
 class MultipleFileInput(forms.ClearableFileInput):
@@ -154,24 +162,13 @@ class IncidentNotificationForm(forms.ModelForm):
             "immediate_action_taken": "Describe the immediate action taken.",
             "long_description": "Production Loss, Asset Damage, Theft, Fire, Etc.",
         }
-        widgets = {
-            "area": widgets.Select(choices=AREA_CHOICES),
-            "section": widgets.Select(choices=SECTION_CHOICES),
-            "section_engineer": widgets.Select(choices=SECTION_ENGINEER_CHOICES),
-            "long_description": widgets.Textarea(
-                attrs={
-                    "rows": 10,
-                }
-            ),
-            "possible_effect": widgets.CheckboxSelectMultiple(choices=EFFECT_CHOICES),
-        }
 
 
-class RINotificationApprovalSendForm(forms.Form):
-    sem = forms.ChoiceField(choices=SECTION_ENGINEER_CHOICES, required=False, label="Section Engineering Manager")
+class IncidentNotificationApprovalSendForm(forms.Form):
+    sem = forms.ModelChoiceField(queryset=SectionEngineeringManager.objects.exclude(user=None), required=True, label="Section Engineering Manager")
 
 
-class RICloseForm(forms.Form):
+class IncidentCloseForm(forms.Form):
     """
     Incident description headline	Greyed out field. (from Log Notification.)
     Date of Incident Ocurrance	    Greyed out field. (from Log Notification.)
@@ -204,14 +201,24 @@ class RICloseForm(forms.Form):
         help_text="Provide confidence rating out of 5.",
     )
     se_close_out_confidence = forms.ChoiceField(
-        choices=SECTION_ENGINEER_CHOICES,
+        choices=[],
         required=False,
         label="SE Close-Out Confidence",
         help_text="The SE selected here will be notified and asked to provide a confidence rating.",
     )
     sem_close_out_confidence = forms.ChoiceField(
-        choices=SECTION_ENGINEER_CHOICES,
+        choices=[],
         required=False,
         label="SEM Close-Out Confidence",
         help_text="The SEM selected here will be notified and asked to provide a confidence rating.",
     )
+
+
+class ApprovalForm(forms.ModelForm):
+
+    class Meta:
+        model = Approval
+        fields = [
+            "outcome",
+            "comment",
+        ]

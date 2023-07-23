@@ -5,7 +5,11 @@
 
     <div class="d-flex justify-content-between align-items-center">
       <h2>Reliability Incident {{ incident.code }}</h2>
-      <div><a href="{% url 'incident_update' incident.pk %}" class="btn btn-primary btn-sm">Edit</a></div>
+      <div>
+        <a href="{% url 'incident_update' incident.pk %}" class="btn btn-primary btn-sm">Edit</a>
+        <a href="{% url 'incident_images' incident.pk %}" class="btn btn-primary btn-sm">Images</a>
+        {#        <a href="{% url 'incident_history' incident.pk %}" class="btn btn-secondary btn-sm">History</a>#}
+      </div>
     </div>
 
     <hr>
@@ -23,7 +27,7 @@
             {% if incident.actions %}
               <li class="timeline-item mb-5">
                 <span class="timeline-icon bg-light text-black" data-feather="fast-forward"></span>
-                <h6>Future Actions</h6>
+                <h6>Actions</h6>
               </li>
             {% endif %}
 
@@ -36,10 +40,6 @@
 
       </div>
       <div class="col-12 col-lg-6">
-        <h4>Short Description</h4>
-        <p>{{ incident.short_description }}</p>
-        <h4 class="mt-3">Long Description</h4>
-        {{ incident.long_description|linebreaks }}
         <table class="table table-bordered">
           <tbody>
           <tr>
@@ -80,7 +80,7 @@
           </tr>
           <tr>
             <th>48h Notification</th>
-            <td>{% if reports.notification %}<a href="#">Download</a>{% else %}---{% endif %}</td>
+            <td><a href="{% url 'incident_notification' incident.pk %}">View</a></td>
           </tr>
           <tr>
             <th>Close Out</th>
@@ -90,9 +90,18 @@
             <th>RCA Report</th>
             <td>{% if reports.rca %}<a href="#">Download</a>{% else %}---{% endif %}</td>
           </tr>
+          <tr>
+            <th>Images</th>
+            <td>{{ incident.images.all|length }} image{{ incident.images.all|length|pluralize }}</td>
+          </tr>
 
           </tbody>
         </table>
+        <h4>Short Description</h4>
+        <p>{{ incident.short_description }}</p>
+        <h4 class="mt-3">Long Description</h4>
+        {{ incident.long_description|linebreaks }}
+
 
         {% if request.GET.solutions == '1' %}
           <div class="d-flex mt-4 justify-content-between">

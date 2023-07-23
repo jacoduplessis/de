@@ -13,5 +13,6 @@ class TimelineEntry:
     icon_classes: str = ""
     link_url: str = "#"
     link_text: str = ""
+    secondary_link_url: str = ""
     secondary_link_text: str = ""
     text: str = ""
