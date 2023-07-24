@@ -4,7 +4,7 @@ from django.http import HttpResponseRedirect, JsonResponse, HttpResponse, HttpRe
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.forms import modelformset_factory
-from .models import Solution, Incident, UserAction, Section, Equipment, IncidentImage, Approval
+from .models import Solution, Incident, UserAction, Section, Equipment, IncidentImage, Approval, Area
 from django.contrib import messages
 from .forms import (
     IncidentCreateForm,
@@ -38,6 +38,7 @@ def apps(request):
 def home(request):
     context = {
         "sections": (Section.objects.annotate(count=Count("incidents")).all().values_list("name", "count", named=True)),
+        "areas": (Area.objects.annotate(count=Count("incidents")).all().values_list("name", "count", named=True)),
         "equipment": (
             Equipment.objects.filter(incidents__time_start__gte=now() - timedelta(days=365))
             .annotate(count=Count("incidents"))
