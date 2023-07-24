@@ -102,7 +102,14 @@ def incident_notification_publish(request, pk):
     if request.method == "POST":
         form = IncidentNotificationApprovalSendForm(request.POST)
 
-        if form.is_valid():
+        if not form.is_valid():
+            context = {
+                "incident": incident,
+                "form": form,
+            }
+            return render(request, template_name="defects/incident_notification_publish.html", context=context)
+
+        else:
             sem = form.cleaned_data["sem"]
 
             # create an approval object
@@ -111,6 +118,7 @@ def incident_notification_publish(request, pk):
                 user_id=sem.user_id,
                 role=Approval.SECTION_ENGINEERING_MANAGER,
                 type=Approval.NOTIFICATION,
+                incident=incident,
             )
             incident.notification_time_published = now()
             incident.save()

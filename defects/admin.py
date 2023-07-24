@@ -1,12 +1,11 @@
 from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
 from import_export.resources import ModelResource
-from .models import Solution, Incident, Equipment, SectionEngineer, SectionEngineeringManager
+from .models import Solution, Incident, Equipment, SectionEngineer, SectionEngineeringManager, Section, Area, UserAction
 
 admin.site.site_header = "Anglo DE Tool Admin"
 admin.site.site_title = "Anglo DE Tool"
 admin.site.index_title = "Administration"
-admin.site
 
 
 @admin.register(Incident)
@@ -58,3 +57,18 @@ class SectionEngineeringManagerAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         return super().get_queryset(request).select_related("user")
+
+
+@admin.register(Area)
+class AreaAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(Section)
+class SectionAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(UserAction)
+class UserActionAdmin(admin.ModelAdmin):
+    pass

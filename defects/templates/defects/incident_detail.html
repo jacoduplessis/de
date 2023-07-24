@@ -78,6 +78,12 @@
             <th>Rand Cost</th>
             <td>{{ incident.rand_value_loss }}</td>
           </tr>
+          {% if incident.preliminary_findings %}
+            <tr>
+              <th>Preliminary Findings</th>
+              <td><a href="{{ MEDIA_URL }}{{ incident.preliminary_findings.url }}" download>Download</a></td>
+            </tr>
+          {% endif %}
           <tr>
             <th>48h Notification</th>
             <td><a href="{% url 'incident_notification' incident.pk %}">View</a></td>

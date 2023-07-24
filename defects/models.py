@@ -199,6 +199,14 @@ class Incident(models.Model):
                 return approval
 
     @property
+    def notification_deadline_text(self):
+        deadline_time = self.time_start + timedelta(hours=48)
+        remaining = deadline_time - now()
+        if remaining > timedelta(seconds=1):
+            return f'{int(remaining.total_seconds() / 3600)} hours until deadline'
+        return 'Deadline has expired'
+
+    @property
     def actions(self):
         actions = []
         if not self.notification_time_published:
@@ -207,7 +215,7 @@ class Incident(models.Model):
                     icon="clock",
                     title="Create 48-hour notification report",
                     time=self.time_start + timedelta(hours=48),
-                    text="xxx hours of deadline remaining.",  # TODO: implement
+                    text=self.notification_deadline_text,  # TODO: implement
                     link_text="Add Information",
                     link_url=reverse("incident_update", args=[self.pk]),
                     secondary_link_url=reverse("incident_notification_publish", args=[self.pk]),
