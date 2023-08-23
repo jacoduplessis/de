@@ -1,11 +1,22 @@
+from datetime import timedelta, datetime
+
 from auditlog.models import LogEntry
-from django.db.models import Q
+from auditlog.signals import accessed
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import LoginView as BaseLoginView, LogoutView as BaseLogoutView
+from django.contrib.auth.models import User
+from django.db.models import Q, Prefetch
+from django.db.models.aggregates import Count
+from django.forms import modelformset_factory, modelform_factory
 from django.http import HttpResponseRedirect, JsonResponse, HttpResponse, HttpResponseForbidden
 from django.shortcuts import render, get_object_or_404
+from django.template.loader import render_to_string
 from django.urls import reverse
-from django.forms import modelformset_factory
-from .models import Solution, Incident, UserAction, Section, Equipment, IncidentImage, Approval, Area
-from django.contrib import messages
+from django.utils.lorem_ipsum import words
+from django.utils.timezone import now
+from django.views.decorators.http import require_POST, require_GET
+
 from .forms import (
     IncidentCreateForm,
     IncidentNotificationForm,
@@ -14,14 +25,7 @@ from .forms import (
     IncidentUpdateForm,
     ApprovalForm,
 )
-from django.utils.timezone import now
-from datetime import timedelta, datetime
-from django.utils.lorem_ipsum import words
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.views import LoginView as BaseLoginView, LogoutView as BaseLogoutView
-from django.db.models.aggregates import Count
-from auditlog.signals import accessed
-
+from .models import Solution, Incident, UserAction, Section, Equipment, IncidentImage, Approval, Area, Feedback
 from .timelines import TimelineEntry
 
 
@@ -375,12 +379,17 @@ def incident_detail_demo(request):
 
 @login_required
 def incident_create(request):
+    """
+    Rendered in modal.
+    """
+    template_name = "defects/incident_create_modal.html"
+
     if request.method == "POST":
         form = IncidentCreateForm(request.POST, request.FILES)
         if not form.is_valid():
             messages.error(request, "Please correct the form inputs and submit again.")
             context = {"form": form}
-            return render(request, "defects/incident_create.html", context)
+            return render(request, template_name, context)
         obj = form.save(commit=False)
         obj.code = Incident.generate_incident_code()
         obj.created_by = request.user
@@ -390,20 +399,25 @@ def incident_create(request):
 
     if request.method == "GET":
         context = {
-            "form": IncidentCreateForm(),
+            "form": IncidentCreateForm(initial={"time_start": now() - timedelta(hours=2), "time_end": now() + timedelta(hours=2)}),
         }
-        return render(request, "defects/incident_create.html", context)
+        return render(request, template_name, context)
 
 
 @login_required
 def incident_update(request, pk):
+    """
+    Renders in modal.
+    """
+    template_name = "defects/incident_update_modal.html"
+
     incident = get_object_or_404(Incident, pk=pk)
     if request.method == "POST":
         form = IncidentUpdateForm(request.POST, request.FILES, instance=incident)
         if not form.is_valid():
             messages.error(request, "Please correct the form inputs and submit again.")
             context = {"form": form}
-            return render(request, "defects/incident_update.html", context)
+            return render(request, template_name, context)
         obj = form.save()
         messages.success(request, "Incident updated.")
         return HttpResponseRedirect(reverse("incident_detail", args=[obj.pk]))
@@ -412,12 +426,14 @@ def incident_update(request, pk):
         context = {
             "form": IncidentUpdateForm(instance=incident),
         }
-        return render(request, "defects/incident_update.html", context)
+        return render(request, template_name, context)
 
 
 @login_required
 def incident_images(request, pk):
-    incident = Incident.objects.get(pk=pk)
+    images_prefetch = Prefetch("images", queryset=IncidentImage.objects.order_by("index"))
+
+    incident = Incident.objects.prefetch_related(images_prefetch).get(pk=pk)
 
     formset_class = modelformset_factory(
         model=IncidentImage,
@@ -426,14 +442,14 @@ def incident_images(request, pk):
             "description",
         ],
         extra=5,
-        can_delete=True,
-        can_order=True,
+        can_order=False,
     )
 
     if request.method == "GET":
         context = {
-            "formset": formset_class(),
+            "formset": formset_class(queryset=IncidentImage.objects.none()),
             "incident": incident,
+            "images": incident.images.all(),
         }
         return render(request, "defects/incident_images.html", context=context)
 
@@ -456,7 +472,7 @@ def incident_images(request, pk):
 
             messages.success(request, "Images uploaded.")
 
-        return HttpResponseRedirect(reverse("incident_detail", args=[pk]))
+        return HttpResponseRedirect(reverse("incident_images", args=[pk]))
 
 
 @login_required
@@ -486,6 +502,53 @@ def incident_notification_form(request, pk):
             "form": IncidentNotificationForm(instance=incident),
         }
         return render(request, "defects/incident_notification_form.html", context)
+
+
+@login_required
+def incident_notification_pdf(request, pk):
+    from weasyprint import HTML
+    from .reports import url_fetcher
+
+    qs = Incident.objects.prefetch_related("images")
+
+    incident = get_object_or_404(qs, pk=pk)
+
+    context = {"incident": incident, "images": incident.images.all()}
+
+    markup = render_to_string("defects/reports/notification.html", context=context, request=request)
+
+    response = HttpResponse(
+        headers={
+            "Content-Type": "application/pdf",
+            # "Content-Disposition": f'attachment; filename="notification-{incident.code}.pdf"',
+        }
+    )
+
+    doc = HTML(string=markup, url_fetcher=url_fetcher)
+    doc.write_pdf(target=response)
+    return response
+
+
+@login_required
+def incident_close_pdf(request, pk):
+    from weasyprint import HTML
+
+    incident = get_object_or_404(Incident, pk=pk)
+
+    context = {"incident": incident}
+
+    markup = render_to_string("defects/reports/closeout.html", context=context, request=request)
+
+    response = HttpResponse(
+        headers={
+            "Content-Type": "application/pdf",
+            #   "Content-Disposition": f'attachment; filename="close-{incident.code}.pdf"',
+        }
+    )
+
+    doc = HTML(string=markup)
+    doc.write_pdf(target=response)
+    return response
 
 
 @login_required
@@ -642,3 +705,79 @@ def approval_detail(request, pk):
             form.save()
             messages.success(request, "Approval outcome has been saved. You can return to this page to edit the outcome.")
             return HttpResponseRedirect(reverse("approval_detail", args=[approval.pk]))
+
+
+@login_required
+def about_users(request):
+    users = User.objects.all().prefetch_related("groups").order_by("email")
+
+    context = {"users": [{"email": u.email, "username": u.username, "groups": [g.name for g in u.groups.all()]} for u in users]}
+
+    return render(request, "defects/about_users.html", context=context)
+
+
+@login_required
+def feedback(request):
+    Form = modelform_factory(Feedback, fields=["description"], help_texts={"description": "Please submit a detailed and descriptive summary."})
+
+    if request.method == "POST":
+        form = Form(request.POST)
+        if form.is_valid():
+            obj = form.save(commit=False)
+            obj.created_by = request.user
+            obj.save()
+            messages.success(request, "Feedback submitted.")
+            return HttpResponseRedirect(reverse("feedback"))
+
+        else:
+            context = {
+                "form": form,
+            }
+            return render(request, "defects/feedback.html", context=context)
+
+    if request.method == "GET":
+        context = {"submissions": Feedback.objects.select_related("created_by").filter(dismissed=False).order_by("-time_created"), "form": Form()}
+
+        return render(request, "defects/feedback.html", context=context)
+
+
+@require_GET
+@login_required
+def image_delete(request, pk):
+    """
+    Technically this should be a POST but this would require an intermediary
+    form with a CSRF token so to keep things simple we just use GET
+    """
+
+    image = IncidentImage.objects.get(id=pk)
+    incident_id = image.incident_id
+    image.image.delete()
+    image.delete()
+    messages.info(request, "Image has been deleted.")
+    return HttpResponseRedirect(reverse("incident_images", args=[incident_id]))
+
+
+@login_required
+def image_update(request, pk):
+    """
+    Renders in modal.
+    """
+    image = IncidentImage.objects.get(id=pk)
+
+    Form = modelform_factory(IncidentImage, fields=["description", "index"])
+
+    if request.method == "POST":
+        form = Form(request.POST, instance=image)
+        if not form.is_valid():
+            return render(request, "defects/image_update_modal.html", context={"form": form, "image": image})
+        form.save()
+        return HttpResponseRedirect(reverse("incident_images", args=[image.incident_id]))
+
+    if request.method == "GET":
+        form = Form(instance=image)
+        context = {
+            "form": form,
+            "image": image,
+        }
+
+        return render(request, "defects/image_update_modal.html", context=context)

@@ -48,8 +48,8 @@
           <tbody>
           {% for obj in user_actions %}
             <tr>
-              <td><a href="{% url 'incident_detail' obj.incident_id %}" class="text-black">{{ obj.incident.code}}</a></td>
-              <td><span class="colored-dot bg-{{ obj.urgency }}"></span> {{ obj.description}}</td>
+              <td><a href="{% url 'incident_detail' obj.incident_id %}" class="text-black">{{ obj.incident.code }}</a></td>
+              <td><span class="colored-dot bg-{{ obj.urgency }}"></span> {{ obj.description }}</td>
               <td>{{ obj.time_required|date:'Y-m-d' }}</td>
             </tr>
           {% endfor %}
@@ -130,126 +130,7 @@
       </div>
     </div>
 
+    <script src="{% static "scripts/dashboard.js" %}" defer></script>
   </main>
 {% endblock %}
 
-{% block extra_scripts %}
-
-
-  <script src="{% static 'chart.min.js' %}"></script>
-  <script>
-    /* globals Chart:false, feather:false */
-
-    (() => {
-      // Graphs
-      const ctx = document.getElementById('myChart')
-      // eslint-disable-next-line no-unused-vars
-      const myChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: [
-            '2022-04',
-            '2022-05',
-            '2022-06',
-            '2022-07',
-            '2022-08',
-            '2022-09',
-            '2022-10'
-          ],
-          datasets: [{
-            data: [
-              39,
-              42,
-              38,
-              35,
-              40,
-              41,
-              29
-            ],
-            lineTension: 0,
-            backgroundColor: 'transparent',
-            borderColor: '#007bff',
-            borderWidth: 4,
-            pointBackgroundColor: '#007bff'
-          }]
-        },
-        options: {
-          scales: {
-            yAxes: [{
-              ticks: {
-                beginAtZero: false
-              }
-            }]
-          },
-          plugins: {
-            title: {
-              display: false
-            },
-            legend: {
-              display: false,
-            }
-          }
-        }
-      })
-    })()
-
-  </script>
-
-  <script>
-    /* globals Chart:false, feather:false */
-
-    (() => {
-      // Graphs
-      const ctx = document.getElementById('bar-chart')
-      // eslint-disable-next-line no-unused-vars
-      const myChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: [
-            '2022-04',
-            '2022-05',
-            '2022-06',
-            '2022-07',
-            '2022-08',
-            '2022-09',
-            '2022-10'
-          ],
-          datasets: [{
-            data: [
-              6,
-              5,
-              4,
-              15,
-              7,
-              8,
-              9
-            ],
-            lineTension: 0,
-            backgroundColor: '#007bff',
-            borderColor: '#007bff',
-            borderWidth: 4,
-            pointBackgroundColor: '#007bff'
-          }]
-        },
-        options: {
-          scales: {
-            yAxes: [{
-              ticks: {
-                beginAtZero: false
-              }
-            }]
-          },
-          plugins: {
-            title: {
-              display: false
-            },
-            legend: {
-              display: false,
-            }
-          }
-        }
-      })
-    })()
-
-  </script>
-{% endblock %}

@@ -5,10 +5,20 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="">
-  <meta name="author" content="Vetasi">
-  <title>AAP AMB - Defect Elimination</title>
+  <title>Anglo - Defect Elimination</title>
 
   <link rel="stylesheet" href="{% static 'bootstrap.min.css' %}"/>
+  <link rel="stylesheet" href="{% static 'unpoly.css' %}"/>
+  <link rel="stylesheet" href="{% static 'unpoly-bootstrap5.css' %}"/>
+  <link rel="stylesheet" href="{% static 'tom-select.bootstrap5.min.css' %}">
+  <link rel="stylesheet" href="{% static 'flatpickr.min.css' %}">
+
+  <script src="{% static 'bootstrap.bundle.min.js' %}" defer></script>
+  <script src="{% static 'unpoly.js' %}" defer></script>
+  <script src="{% static 'unpoly-bootstrap5.js' %}" defer></script>
+  <script src="{% static 'tom-select.complete.min.js' %}" defer></script>
+  <script src="{% static 'flatpickr.js' %}" defer></script>
+  <script src="{% static 'chart.min.js' %}" defer></script>
 
   <style>
     .bd-placeholder-img {
@@ -68,11 +78,6 @@
       font-size: .875rem;
     }
 
-    .feather {
-      width: 16px;
-      height: 16px;
-    }
-
     /*
      * Sidebar
      */
@@ -108,18 +113,8 @@
       color: #333;
     }
 
-    .sidebar .nav-link .feather {
-      margin-right: 4px;
-      color: #727272;
-    }
-
     .sidebar .nav-link.active {
       color: #2470dc;
-    }
-
-    .sidebar .nav-link:hover .feather,
-    .sidebar .nav-link.active .feather {
-      color: inherit;
     }
 
     .sidebar-heading {
@@ -161,41 +156,45 @@
       background-color: #021795;
     }
 
+    .nav-link svg {
+      margin-right: 0.3rem;
+    }
+
   </style>
 
   <!-- timeline css -->
   <style>
-  .timeline-with-icons {
-    border-left: 1px solid hsl(0, 0%, 90%);
-    position: relative;
-    list-style: none;
-  }
+    .timeline-with-icons {
+      border-left: 1px solid hsl(0, 0%, 90%);
+      position: relative;
+      list-style: none;
+    }
 
-  .timeline-with-icons .timeline-item {
-    position: relative;
-  }
+    .timeline-with-icons .timeline-item {
+      position: relative;
+    }
 
-  .timeline-with-icons .timeline-item:after {
-    position: absolute;
-    display: block;
-    top: 0;
-  }
+    .timeline-with-icons .timeline-item:after {
+      position: absolute;
+      display: block;
+      top: 0;
+    }
 
-  .timeline-with-icons .timeline-icon {
-    position: absolute;
-    left: -48px;
-    top: -6px;
-    background-color: hsl(217, 88.2%, 90%);
-    color: hsl(217, 88.8%, 35.1%);
-    border-radius: 50%;
-    height: 31px;
-    width: 31px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 5px
-  }
-</style>
+    .timeline-with-icons .timeline-icon {
+      position: absolute;
+      left: -48px;
+      top: -6px;
+      background-color: hsl(217, 88.2%, 90%);
+      color: hsl(217, 88.8%, 35.1%);
+      border-radius: 50%;
+      height: 31px;
+      width: 31px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 5px
+    }
+  </style>
 
   {% block extra_styles %}{% endblock %}
 </head>
@@ -215,32 +214,10 @@
     {% endblock messages %}
 
     {% block content %}
-
+      <main></main>
     {% endblock content %}
   </div>
 </div>
-
-
-<script src="{% static 'bootstrap.bundle.min.js' %}"></script>
-<script src="{% static 'feather.min.js' %}"></script>
-
-<script>
-  document.querySelectorAll('.nav-link').forEach(el => {
-    if (el.getAttribute('href') === window.location.pathname) {
-      el.classList.add('active')
-    }
-  })
-</script>
-
-<script>
-  /* globals Chart:false, feather:false */
-
-  (() => {
-    'use strict'
-
-    feather.replace({'aria-hidden': 'true'})
-  })()
-</script>
 
 {% block extra_scripts %}{% endblock %}
 </body>

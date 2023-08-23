@@ -1,0 +1,25 @@
+{% extends 'defects/base.html' %}
+
+{% load crispy_forms_filters static %}
+
+{% block content %}
+  <main>
+    <h2>Log Reliability Incident</h2>
+    <hr>
+
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {{ form|crispy }}
+      <p><small class="text-body-secondary">RI number will be generated upon submission.</small></p>
+      <input type="submit" value="Submit" class="btn btn-primary">
+    </form>
+
+    {% include "defects/_select_equipment.html" %}
+    {% include "defects/_datepicker.html" %}
+
+  </main>
+
+{% endblock %}
+
+
+

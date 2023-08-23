@@ -1,0 +1,44 @@
+{% extends 'defects/base.html' %}
+
+{% load crispy_forms_filters %}
+
+{% block content %}
+
+  <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 mt-3">
+    <h2>Feedback</h2>
+    <hr>
+    <p>On this page feedback and issues can be submitted, and previous submissions viewed.</p>
+
+    <h4>Submit New Feedback</h4>
+    <form method="post" up-submit>
+      {% csrf_token %}
+      {{ form|crispy }}
+      <input type="submit" class="btn btn-primary" value="Submit">
+    </form>
+
+    {% if submissions %}
+      <hr>
+      <h4>Previous Submissions</h4>
+      <table class="table table-striped">
+        <thead>
+        <tr>
+          <th>User</th>
+          <th>Date</th>
+          <th>Description</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for sub in submissions %}
+          <tr>
+            <td>{{ sub.created_by.email }}</td>
+            <td>{{ sub.time_created|date:"Y-m-d" }}</td>
+            <td>{{ sub.description }}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+
+    {% endif %}
+  </main>
+
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends 'defects/base.html' %}
+
+{% load crispy_forms_filters static %}
+
+{% block content %}
+  <main>
+    <h2>Update Reliability Incident</h2>
+    <hr>
+    <div>
+      <form method="post">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <input type="submit" value="Submit" class="btn btn-primary">
+      </form>
+    </div>
+
+    {% include "defects/_select_equipment.html" %}
+    {% include "defects/_datepicker.html" %}
+  </main>
+
+{% endblock %}
+
+

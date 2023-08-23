@@ -5,7 +5,7 @@ from django.utils.crypto import get_random_string
 from datetime import timedelta
 from django.db import transaction
 from django.utils.lorem_ipsum import words, paragraphs
-
+from django.contrib.auth.models import User
 
 class Command(BaseCommand):
     """
@@ -99,11 +99,7 @@ class Command(BaseCommand):
             concentrators = Section.objects.create(name="Concentrators")
             aps = Section.objects.create(name="APS")
 
-            se_a = SectionEngineer.objects.create(name="Alice")
-            se_b = SectionEngineer.objects.create(name="Bob")
-
-            sem_c = SectionEngineeringManager.objects.create(name="Chris")
-            sem_d = SectionEngineeringManager.objects.create(name="Dolores")
+            se = User.objects.filter(groups__name__in=["section_engineer"]).first()
 
             winder = Equipment.objects.create(name="Winder", code=get_random_string(length=8))
             motor = Equipment.objects.create(name="Motor", code=get_random_string(length=8))
@@ -116,7 +112,7 @@ class Command(BaseCommand):
                     operation=amb,
                     status=Incident.ACTIVE,
                     created_by_id=user_id,
-                    section_engineer=se_a,
+                    section_engineer=se,
                     equipment=motor,
                     time_start=now() - timedelta(days=100, hours=5),
                     time_end=now() - timedelta(days=100),
@@ -129,7 +125,7 @@ class Command(BaseCommand):
                     operation=amb,
                     status=Incident.ACTIVE,
                     created_by_id=user_id,
-                    section_engineer=se_b,
+                    section_engineer=se,
                     equipment=motor,
                     time_start=now() - timedelta(days=50, hours=4),
                     time_end=now() - timedelta(days=50),
@@ -142,7 +138,7 @@ class Command(BaseCommand):
                     operation=amb,
                     status=Incident.ONGOING,
                     created_by_id=user_id,
-                    section_engineer=se_a,
+                    section_engineer=se,
                     equipment=winder,
                     time_start=now() - timedelta(days=20, hours=2),
                     time_end=now() - timedelta(days=20),
@@ -155,7 +151,7 @@ class Command(BaseCommand):
                     operation=amb,
                     status=Incident.OVERDUE,
                     created_by_id=user_id,
-                    section_engineer=se_b,
+                    section_engineer=se,
                     equipment=pump,
                     time_start=now() - timedelta(days=5, hours=20),
                     time_end=now() - timedelta(days=5),

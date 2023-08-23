@@ -1,7 +1,7 @@
 from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
 from import_export.resources import ModelResource
-from .models import Solution, Incident, Equipment, SectionEngineer, SectionEngineeringManager, Section, Area, UserAction, Operation
+from .models import Solution, Incident, Equipment, SectionEngineer, SectionEngineeringManager, Section, Area, UserAction, Operation, Feedback
 
 admin.site.site_header = "Anglo DE Tool Admin"
 admin.site.site_title = "Anglo DE Tool"
@@ -76,4 +76,9 @@ class UserActionAdmin(admin.ModelAdmin):
 
 @admin.register(Operation)
 class OperationAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(Feedback)
+class FeedbackAdmin(admin.ModelAdmin):
     pass

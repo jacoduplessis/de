@@ -6,7 +6,7 @@
     <div class="d-flex justify-content-between align-items-center">
       <h2>Reliability Incident {{ incident.code }}</h2>
       <div>
-        <a href="{% url 'incident_update' incident.pk %}" class="btn btn-primary btn-sm">Edit</a>
+        <a href="{% url 'incident_update' incident.pk %}" class="btn btn-primary btn-sm"  up-layer="new" up-size="large">Edit</a>
         <a href="{% url 'incident_images' incident.pk %}" class="btn btn-primary btn-sm">Images</a>
         {#        <a href="{% url 'incident_history' incident.pk %}" class="btn btn-secondary btn-sm">History</a>#}
       </div>
@@ -26,7 +26,10 @@
 
             {% if incident.actions %}
               <li class="timeline-item mb-5">
-                <span class="timeline-icon bg-light text-black" data-feather="fast-forward"></span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="timeline-icon bi bi-fast-forward-circle bg-secondary text-white" viewBox="0 0 16 16">
+                  <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14Zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16Z"/>
+                  <path d="M4.271 5.055a.5.5 0 0 1 .52.038L8 7.386V5.5a.5.5 0 0 1 .79-.407l3.5 2.5a.5.5 0 0 1 0 .814l-3.5 2.5A.5.5 0 0 1 8 10.5V8.614l-3.21 2.293A.5.5 0 0 1 4 10.5v-5a.5.5 0 0 1 .271-.445Z"/>
+                </svg>
                 <h6>Actions</h6>
               </li>
             {% endif %}
@@ -60,7 +63,7 @@
           </tr>
           <tr>
             <th>Section Engineer</th>
-            <td>{{ incident.section_engineer.name }}</td>
+            <td>{{ incident.section_engineer.username }}</td>
           </tr>
           <tr>
             <th>Time</th>
@@ -85,7 +88,7 @@
           {% if incident.preliminary_findings %}
             <tr>
               <th>Preliminary Findings</th>
-              <td><a href="{{ MEDIA_URL }}{{ incident.preliminary_findings.url }}" download>Download</a></td>
+              <td><a href="{{ incident.preliminary_findings.url }}" download>Download</a></td>
             </tr>
           {% endif %}
           <tr>

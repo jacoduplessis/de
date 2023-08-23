@@ -96,12 +96,12 @@ class Incident(models.Model):
 
     code = models.CharField(unique=True, max_length=200)  # also known as RI_Number
     time_created = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="+")
     status = models.CharField(max_length=100, choices=STATUS_CHOICES, default=ACTIVE)
     operation = models.ForeignKey(Operation, null=True, blank=True, on_delete=models.SET_NULL)
     area = models.ForeignKey(Area, null=True, blank=True, on_delete=models.SET_NULL, related_name="incidents")
     section = models.ForeignKey(Section, blank=True, null=True, on_delete=models.SET_NULL, related_name="incidents")
-    section_engineer = models.ForeignKey(SectionEngineer, blank=True, null=True, on_delete=models.SET_NULL)
+    section_engineer = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL, related_name="+")
     time_start = models.DateTimeField(blank=True, null=True)
     time_end = models.DateTimeField(blank=True, null=True)
     significant = models.BooleanField(default=False)
@@ -354,3 +354,10 @@ auditlog.register(
     serialize_data=True,
     serialize_auditlog_fields_only=True,
 )
+
+
+class Feedback(models.Model):
+    time_created = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    description = models.TextField(blank=True)
+    dismissed = models.BooleanField(default=False)

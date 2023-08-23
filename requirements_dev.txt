@@ -26,7 +26,7 @@ diff-match-patch==20230430
     # via django-import-export
 dj-database-url==2.0.0
     # via anglo-defects (pyproject.toml)
-django==4.2.2
+django==4.2.4
     # via
     #   anglo-defects (pyproject.toml)
     #   crispy-bootstrap5
@@ -34,7 +34,6 @@ django==4.2.2
     #   django-auditlog
     #   django-crispy-forms
     #   django-import-export
-    #   django-lifecycle
 django-auditlog==2.3.0
     # via anglo-defects (pyproject.toml)
 django-crispy-forms==2.0
@@ -43,11 +42,11 @@ django-crispy-forms==2.0
     #   crispy-bootstrap5
 django-import-export==3.2.0
     # via anglo-defects (pyproject.toml)
-django-lifecycle==1.0.0
-    # via anglo-defects (pyproject.toml)
 et-xmlfile==1.1.0
     # via openpyxl
-gunicorn==20.1.0
+gunicorn==21.2.0
+    # via anglo-defects (pyproject.toml)
+huey==2.4.5
     # via anglo-defects (pyproject.toml)
 markuppy==1.14
     # via tablib
@@ -61,7 +60,7 @@ packaging==23.1
     # via
     #   black
     #   build
-    #   django-lifecycle
+    #   gunicorn
 pathspec==0.11.1
     # via black
 pillow==10.0.0
@@ -78,9 +77,9 @@ python-dotenv==1.0.0
     # via anglo-defects (pyproject.toml)
 pyyaml==6.0.1
     # via tablib
-redis==4.5.5
+redis==5.0.0
     # via anglo-defects (pyproject.toml)
-sentry-sdk==1.25.1
+sentry-sdk==1.29.2
     # via anglo-defects (pyproject.toml)
 six==1.16.0
     # via python-dateutil
@@ -92,8 +91,6 @@ typing-extensions==4.7.1
     # via dj-database-url
 urllib3==2.0.4
     # via sentry-sdk
-urlman==2.0.1
-    # via django-lifecycle
 wheel==0.41.0
     # via pip-tools
 whitenoise==6.5.0

@@ -6,7 +6,7 @@
     <div class="d-flex justify-content-between mb-3">
       <h2>Incident Register</h2>
       <div>
-        <a href="{% url 'incident_create' %}" class="btn btn-primary btn-sm">Log Incident</a>
+        <a href="{% url 'incident_create' %}" up-layer="new" class="btn btn-primary btn-sm">Log Incident</a>
       </div>
     </div>
     <div class="d-flex justify-content-between">
@@ -43,9 +43,9 @@
             <td class="text-nowrap"><a class="text-black" href="{% url 'incident_detail' incident.pk %}">{{ incident.code }}</a></td>
             <td class="font-monospace text-nowrap">{{ incident.time_start|date:'Y-m-d' }}</td>
             <td class="text-nowrap">{{ incident.section.name }}</td>
-            <td class="text-nowrap">{{ incident.section_engineer.name }}</td>
+            <td class="text-nowrap">{{ incident.section_engineer.username }}</td>
             <td class="text-nowrap">{{ incident.equipment.name }}</td>
-            <td class="text-nowrap">{{ incident.short_description|truncatewords:5 }}</td>
+            <td class="text-nowrap">{{ incident.short_description }}</td>
           </tr>
         {% endfor %}
         </tbody>

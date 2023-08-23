@@ -1,7 +1,8 @@
 from django import forms
 from django.forms import widgets
 from .models import Incident, SectionEngineeringManager, Approval
-
+from django.contrib.auth.models import User
+from django.db.models.query_utils import Q
 EFFECT_CHOICES = (
     ("repair", "Estimated cost of Repair > R 250K"),
     ("production_loss", "Production Loss > 3 hours"),
@@ -48,7 +49,7 @@ class IncidentCreateForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["equipment"].choices = []  # load options with ajax
-
+        self.fields["section_engineer"].queryset = User.objects.filter(groups__name__in=["section_engineer"])
 
 class IncidentUpdateForm(forms.ModelForm):
     class Meta:
@@ -99,7 +100,10 @@ class IncidentUpdateForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         choices = [] if not self.instance else [(self.instance.equipment_id, str(self.instance.equipment))]
         self.fields["equipment"].choices = choices  # load options with ajax
-
+        conditions = Q(groups__name__in=["section_engineer"])
+        if self.instance:
+            conditions = conditions | Q(id=self.instance.section_engineer_id)
+        self.fields["section_engineer"].queryset = User.objects.filter(conditions)
 
 class MultipleFileInput(forms.ClearableFileInput):
     allow_multiple_selected = True
@@ -161,6 +165,15 @@ class IncidentNotificationForm(forms.ModelForm):
             "immediate_action_taken": "Describe the immediate action taken.",
             "long_description": "Production Loss, Asset Damage, Theft, Fire, Etc.",
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        choices = [] if not self.instance else [(self.instance.equipment_id, str(self.instance.equipment))]
+        self.fields["equipment"].choices = choices  # load options with ajax
+        conditions = Q(groups__name__in=["section_engineer"])
+        if self.instance:
+            conditions = conditions | Q(id=self.instance.section_engineer_id)
+        self.fields["section_engineer"].queryset = User.objects.filter(conditions)
 
 
 class IncidentNotificationApprovalSendForm(forms.Form):

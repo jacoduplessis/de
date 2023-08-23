@@ -5,21 +5,42 @@
 {% block content %}
   <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 mt-3 mb-2">
 
-    <div class="d-flex justify-content-between align-items-center">
-      <h2>Reliability Incident {{ incident.code }} Images</h2>
-      <div></div>
-    </div>
+    <h2>Reliability Incident {{ incident.code }} Images</h2>
 
     <hr>
 
-    <div>
-      <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ formset|crispy }}
-        <input type="submit" class="btn btn-primary" value="Submit">
-        <a href="{% url 'incident_detail' incident.pk %}" class="btn btn-secondary">Back</a>
-      </form>
-    </div>
+      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 mb-5">
+        {% for image in images %}
+          <div class="col">
+            <div class="card">
+              <img src="{{ image.image.url }}" class="card-img-top" alt="">
+              <div class="card-body">
+                <p class="card-text">{{ image.description }}</p>
+                <div class="dropdown">
+                  <button class="btn btn-primary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Actions
+                  </button>
+                  <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="{% url 'image_update' image.pk %}" up-layer="new">Edit</a></li>
+                    <li><a class="dropdown-item" href="{{ image.image.url }}" target="_blank">View Full Size</a></li>
+                    <li><a class="dropdown-item" href="{% url 'image_delete' image.pk %}" up-follow>Delete</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+
+    <h4>Upload Images</h4>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {{ formset|crispy }}
+      <input type="submit" class="btn btn-primary" value="Submit">
+      <a href="{% url 'incident_detail' incident.pk %}" class="btn btn-secondary">Back</a>
+    </form>
+
 
   </main>
 
