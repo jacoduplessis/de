@@ -72,7 +72,10 @@ def incident_list(request):
 @login_required
 def incident_detail(request, pk):
     incident = (
-        Incident.objects.select_related("section", "created_by", "section_engineer", "equipment").prefetch_related("images", "approvals").get(pk=pk)
+        Incident.objects
+        .select_related("section", "created_by", "section_engineer", "equipment")
+        .prefetch_related("images", "approvals", "solutions")
+        .get(pk=pk)
     )
     accessed.send(Incident, instance=incident)
 
@@ -532,12 +535,17 @@ def incident_notification_pdf(request, pk):
 @login_required
 def incident_close_pdf(request, pk):
     from weasyprint import HTML
+    from .reports import url_fetcher
 
     incident = get_object_or_404(Incident, pk=pk)
 
     context = {"incident": incident}
 
     markup = render_to_string("defects/reports/closeout.html", context=context, request=request)
+
+    if request.GET.get("html") == "1":
+        markup = markup.replace("static:", "/static/")
+        return HttpResponse(markup, headers={"content-type": "text/html"})
 
     response = HttpResponse(
         headers={
@@ -546,7 +554,7 @@ def incident_close_pdf(request, pk):
         }
     )
 
-    doc = HTML(string=markup)
+    doc = HTML(string=markup, url_fetcher=url_fetcher)
     doc.write_pdf(target=response)
     return response
 
@@ -781,3 +789,44 @@ def image_update(request, pk):
         }
 
         return render(request, "defects/image_update_modal.html", context=context)
+
+
+def incident_solution_create(request, pk):
+    """
+    Renders in modal
+    """
+    incident = Incident.objects.get(pk=pk)
+
+    Form = modelform_factory(
+        Solution,
+        fields=[
+            "priority",
+            "description",
+            "person_responsible",
+            "planned_completion_date",
+            "remarks",
+        ],
+    )
+
+    if request.method == "GET":
+        form = Form()
+        context = {
+            "incident": incident,
+            "form": form,
+        }
+        return render(request, "defects/incident_solution_create.html", context=context)
+
+    if request.method == "POST":
+        form = Form(request.POST)
+        if not form.is_valid():
+            context = {
+                "form": form,
+                "incident": incident,
+            }
+            return render(request, template_name="defects/incident_solution_create.html", context=context)
+
+        obj = form.save(commit=False)
+        obj.created_by = request.user
+        obj.incident_id = pk
+        obj.save()
+        return HttpResponseRedirect(reverse("incident_detail", args=[pk]))

@@ -26,6 +26,8 @@
 - notifications / emails
 - RELIABILITY INCIDENT EFFECT (dynamic, multi-choice?)
 - incident status
+- solution priority
+- dates on close out slide solution categories
 
 ## TODO
 

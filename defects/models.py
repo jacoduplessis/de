@@ -170,6 +170,7 @@ class Incident(models.Model):
                     time=self.notification_time_published,
                     link_text="View Notification Report",
                     link_url=reverse("incident_notification", args=[self.pk]),
+                    link_attrs="up-follow"
                 )
             )
             if self.notification_approval.outcome == Approval.ACCEPTED:
@@ -218,8 +219,10 @@ class Incident(models.Model):
                     text=self.notification_deadline_text,  # TODO: implement
                     link_text="Add Information",
                     link_url=reverse("incident_update", args=[self.pk]),
+                    link_attrs="up-layer=new up-size=large",
                     secondary_link_url=reverse("incident_notification_publish", args=[self.pk]),
                     secondary_link_text="Publish & Submit For Review",
+                    secondary_link_attrs="up-follow"
                 )
             )
 
@@ -247,12 +250,32 @@ class IncidentImage(models.Model):
 
 
 class Solution(models.Model):
-    incident = models.ForeignKey(Incident, on_delete=models.SET_NULL, null=True, blank=True)
-    reliability_incident_name = models.CharField(max_length=500, blank=True)
-    priority = models.CharField(max_length=200, blank=True)
+
+    SHORT_TERM = "short_term"
+    MEDIUM_TERM = "medium_term"
+    LONG_TERM = "long_term"
+
+    PRIORITY_CHOICES = (
+        (SHORT_TERM, "Short Term"),
+        (MEDIUM_TERM, "Medium Term"),
+        (LONG_TERM, "Long Term"),
+    )
+
+    IDENTIFIED = "identified"
+    COMPLETED = "completed"
+    SCHEDULED = "scheduled"
+
+    STATUS_CHOICES = (
+        (IDENTIFIED, "Identified"),
+        (COMPLETED, "Complated"),
+        (SCHEDULED, "Scheduled"),
+    )
+
+    incident = models.ForeignKey(Incident, on_delete=models.SET_NULL, null=True, blank=True, related_name="solutions")
+    priority = models.CharField(max_length=200, blank=True, choices=PRIORITY_CHOICES, default=SHORT_TERM)
     description = models.CharField(max_length=500)
     person_responsible = models.CharField(max_length=200, blank=True)
-    status = models.CharField(max_length=200, blank=True)
+    status = models.CharField(max_length=200, blank=True, choices=STATUS_CHOICES, default=IDENTIFIED)
     planned_completion_date = models.DateField(blank=True, null=True)
     planned_completion_date_string = models.CharField(max_length=200, blank=True)
     actual_completion_date = models.DateField(blank=True, null=True)

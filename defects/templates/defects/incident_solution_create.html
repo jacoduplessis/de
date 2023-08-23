@@ -1,0 +1,21 @@
+{% extends 'defects/base.html' %}
+
+{% load crispy_forms_filters static %}
+
+{% block content %}
+  <main>
+    <h2>Add Incident Solution</h2>
+    <hr>
+
+    <form method="post" action="{% url 'incident_solution_create' incident.pk %}">
+      {% csrf_token %}
+      {{ form|crispy }}
+      <input type="submit" value="Submit" class="btn btn-primary">
+    </form>
+
+  </main>
+
+{% endblock %}
+
+
+

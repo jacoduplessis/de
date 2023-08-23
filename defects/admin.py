@@ -33,7 +33,6 @@ class SolutionAdmin(ImportExportModelAdmin):
     ]
 
     list_display = [
-        "reliability_incident_name",
         "description",
         "status",
         "planned_completion_date_string",
