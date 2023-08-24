@@ -7,7 +7,7 @@
       <h2>Reliability Incident {{ incident.code }}</h2>
       <div>
         <a href="{% url 'incident_update' incident.pk %}" class="btn btn-primary btn-sm" up-layer="new" up-size="large">Edit</a>
-        <a href="{% url 'incident_images' incident.pk %}" class="btn btn-primary btn-sm" up-follow>Images</a>
+        <a href="{% url 'incident_images' incident.pk %}" class="btn btn-primary btn-sm" up-layer="new" up-size="large">Images</a>
         {#        <a href="{% url 'incident_history' incident.pk %}" class="btn btn-secondary btn-sm">History</a>#}
       </div>
     </div>
@@ -115,7 +115,7 @@
           </tr>
           <tr>
             <th>Images</th>
-            <td><a href="{% url 'incident_images' incident.pk %}" up-follow>{{ incident.images.all|length }} image{{ incident.images.all|length|pluralize }}</a></td>
+            <td><a href="{% url 'incident_images' incident.pk %}" up-layer="new" up-size="large">{{ incident.images.all|length }} image{{ incident.images.all|length|pluralize }}</a></td>
           </tr>
 
           </tbody>

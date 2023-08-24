@@ -1,3 +1,4 @@
+import csv
 from datetime import timedelta, datetime
 
 from auditlog.models import LogEntry
@@ -16,7 +17,9 @@ from django.urls import reverse
 from django.utils.lorem_ipsum import words
 from django.utils.timezone import now
 from django.views.decorators.http import require_POST, require_GET
+from django.db import connection
 
+from .exports import export_table_csv
 from .forms import (
     IncidentCreateForm,
     IncidentNotificationForm,
@@ -50,7 +53,7 @@ def home(request):
             .values_list("name", "count", named=True)
         ),
         "user_actions": (UserAction.objects.select_related("incident").filter(user=request.user, time_dismissed=None).order_by("time_required")),
-        "approvals": Approval.objects.select_related("incident", "created_by").filter(user=request.user, outcome="")
+        "approvals": Approval.objects.select_related("incident", "created_by").filter(user=request.user, outcome=""),
     }
 
     return render(request, template_name="defects/index.html", context=context)
@@ -439,6 +442,9 @@ def incident_update(request, pk):
 
 @login_required
 def incident_images(request, pk):
+    """
+    Renders in modal.
+    """
     images_prefetch = Prefetch("images", queryset=IncidentImage.objects.order_by("index"))
 
     incident = Incident.objects.prefetch_related(images_prefetch).get(pk=pk)
@@ -770,7 +776,7 @@ def image_delete(request, pk):
     image.image.delete()
     image.delete()
     messages.info(request, "Image has been deleted.")
-    return HttpResponseRedirect(reverse("incident_images", args=[incident_id]))
+    return HttpResponseRedirect(reverse("incident_detail", args=[incident_id]))
 
 
 @login_required
@@ -839,6 +845,7 @@ def incident_solution_create(request, pk):
         obj.save()
         return HttpResponseRedirect(reverse("incident_detail", args=[pk]))
 
+
 @login_required
 def incident_rca_report_upload(request, pk):
     """
@@ -850,12 +857,11 @@ def incident_rca_report_upload(request, pk):
     }
 
     Form = modelform_factory(
-        Incident, fields=[
+        Incident,
+        fields=[
             "report_file",
         ],
-        labels={
-            "report_file": "Upload RCA Report"
-        }
+        labels={"report_file": "Upload RCA Report"},
     )
 
     if request.method == "GET":
@@ -873,3 +879,11 @@ def incident_rca_report_upload(request, pk):
         return HttpResponseRedirect(reverse("incident_detail", args=[incident.pk]))
 
 
+@login_required
+def incident_register_export(request):
+    response = HttpResponse(headers={
+        "Content-Type": "text/csv",
+        "Content-Disposition": f"attachment; filename=\"incidents-{now().strftime('%Y-%m-%d')}.csv\""
+    })
+
+    return export_table_csv(response, Incident._meta.db_table)

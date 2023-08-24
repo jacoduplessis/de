@@ -24,12 +24,14 @@
 - areas, sections
 - production cost (calculator, how it will be recorded)
 - notifications / emails
-- RELIABILITY INCIDENT EFFECT (dynamic, multi-choice?)
+- RELIABILITY INCIDENT EFFECT (dynamic, multi-choice?) / HIPO?
 - incident status
 - solution priority
 - dates on close out slide solution categories
 - extra fields for close out slide - immediate cause, root cause, images
-- significant incident
+- significant incident / HIPO
+- design of compliance dashboard - breakdown per area, section?
+- anniversaries
 
 ## TODO
 

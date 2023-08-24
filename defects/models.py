@@ -133,7 +133,8 @@ class Incident(models.Model):
         if not d:
             return "---"
         seconds = d.total_seconds()
-        hours, minutes = divmod(seconds, 3600)
+        hours, rem = divmod(seconds, 3600)
+        minutes, rem = divmod(rem, 60)
         if hours == 0:
             return f"{minutes:.0f} minutes"
         return f"{hours:.0f} hours, {minutes:.0f} minutes"
