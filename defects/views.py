@@ -72,8 +72,7 @@ def incident_list(request):
 @login_required
 def incident_detail(request, pk):
     incident = (
-        Incident.objects
-        .select_related("section", "created_by", "section_engineer", "equipment")
+        Incident.objects.select_related("section", "created_by", "section_engineer", "equipment")
         .prefetch_related("images", "approvals", "solutions")
         .get(pk=pk)
     )

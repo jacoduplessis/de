@@ -3,6 +3,7 @@ from django.forms import widgets
 from .models import Incident, SectionEngineeringManager, Approval
 from django.contrib.auth.models import User
 from django.db.models.query_utils import Q
+
 EFFECT_CHOICES = (
     ("repair", "Estimated cost of Repair > R 250K"),
     ("production_loss", "Production Loss > 3 hours"),
@@ -50,6 +51,7 @@ class IncidentCreateForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields["equipment"].choices = []  # load options with ajax
         self.fields["section_engineer"].queryset = User.objects.filter(groups__name__in=["section_engineer"])
+
 
 class IncidentUpdateForm(forms.ModelForm):
     class Meta:
@@ -104,6 +106,7 @@ class IncidentUpdateForm(forms.ModelForm):
         if self.instance:
             conditions = conditions | Q(id=self.instance.section_engineer_id)
         self.fields["section_engineer"].queryset = User.objects.filter(conditions)
+
 
 class MultipleFileInput(forms.ClearableFileInput):
     allow_multiple_selected = True

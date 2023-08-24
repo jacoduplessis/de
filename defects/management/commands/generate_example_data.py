@@ -7,6 +7,7 @@ from django.db import transaction
 from django.utils.lorem_ipsum import words, paragraphs
 from django.contrib.auth.models import User
 
+
 class Command(BaseCommand):
     """
     UG2_RI_2022_20 	Confirm solution implementation 	1w overdue

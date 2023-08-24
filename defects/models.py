@@ -170,7 +170,7 @@ class Incident(models.Model):
                     time=self.notification_time_published,
                     link_text="View Notification Report",
                     link_url=reverse("incident_notification", args=[self.pk]),
-                    link_attrs="up-follow"
+                    link_attrs="up-follow",
                 )
             )
             if self.notification_approval.outcome == Approval.ACCEPTED:
@@ -204,8 +204,8 @@ class Incident(models.Model):
         deadline_time = self.time_start + timedelta(hours=48)
         remaining = deadline_time - now()
         if remaining > timedelta(seconds=1):
-            return f'{int(remaining.total_seconds() / 3600)} hours until deadline'
-        return 'Deadline has expired'
+            return f"{int(remaining.total_seconds() / 3600)} hours until deadline"
+        return "Deadline has expired"
 
     @property
     def actions(self):
@@ -222,7 +222,7 @@ class Incident(models.Model):
                     link_attrs="up-layer=new up-size=large",
                     secondary_link_url=reverse("incident_notification_publish", args=[self.pk]),
                     secondary_link_text="Publish & Submit For Review",
-                    secondary_link_attrs="up-follow"
+                    secondary_link_attrs="up-follow",
                 )
             )
 
@@ -250,7 +250,6 @@ class IncidentImage(models.Model):
 
 
 class Solution(models.Model):
-
     SHORT_TERM = "short_term"
     MEDIUM_TERM = "medium_term"
     LONG_TERM = "long_term"

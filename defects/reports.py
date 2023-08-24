@@ -14,8 +14,6 @@ def url_fetcher(url, timeout=5, ssl_context=None):
     if url.startswith("static:"):
         path = url[7:]
         abs_path = find(path)
-        return {
-            "file_obj": open(abs_path, "rb")
-        }
+        return {"file_obj": open(abs_path, "rb")}
 
     return default_url_fetcher(url, timeout=timeout, ssl_context=ssl_context)

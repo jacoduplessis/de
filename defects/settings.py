@@ -103,7 +103,6 @@ DATABASES = {
 }
 
 
-
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 
@@ -173,9 +172,6 @@ LOGGING = {
             "level": LOG_LEVEL,
             "propagate": False,
         },
-        "weasyprint": {
-            "handlers": ["console"],
-            "level": LOG_LEVEL
-        }
+        "weasyprint": {"handlers": ["console"], "level": LOG_LEVEL},
     },
 }
