@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from defects.models import UserAction, Incident, Section, SectionEngineer, Equipment, Operation, Area, SectionEngineeringManager
+from defects.models import UserAction, Incident, Section, Equipment, Operation, Area
 from django.utils.timezone import now
 from django.utils.crypto import get_random_string
 from datetime import timedelta

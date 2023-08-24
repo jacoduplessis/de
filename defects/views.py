@@ -50,6 +50,7 @@ def home(request):
             .values_list("name", "count", named=True)
         ),
         "user_actions": (UserAction.objects.select_related("incident").filter(user=request.user, time_dismissed=None).order_by("time_required")),
+        "approvals": Approval.objects.select_related("incident", "created_by").filter(user=request.user, outcome="")
     }
 
     return render(request, template_name="defects/index.html", context=context)
@@ -93,7 +94,11 @@ def incident_notification(request, pk):
     return render(request, template_name="defects/incident_notification.html", context=context)
 
 
-def incident_notification_publish(request, pk):
+def incident_notification_approval_request(request, pk):
+    """
+    Rendered in modal.
+    """
+
     incident = Incident.objects.select_related("section", "created_by", "section_engineer", "equipment").prefetch_related("images").get(pk=pk)
 
     if request.method == "GET":
@@ -104,7 +109,7 @@ def incident_notification_publish(request, pk):
             "form": form,
         }
 
-        return render(request, template_name="defects/incident_notification_publish.html", context=context)
+        return render(request, template_name="defects/incident_notification_approval_request.html", context=context)
 
     if request.method == "POST":
         form = IncidentNotificationApprovalSendForm(request.POST)
@@ -114,15 +119,16 @@ def incident_notification_publish(request, pk):
                 "incident": incident,
                 "form": form,
             }
-            return render(request, template_name="defects/incident_notification_publish.html", context=context)
+            return render(request, template_name="defects/incident_notification_approval_request.html", context=context)
 
         else:
-            sem = form.cleaned_data["sem"]
+            user = form.cleaned_data["user"]
 
             # create an approval object
             Approval.objects.create(
-                name=sem.name,
-                user_id=sem.user_id,
+                created_by=request.user,
+                name=user.username,
+                user=user,
                 role=Approval.SECTION_ENGINEERING_MANAGER,
                 type=Approval.NOTIFICATION,
                 incident=incident,
@@ -682,6 +688,9 @@ def incident_history(request, pk):
 
 @login_required
 def approval_detail(request, pk):
+    """
+    Rendered in modal.
+    """
     approval = Approval.objects.select_related("incident").get(id=pk)
 
     if request.user.id != approval.user_id:
@@ -710,8 +719,8 @@ def approval_detail(request, pk):
 
         else:
             form.save()
-            messages.success(request, "Approval outcome has been saved. You can return to this page to edit the outcome.")
-            return HttpResponseRedirect(reverse("approval_detail", args=[approval.pk]))
+            messages.success(request, "Approval outcome has been saved.")
+            return HttpResponseRedirect(reverse("home"))
 
 
 @login_required
@@ -829,3 +838,38 @@ def incident_solution_create(request, pk):
         obj.incident_id = pk
         obj.save()
         return HttpResponseRedirect(reverse("incident_detail", args=[pk]))
+
+@login_required
+def incident_rca_report_upload(request, pk):
+    """
+    Renders in modal.
+    """
+    incident = get_object_or_404(Incident, id=pk)
+    context = {
+        "incident": incident,
+    }
+
+    Form = modelform_factory(
+        Incident, fields=[
+            "report_file",
+        ],
+        labels={
+            "report_file": "Upload RCA Report"
+        }
+    )
+
+    if request.method == "GET":
+        context["form"] = Form(instance=incident)
+        return render(request, "defects/incident_rca_upload.html", context=context)
+
+    if request.method == "POST":
+        form = Form(request.POST, request.FILES, instance=incident)
+        if not form.is_valid():
+            context["form"] = form
+            return render(request, "defects/incident_rca_upload.html", context=context)
+
+        form.save()
+        messages.success(request, "Incident RCA Report uploaded.")
+        return HttpResponseRedirect(reverse("incident_detail", args=[incident.pk]))
+
+

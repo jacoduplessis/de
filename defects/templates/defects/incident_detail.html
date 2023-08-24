@@ -73,6 +73,12 @@
             <th>Time</th>
             <td>{{ incident.time_start|date:'Y-m-d H:i' }}{% if incident.time_end %} – {{ incident.time_end|date:'Y-m-d H:i' }}{% endif %}</td>
           </tr>
+          {% if incident.time_end %}
+          <tr>
+            <th>Duration</th>
+            <td>{{ incident.duration_text }}</td>
+          </tr>
+          {% endif %}
           <tr>
             <th>Equipment</th>
             <td>{{ incident.equipment.name }} ({{ incident.equipment.code }})</td>
@@ -105,7 +111,7 @@
           </tr>
           <tr>
             <th>RCA Report</th>
-            <td>{% if reports.rca %}<a href="#">Download</a>{% else %}---{% endif %}</td>
+            <td>{% if incident.report_file %}<a href="{{ incident.report_file.url }}" target="_blank">Download Report</a>, {% endif %}<a href="{% url 'incident_rca_report_upload' incident.pk %}" up-layer="new">Upload Report</a></td>
           </tr>
           <tr>
             <th>Images</th>

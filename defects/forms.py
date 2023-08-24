@@ -53,6 +53,21 @@ class IncidentCreateForm(forms.ModelForm):
         self.fields["section_engineer"].queryset = User.objects.filter(groups__name__in=["section_engineer"])
 
 
+    def clean(self):
+
+        super().clean()
+        time_start = self.cleaned_data.get("time_start")
+        time_end = self.cleaned_data.get("time_end")
+
+        if not time_end:
+            return
+
+        if time_end < time_start:
+            msg = "End time must be later than start time"
+            self.add_error("time_start", msg)
+            self.add_error("time_end", msg)
+
+
 class IncidentUpdateForm(forms.ModelForm):
     class Meta:
         model = Incident
@@ -107,14 +122,26 @@ class IncidentUpdateForm(forms.ModelForm):
             conditions = conditions | Q(id=self.instance.section_engineer_id)
         self.fields["section_engineer"].queryset = User.objects.filter(conditions)
 
+    def clean(self):
+
+        super().clean()
+        time_start = self.cleaned_data.get("time_start")
+        time_end = self.cleaned_data.get("time_end")
+
+        if not time_end:
+            return
+
+        if time_end < time_start:
+            msg = "End time must be later than start time"
+            self.add_error("time_start", msg)
+            self.add_error("time_end", msg)
+
 
 class MultipleFileInput(forms.ClearableFileInput):
     allow_multiple_selected = True
 
 
 class IncidentNotificationForm(forms.ModelForm):
-    pictures = forms.FileField(required=False, help_text="If applicable.", widget=MultipleFileInput())
-
     """
     Operation	                                Greyed out field (Prepoulated with Amandelbult Complex)	Non-negotiable?
     Area	                                    Dropdown searchable list (APS, Concentrator, Dishaba Upper, Disbha Lower, etc.)	Non-negotiable?
@@ -178,9 +205,29 @@ class IncidentNotificationForm(forms.ModelForm):
             conditions = conditions | Q(id=self.instance.section_engineer_id)
         self.fields["section_engineer"].queryset = User.objects.filter(conditions)
 
+    def clean(self):
+
+        super().clean()
+        time_start = self.cleaned_data.get("time_start")
+        time_end = self.cleaned_data.get("time_end")
+
+        if not time_end:
+            return
+
+        if time_end < time_start:
+            msg = "End time must be later than start time"
+            self.add_error("time_start", msg)
+            self.add_error("time_end", msg)
+
 
 class IncidentNotificationApprovalSendForm(forms.Form):
-    sem = forms.ModelChoiceField(queryset=SectionEngineeringManager.objects.exclude(user=None), required=True, label="Section Engineering Manager")
+
+    user = forms.ModelChoiceField(
+        queryset=User.objects.filter(groups__name__in=["section_engineering_manager"]),
+        label="Section Engineering Manager",
+        required=True,
+    )
+
 
 
 class IncidentCloseForm(forms.Form):

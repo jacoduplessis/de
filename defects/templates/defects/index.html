@@ -35,6 +35,31 @@
       </div>
 
       <div class="col-12 col-lg-6 my-3">
+        {% if approvals %}
+          <h6 class="text-body-secondary">Approvals Required</h6>
+
+          <table class="table table-sm table-striped">
+            <thead>
+            <tr>
+              <th>Incident</th>
+              <th>Type</th>
+              <th>Requester</th>
+              <th>Action</th>
+            </tr>
+            </thead>
+            <tbody>
+              {% for approval in approvals %}
+                <tr>
+                  <td><a href="{% url 'incident_detail' approval.incident_id %}" class="text-black" up-follow>{{ approval.incident.code }}</a></td>
+                  <td>{{ approval.get_type_display }}</td>
+                  <td>{{ approval.created_by.username }}</td>
+                  <td><a href="{% url 'approval_detail' approval.pk %}" class="text-black" up-layer="new">View</a></td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% endif %}
+
         <h6 class="text-body-secondary">Actions Required</h6>
 
         <table class="table table-sm table-striped">
@@ -130,7 +155,7 @@
       </div>
     </div>
 
-    <script src="{% static "scripts/dashboard.js" %}" defer></script>
+    <script src="{% static "scripts/home-dashboard.js" %}" defer></script>
   </main>
 {% endblock %}
 

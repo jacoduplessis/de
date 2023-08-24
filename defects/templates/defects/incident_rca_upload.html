@@ -1,14 +1,12 @@
-
-
 {% load crispy_forms_filters static %}
 
 {% include "defects/_messages.html" %}
 
 <main>
-  <h2>Update Image</h2>
+  <h2>Upload RCA Report</h2>
   <hr>
 
-  <form method="post" action="{% url "image_update" image.pk %}">
+  <form method="post" action="{% url 'incident_rca_report_upload' incident.pk %}" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form|crispy }}
     <input type="submit" value="Submit" class="btn btn-primary">

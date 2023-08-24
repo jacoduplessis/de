@@ -1,4 +1,5 @@
 from decimal import Decimal
+from typing import Optional
 
 from django.db import models
 from django.contrib.auth.models import User
@@ -35,18 +36,6 @@ class Section(models.Model):
         return self.name
 
 
-class SectionEngineer(models.Model):
-    name = models.CharField(max_length=200)
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        verbose_name = "Section Engineer"
-        verbose_name_plural = "Section Engineers"
-
-
 class SectionEngineeringManager(models.Model):
     name = models.CharField(max_length=200)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
@@ -57,14 +46,6 @@ class SectionEngineeringManager(models.Model):
     class Meta:
         verbose_name = "Section Engineering Manager"
         verbose_name_plural = "Section Engineering Managers"
-
-
-class SeniorAssetManager(models.Model):
-    name = models.CharField(max_length=200)
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-
-    def __str__(self):
-        return self.name
 
 
 class Equipment(models.Model):
@@ -108,13 +89,13 @@ class Incident(models.Model):
     equipment = models.ForeignKey(Equipment, on_delete=models.SET_NULL, null=True, blank=True, related_name="incidents")
     short_description = models.CharField(max_length=200, blank=True)
     long_description = models.TextField(blank=True)
-    preliminary_findings = models.FileField(upload_to="files/", null=True, blank=True)
+    preliminary_findings = models.FileField(upload_to="files/", blank=True)
     notification_time_published = models.DateTimeField(blank=True, null=True)
     notification_am_reviewed = models.BooleanField(default=False)
     notification_circulated = models.BooleanField(default=False)
     notification_file = models.FileField(blank=True)
     close_out_file = models.FileField(blank=True)
-    report_file = models.FileField(blank=True)
+    report_file = models.FileField(blank=True, upload_to="files/")  # RCA report
     production_value_loss = models.DecimalField(blank=True, max_digits=20, decimal_places=10, default=Decimal("0.00"))
     rand_value_loss = models.DecimalField(blank=True, max_digits=20, decimal_places=2, default=Decimal("0.00"))
     possible_effect = models.TextField(blank=True)
@@ -138,8 +119,24 @@ class Incident(models.Model):
     @property
     def status_class(self):
         _map = {self.ACTIVE: "primary", self.ONGOING: "secondary", self.COMPLETE: "success", self.OVERDUE: "danger", self.INCOMPLETE: "warning"}
-
         return _map.get(self.status)
+
+    @property
+    def duration_delta(self) -> Optional[timedelta]:
+        if not self.time_end:
+            return None
+        return self.time_end - self.time_start
+
+    @property
+    def duration_text(self) -> str:
+        d = self.duration_delta
+        if not d:
+            return "---"
+        seconds = d.total_seconds()
+        hours, minutes = divmod(seconds, 3600)
+        if hours == 0:
+            return f"{minutes:.0f} minutes"
+        return f"{hours:.0f} hours, {minutes:.0f} minutes"
 
     @property
     def timeline(self):
@@ -152,7 +149,7 @@ class Incident(models.Model):
                 title="Incident Occurrence",
                 time=self.time_start,
                 until=self.time_end,
-                text="Downtime",
+                text=f"Downtime, duration: {self.duration_text}",
             ),
             TimelineEntry(
                 icon="log-in",
@@ -173,31 +170,54 @@ class Incident(models.Model):
                     link_attrs="up-follow",
                 )
             )
-            if self.notification_approval.outcome == Approval.ACCEPTED:
-                entries.append(
-                    TimelineEntry(
-                        icon="clock",
-                        title="48-hour notification report approved by SEM",
-                        time=self.notification_approval.time_modified,
-                        text=f"Comment: {self.notification_approval.comment}",
+            for approval in self.approvals.filter(type=Approval.NOTIFICATION).order_by("time_created"):
+                if approval.outcome == "":
+                    entries.append(
+                        TimelineEntry(
+                            icon="clock",
+                            title="Awaiting SEM approval for 48h Notification",
+                            text=f"SEM reviewing: {approval.name}",
+                            link_text="Approval Link",
+                            link_url=reverse("approval_detail", args=[approval.id]),
+                        )
                     )
-                )
-            if self.notification_approval.outcome == Approval.REJECTED:
-                entries.append(
-                    TimelineEntry(
-                        icon="clock",
-                        title="48-hour notification report rejected by SEM",
-                        time=self.notification_approval.time_modified,
-                        text=f"Comment: {self.notification_approval.comment}",
+
+                if approval.outcome == Approval.ACCEPTED:
+                    entries.append(
+                        TimelineEntry(
+                            icon="clock",
+                            title="48-hour notification report approved by SEM",
+                            time=approval.time_modified,
+                            text=f"Comment: {approval.comment}",
+                        )
                     )
+                if approval.outcome == Approval.REJECTED:
+                    entries.append(
+                        TimelineEntry(
+                            icon="clock",
+                            title="48-hour notification report rejected by SEM",
+                            time=approval.time_modified,
+                            text=f"Comment: {approval.comment}",
+                        )
+                    )
+
+        if self.notification_approved:
+            entries.append(
+                TimelineEntry(
+                    icon="clock",
+                    title="RCA Report",
+                    text="Is a full RCA Report required? Note that full RCA investigation must be scheduled, conducted and the full RCA report must be submitted within 14 days of submitting the 48Hr Notification Report.",
+                    secondary_link_text="Not Required",
+                    secondary_link_url="#",
+                    link_text="Mark Incident As Significant",
+                    link_url="#"
                 )
+            )
         return entries
 
     @cached_property
-    def notification_approval(self):
-        for approval in self.approvals.all():
-            if approval.role == Approval.SECTION_ENGINEERING_MANAGER and approval.type == Approval.NOTIFICATION:
-                return approval
+    def notification_approved(self):
+        return self.approvals.filter(type=Approval.NOTIFICATION, outcome=Approval.ACCEPTED).exists()
 
     @property
     def notification_deadline_text(self):
@@ -222,21 +242,9 @@ class Incident(models.Model):
                     link_attrs="up-layer=new up-size=large",
                     secondary_link_url=reverse("incident_notification_publish", args=[self.pk]),
                     secondary_link_text="Publish & Submit For Review",
-                    secondary_link_attrs="up-follow",
+                    secondary_link_attrs="up-layer=new",
                 )
             )
-
-        if self.notification_time_published is not None:
-            if not self.notification_approval.outcome == Approval.ACCEPTED:
-                actions.append(
-                    TimelineEntry(
-                        icon="clock",
-                        title="Awaiting SEM approval for 48h Notification",
-                        text=f"SEM reviewing: {self.notification_approval.name}",
-                        link_text="Approval Link",
-                        link_url=reverse("approval_detail", args=[self.notification_approval.id]),
-                    )
-                )
 
         return actions
 
@@ -313,10 +321,10 @@ class Approval(models.Model):
     )
 
     incident = models.ForeignKey(Incident, on_delete=models.SET_NULL, null=True, related_name="approvals")
-
     time_created = models.DateTimeField(auto_now_add=True)
     time_modified = models.DateTimeField(auto_now=True)
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="+")
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="+")
     name = models.CharField(max_length=200)
     role = models.CharField(max_length=200, choices=ROLE_CHOICES)
     type = models.CharField(max_length=100, choices=TYPE_CHOICES)

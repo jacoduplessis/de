@@ -1,0 +1,21 @@
+{% load crispy_forms_filters static %}
+
+{% include "defects/_messages.html" %}
+
+<main>
+  <h2>Reliability Incident Notification Report Approval Request</h2>
+  <hr>
+
+  <p>Select a section engineering manager below to review the notification report for incident "{{ incident.code }}".</p>
+
+  <p>Once approved, the notification report will be sent to AM&R for circulation.</p>
+
+  <form method="post">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <input type="submit" value="Submit" class="btn btn-primary">
+  </form>
+
+</main>
+
+

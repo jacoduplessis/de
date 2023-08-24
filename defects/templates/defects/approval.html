@@ -1,29 +1,24 @@
-{% extends "defects/base.html" %}
-
 {% load crispy_forms_filters %}
 
-{% block content %}
 
-  <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 mt-3">
+<main>
 
-    <div class="d-flex justify-content-between align-items-center">
-      <h2>Approval Request for {{ incident.code }} {% if approval.type == approval.NOTIFICATION %}48H Notification{% endif %}</h2>
-    </div>
+  <h2>Approval Request for {{ incident.code }} {% if approval.type == approval.NOTIFICATION %}48H Notification{% endif %}</h2>
 
-    <hr>
+  <hr>
 
-    {% if approval.type == approval.NOTIFICATION %}
-      <p>You have been requested to approve the notification report for reliability incident "{{ incident.code }}".</p>
-      <p>The report can be viewed here: <a href="{% url 'incident_notification' incident.pk %}" target="_blank">Notification Report</a></p>
-    {% endif %}
+  {% if approval.type == approval.NOTIFICATION %}
+    <p>You have been requested to approve the notification report for reliability incident "{{ incident.code }}".</p>
+    <p>The report can be viewed <a href="{% url 'incident_notification' incident.pk %}" target="_blank">here</a> or
+      downloaded as PDF <a href="{% url 'incident_notification_pdf' incident.pk %}" target="_blank">here</a>.</p>
+  {% endif %}
 
-    <div style="max-width: 500px">
-      <form method="post">
-        {% csrf_token %}
-        {{ form|crispy }}
-        <input type="submit" class="btn btn-primary" value="Submit">
-      </form>
-    </div>
 
-  </main>
-{% endblock %}
+  <form method="post">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <input type="submit" class="btn btn-primary" value="Submit">
+  </form>
+
+</main>
+

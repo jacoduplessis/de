@@ -28,6 +28,8 @@
 - incident status
 - solution priority
 - dates on close out slide solution categories
+- extra fields for close out slide - immediate cause, root cause, images
+- significant incident
 
 ## TODO
 
@@ -77,5 +79,10 @@
 - about page
 - fixtures
 - image uploads and editing
-
+- duration calculation
 - PDF generation
+- approvals in SEM dashboard
+- workflow for failed approval requests
+- timezone management
+- upload / download RCA report
+-
