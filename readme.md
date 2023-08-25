@@ -52,6 +52,8 @@
 - permission checks
 - indicator that results are filtered.
 - email links
+- install fonts in container
+- add test case that generates pdf
 
 ## Key Features
 

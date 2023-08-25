@@ -116,7 +116,7 @@ class Incident(models.Model):
 
     @property
     def status_class(self):
-        _map = {self.ACTIVE: "primary", self.ONGOING: "secondary", self.COMPLETE: "success", self.OVERDUE: "danger", self.INCOMPLETE: "warning"}
+        _map = {self.ACTIVE: "primary", self.COMPLETE: "success", self.OVERDUE: "danger", self.INCOMPLETE: "warning"}
         return _map.get(self.status)
 
     @property
