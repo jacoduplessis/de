@@ -137,7 +137,7 @@ class Command(BaseCommand):
                     code=Incident.generate_incident_code(),
                     section=dishaba,
                     operation=amb,
-                    status=Incident.ONGOING,
+                    status=Incident.ACTIVE,
                     created_by_id=user_id,
                     section_engineer=se,
                     equipment=winder,
