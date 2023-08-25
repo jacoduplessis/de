@@ -1,0 +1,16 @@
+{% load crispy_forms_filters static %}
+
+<main>
+  <h2>Apply Filters</h2>
+  <hr>
+
+  <form method="get" up-cache="false" action="{% url 'incident_list_filter' %}" up-submit up-layer="parent" up-context='{"action": "submit"}'>
+    {{ form|crispy }}
+    <input type="submit" value="Submit" class="btn btn-primary">
+  </form>
+</main>
+
+
+
+
+

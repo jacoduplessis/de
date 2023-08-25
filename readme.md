@@ -9,8 +9,8 @@
 
 ## Technical Questions
 
-- OS
-- docker available
+- OS / VPS
+- docker available / install?
 - network limitations
 - access to server
 - SMTP server
@@ -29,7 +29,7 @@
 - solution priority
 - dates on close out slide solution categories
 - extra fields for close out slide - immediate cause, root cause, images
-- significant incident / HIPO
+- significant incident => RCA process triggered
 - design of compliance dashboard - breakdown per area, section?
 - anniversaries
 
@@ -50,6 +50,8 @@
 - prelim findings input
 - figure out incident status
 - permission checks
+- indicator that results are filtered.
+- email links
 
 ## Key Features
 
@@ -87,4 +89,11 @@
 - workflow for failed approval requests
 - timezone management
 - upload / download RCA report
--
+- data generator
+- register search
+- filtering
+
+
+## Performance Improvements
+
+- search indexes

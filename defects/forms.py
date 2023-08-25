@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import widgets
-from .models import Incident, SectionEngineeringManager, Approval
+from .models import Incident, SectionEngineeringManager, Approval, Area, Operation, Section
 from django.contrib.auth.models import User
 from django.db.models.query_utils import Q
 
@@ -283,3 +283,10 @@ class ApprovalForm(forms.ModelForm):
             "outcome",
             "comment",
         ]
+
+
+class IncidentFilterForm(forms.Form):
+
+    section = forms.ModelChoiceField(Section.objects.all(), required=False)
+    operation = forms.ModelChoiceField(Operation.objects.all(), required=False)
+    area = forms.ModelChoiceField(Area.objects.all(), required=False)

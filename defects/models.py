@@ -62,14 +62,12 @@ class Equipment(models.Model):
 
 class Incident(models.Model):
     ACTIVE = "active"
-    ONGOING = "ongoing"
     COMPLETE = "complete"
     OVERDUE = "overdue"
     INCOMPLETE = "incomplete"
 
     STATUS_CHOICES = (
         (ACTIVE, "Active"),
-        (ONGOING, "Ongoing"),
         (COMPLETE, "Complete"),
         (OVERDUE, "Overdue"),
         (INCOMPLETE, "Incomplete"),

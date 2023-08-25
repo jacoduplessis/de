@@ -1,4 +1,5 @@
 import csv
+import json
 from datetime import timedelta, datetime
 
 from auditlog.models import LogEntry
@@ -17,7 +18,6 @@ from django.urls import reverse
 from django.utils.lorem_ipsum import words
 from django.utils.timezone import now
 from django.views.decorators.http import require_POST, require_GET
-from django.db import connection
 
 from .exports import export_table_csv
 from .forms import (
@@ -27,6 +27,7 @@ from .forms import (
     IncidentCloseForm,
     IncidentUpdateForm,
     ApprovalForm,
+    IncidentFilterForm,
 )
 from .models import Solution, Incident, UserAction, Section, Equipment, IncidentImage, Approval, Area, Feedback
 from .timelines import TimelineEntry
@@ -66,9 +67,33 @@ def about(request):
 
 @login_required()
 def incident_list(request):
-    incidents = Incident.objects.select_related("created_by", "equipment", "section", "section_engineer").all()
+    incidents = Incident.objects.select_related("created_by", "equipment", "section", "section_engineer").order_by("-time_start")
 
-    context = {"incidents": incidents}
+    query = request.GET.get("query", "")
+
+    if query:
+        search_filters = (
+            Q(short_description__icontains=query) |
+            Q(long_description__icontains=query) |
+            Q(code__exact=query) |
+            Q(equipment__name__icontains=query) |
+            Q(possible_effect__icontains=query)
+        )
+        incidents = incidents.filter(search_filters)
+
+    area_id = request.GET.get("area")
+    if area_id:
+        incidents = incidents.filter(area_id=area_id)
+
+    section_id = request.GET.get("section")
+    if section_id:
+        incidents = incidents.filter(section_id=section_id)
+
+    operation_id = request.GET.get("operation")
+    if operation_id:
+        incidents = incidents.filter(operation_id=operation_id)
+
+    context = {"incidents": incidents, "query": query}
 
     return render(request, "defects/incident_list.html", context)
 
@@ -359,7 +384,7 @@ def incident_detail_demo(request):
             TimelineEntry(
                 icon="check",
                 icon_classes="bg-success text-white",
-                title='Incident Closed: This incident has a close out confidence ranking of "X" stars. This is above the 2-star minumum threshold.',
+                title='Incident Closed: This incident has a close out confidence ranking of "X" stars. This is above the 2-star minimum threshold.',
                 text='alternatively – Incident Not Closed: This incident has a close out confidence ranking of "X" stars. This is below the 2-star minumum threshold. Please read SE and/or SEM comments and resubmit.',
             )
         )
@@ -647,18 +672,6 @@ def solution_list(request):
     return render(request, "defects/solutions_list.html", context)
 
 
-@login_required
-def incident_notification_approval_send(request):
-    if request.method == "POST":
-        messages.success(request, "Notification report has be sent to SEM for approval.")
-
-        return HttpResponseRedirect(reverse("incident_detail_demo") + "?state=3")
-
-    context = {"form": RINotificationApprovalSendForm()}
-
-    return render(request, "defects/incident_notification_approval_send.html", context)
-
-
 class LoginView(BaseLoginView):
     template_name = "defects/login.html"
     redirect_authenticated_user = True
@@ -880,10 +893,25 @@ def incident_rca_report_upload(request, pk):
 
 
 @login_required
-def incident_register_export(request):
-    response = HttpResponse(headers={
-        "Content-Type": "text/csv",
-        "Content-Disposition": f"attachment; filename=\"incidents-{now().strftime('%Y-%m-%d')}.csv\""
-    })
+def incident_list_export(request):
+    response = HttpResponse(
+        headers={"Content-Type": "text/csv", "Content-Disposition": f"attachment; filename=\"incidents-{now().strftime('%Y-%m-%d')}.csv\""}
+    )
 
     return export_table_csv(response, Incident._meta.db_table)
+
+@require_GET
+@login_required
+def incident_list_filter(request):
+    """
+    Renders in modal.
+
+    Because this is a search form using GET, we use the context as workaround to detect
+    whether the form is submitted or loaded.
+    """
+    form_submission = json.loads(request.headers.get("X-Up-Context", "{}")).get("action", "") == "submit"
+    if form_submission:
+        return HttpResponseRedirect(reverse("incident_list") + '?' + request.GET.urlencode())
+
+    form = IncidentFilterForm(data=request.GET)
+    return render(request, "defects/incident_list_filter.html", context={"form": form})
