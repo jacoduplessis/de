@@ -36,18 +36,6 @@ class Section(models.Model):
         return self.name
 
 
-class SectionEngineeringManager(models.Model):
-    name = models.CharField(max_length=200)
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        verbose_name = "Section Engineering Manager"
-        verbose_name_plural = "Section Engineering Managers"
-
-
 class Equipment(models.Model):
     code = models.CharField(unique=True, max_length=200)
     name = models.CharField(max_length=200)
@@ -64,13 +52,13 @@ class Incident(models.Model):
     ACTIVE = "active"
     COMPLETE = "complete"
     OVERDUE = "overdue"
-    INCOMPLETE = "incomplete"
+    SCHEDULED = "scheduled"
 
     STATUS_CHOICES = (
         (ACTIVE, "Active"),
         (COMPLETE, "Complete"),
         (OVERDUE, "Overdue"),
-        (INCOMPLETE, "Incomplete"),
+        (SCHEDULED, "Scheduled"),
     )
 
     code = models.CharField(unique=True, max_length=200)  # also known as RI_Number
@@ -114,7 +102,7 @@ class Incident(models.Model):
 
     @property
     def status_class(self):
-        _map = {self.ACTIVE: "primary", self.COMPLETE: "success", self.OVERDUE: "danger", self.INCOMPLETE: "warning"}
+        _map = {self.ACTIVE: "primary", self.COMPLETE: "success", self.OVERDUE: "danger", "incomplete": "warning", self.SCHEDULED: "warning"}
         return _map.get(self.status)
 
     @property
@@ -134,6 +122,46 @@ class Incident(models.Model):
         if hours == 0:
             return f"{minutes:.0f} minutes"
         return f"{hours:.0f} hours, {minutes:.0f} minutes"
+
+    @property
+    def notification_overdue(self):
+        # todo: implement
+        return False
+
+    @property
+    def report_overdue(self):
+        # todo: implement
+        return False
+
+    @property
+    def has_overdue_solutions(self):
+        # todo: implement
+        return False
+
+    @property
+    def has_ongoing_solutions(self):
+        # todo: implement
+        return False
+
+    @property
+    def is_complete(self):
+        # todo: implement
+        return False
+
+    @property
+    def status_computed(self):
+        # todo: use a periodic background task of sorts to store the result of this property in the db column
+
+        if any([self.notification_overdue, self.report_overdue, self.has_overdue_solutions]):
+            return Incident.OVERDUE
+
+        if self.has_ongoing_solutions:
+            return Incident.SCHEDULED
+
+        if self.is_complete:
+            return Incident.COMPLETE
+
+        return Incident.ACTIVE
 
     @property
     def timeline(self):
@@ -207,7 +235,7 @@ class Incident(models.Model):
                     secondary_link_text="Not Required",
                     secondary_link_url="#",
                     link_text="Mark Incident As Significant",
-                    link_url="#"
+                    link_url="#",
                 )
             )
         return entries

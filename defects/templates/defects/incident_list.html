@@ -10,7 +10,7 @@
       </div>
     </div>
     <div class="d-flex justify-content-between">
-      <p>Viewing Reliability Incidents for Amandelbult Mine. {% if query %}Results for search query: <strong>"{{ query }}"</strong>{% endif %}</p>
+      <p>{% if query %}Results for search query: <strong>"{{ query }}"</strong>{% else %}No search query applied.{% endif %}</p>
       <div class="d-flex">
         <form method="get" class="pe-2">
           <input type="text" class="form-control form-control-sm" name="query" placeholder="Search..." aria-label="Search" value="{{ query }}">

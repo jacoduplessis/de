@@ -17,7 +17,7 @@
                 Actions
               </button>
               <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="{% url 'image_update' image.pk %}" up-layer="new" up-accept-location="{% url 'incident_images' incident.pk %}" up-on-accepted="up.reload('main')">Edit</a></li>
+                <li><a class="dropdown-item" href="{% url 'image_update' image.pk %}" up-layer="new">Edit</a></li>
                 <li><a class="dropdown-item" href="{{ image.image.url }}" target="_blank">View Full Size</a></li>
                 <li><a class="dropdown-item" href="{% url 'image_delete' image.pk %}" up-follow>Delete</a></li>
               </ul>

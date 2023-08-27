@@ -5,7 +5,7 @@ from datetime import timedelta, datetime
 from auditlog.models import LogEntry
 from auditlog.signals import accessed
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.views import LoginView as BaseLoginView, LogoutView as BaseLogoutView
 from django.contrib.auth.models import User
 from django.db import transaction
@@ -420,6 +420,7 @@ def incident_detail_demo(request):
 
 
 @login_required
+@permission_required("defects.add_incident")
 def incident_create(request):
     """
     Rendered in modal.
@@ -815,7 +816,7 @@ def image_update(request, pk):
     if request.method == "POST":
         form = Form(request.POST, instance=image)
         if not form.is_valid():
-            return render(request, "defects/image_update_modal.html", context={"form": form, "image": image})
+            return render(request, "defects/incident_image_update.html", context={"form": form, "image": image})
         form.save()
         return HttpResponseRedirect(reverse("incident_images", args=[image.incident_id]))
 
@@ -826,7 +827,7 @@ def image_update(request, pk):
             "image": image,
         }
 
-        return render(request, "defects/image_update_modal.html", context=context)
+        return render(request, "defects/incident_image_update.html", context=context)
 
 
 def incident_solution_create(request, pk):

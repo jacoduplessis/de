@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import widgets
-from .models import Incident, SectionEngineeringManager, Approval, Area, Operation, Section
+from .models import Incident, Approval, Area, Operation, Section
 from django.contrib.auth.models import User
 from django.db.models.query_utils import Q
 

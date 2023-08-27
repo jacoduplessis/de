@@ -37,6 +37,7 @@
 - design of compliance dashboard - breakdown per area, section?
 - anniversaries
 
+- should user actions be dismissible
 - fonts / Arial? ATM it uses dejavu sans on the serverr
 
 ## TODO
@@ -49,9 +50,7 @@
 - add ordering, searching to list views
 - custom error templates
 - render possible effect, production loss in notification html view and pdf
-- integrate modals and forms with unpoly
 - setup logging
-- prelim findings input
 - figure out incident status
 - permission checks
 - indicator that results are filtered.
@@ -59,6 +58,7 @@
 - install fonts in container
 - add test case that generates pdf
 - global list of issues with incident data
+- maps SRS permissions into concrete db permission / group entries
 
 ## Key Features
 
@@ -107,6 +107,7 @@
 - rename label of image ordering field
 - automated tests
 - user action framework
+- start adding permission checks
 
 ## Performance Improvements
 
