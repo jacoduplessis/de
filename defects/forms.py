@@ -52,9 +52,7 @@ class IncidentCreateForm(forms.ModelForm):
         self.fields["equipment"].choices = []  # load options with ajax
         self.fields["section_engineer"].queryset = User.objects.filter(groups__name__in=["section_engineer"])
 
-
     def clean(self):
-
         super().clean()
         time_start = self.cleaned_data.get("time_start")
         time_end = self.cleaned_data.get("time_end")
@@ -123,7 +121,6 @@ class IncidentUpdateForm(forms.ModelForm):
         self.fields["section_engineer"].queryset = User.objects.filter(conditions)
 
     def clean(self):
-
         super().clean()
         time_start = self.cleaned_data.get("time_start")
         time_end = self.cleaned_data.get("time_end")
@@ -135,10 +132,6 @@ class IncidentUpdateForm(forms.ModelForm):
             msg = "End time must be later than start time"
             self.add_error("time_start", msg)
             self.add_error("time_end", msg)
-
-
-class MultipleFileInput(forms.ClearableFileInput):
-    allow_multiple_selected = True
 
 
 class IncidentNotificationForm(forms.ModelForm):
@@ -187,7 +180,7 @@ class IncidentNotificationForm(forms.ModelForm):
             "section_engineer": "Section Engineer",
             "time_start": "Incident Start Time",
             "time_end": "Incident End Time",
-            "equipment": "Equipment (from SAP)",
+            "equipment": "Equipment",
         }
         help_texts = {
             "significant": "Is this a significant incident?",
@@ -206,7 +199,6 @@ class IncidentNotificationForm(forms.ModelForm):
         self.fields["section_engineer"].queryset = User.objects.filter(conditions)
 
     def clean(self):
-
         super().clean()
         time_start = self.cleaned_data.get("time_start")
         time_end = self.cleaned_data.get("time_end")
@@ -221,13 +213,11 @@ class IncidentNotificationForm(forms.ModelForm):
 
 
 class IncidentNotificationApprovalSendForm(forms.Form):
-
     user = forms.ModelChoiceField(
         queryset=User.objects.filter(groups__name__in=["section_engineering_manager"]),
         label="Section Engineering Manager",
         required=True,
     )
-
 
 
 class IncidentCloseForm(forms.Form):
@@ -286,7 +276,13 @@ class ApprovalForm(forms.ModelForm):
 
 
 class IncidentFilterForm(forms.Form):
-
     section = forms.ModelChoiceField(Section.objects.all(), required=False)
     operation = forms.ModelChoiceField(Operation.objects.all(), required=False)
     area = forms.ModelChoiceField(Area.objects.all(), required=False)
+    status = forms.ChoiceField(
+        choices=[
+            ("", "---------"),
+        ]
+        + list(Incident.STATUS_CHOICES),
+        required=False,
+    )

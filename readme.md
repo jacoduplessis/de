@@ -4,8 +4,12 @@
 
 - Load data fixtures in the following order:
 
-  > python manage.py loaddata defects/fixtures/groups.json
-  > python manage.py loaddata defects/fixtures/users.json
+> python manage.py loaddata defects/fixtures/groups.json
+> python manage.py loaddata defects/fixtures/users.json
+
+- Create Operations, Areas and Sections in Admin
+
+> python manage.py generate_fake_data 100
 
 ## Technical Questions
 
@@ -24,14 +28,16 @@
 - areas, sections
 - production cost (calculator, how it will be recorded)
 - notifications / emails
-- RELIABILITY INCIDENT EFFECT (dynamic, multi-choice?) / HIPO?
-- incident status
-- solution priority
+- RELIABILITY INCIDENT EFFECT (select one)
+- incident status (4 options, look in doc)
+- solution priority (not the same as short, med, long term)
 - dates on close out slide solution categories
 - extra fields for close out slide - immediate cause, root cause, images
 - significant incident => RCA process triggered
 - design of compliance dashboard - breakdown per area, section?
 - anniversaries
+
+- fonts / Arial? ATM it uses dejavu sans on the serverr
 
 ## TODO
 
@@ -39,13 +45,11 @@
 - application logging
 - edit locks
 - background tasks
-- add pagination to list views
+- add pagination to list views ?
 - add ordering, searching to list views
 - custom error templates
 - render possible effect, production loss in notification html view and pdf
 - integrate modals and forms with unpoly
-- replace icons with BSI
-- group creation
 - setup logging
 - prelim findings input
 - figure out incident status
@@ -54,6 +58,7 @@
 - email links
 - install fonts in container
 - add test case that generates pdf
+- global list of issues with incident data
 
 ## Key Features
 
@@ -95,6 +100,13 @@
 - register search
 - filtering
 
+#### after 2023-08-25
+
+- add status to incident filters
+- remove order button
+- rename label of image ordering field
+- automated tests
+- user action framework
 
 ## Performance Improvements
 

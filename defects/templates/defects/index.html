@@ -71,11 +71,11 @@
           </tr>
           </thead>
           <tbody>
-          {% for obj in user_actions %}
+          {% for action in user_actions %}
             <tr>
-              <td><a href="{% url 'incident_detail' obj.incident_id %}" class="text-black">{{ obj.incident.code }}</a></td>
-              <td><span class="colored-dot bg-{{ obj.urgency }}"></span> {{ obj.description }}</td>
-              <td>{{ obj.time_required|date:'Y-m-d' }}</td>
+              <td><a href="{% url 'incident_detail' action.incident.id %}" class="text-black">{{ action.incident.code }}</a></td>
+              <td><span class="colored-dot bg-{{ action.urgency.value }}"></span> {{ action.message }}</td>
+              <td>{{ action.time_required|date:'Y-m-d' }}</td>
             </tr>
           {% endfor %}
           </tbody>

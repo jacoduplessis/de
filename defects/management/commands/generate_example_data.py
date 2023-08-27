@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from defects.models import UserAction, Incident, Section, Equipment, Operation, Area
+from defects.models import Incident, Section, Equipment, Operation, Area
 from django.utils.timezone import now
 from django.utils.crypto import get_random_string
 from datetime import timedelta
@@ -162,31 +162,3 @@ class Command(BaseCommand):
             ]
 
             Incident.objects.bulk_create(incidents)
-
-            UserAction.objects.create(
-                user_id=user_id,
-                incident_id=1,
-                description="Confirm solution implementation",
-                time_required=now() - timedelta(days=7),
-            )
-
-            UserAction.objects.create(
-                user_id=user_id,
-                incident_id=2,
-                description="Upload 48h notification",
-                time_required=now() - timedelta(hours=3),
-            )
-
-            UserAction.objects.create(
-                user_id=user_id,
-                incident_id=3,
-                description="Upload final report",
-                time_required=now() + timedelta(days=1),
-            )
-
-            UserAction.objects.create(
-                user_id=user_id,
-                incident_id=4,
-                description="Review 1-year anniversary",
-                time_required=now() + timedelta(days=21),
-            )

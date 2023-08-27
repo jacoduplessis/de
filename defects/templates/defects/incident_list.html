@@ -18,13 +18,8 @@
         <div>
           <a href="{% url 'incident_list_export' %}" target="_blank" class="btn btn-outline-secondary btn-sm">Export</a>
           <a href="{% url 'incident_list_filter' %}?{{ request.GET.urlencode }}" up-layer="new" up-history="false" class="btn btn-outline-secondary btn-sm">Filter</a>
-          <a href="#" disabled class="btn btn-outline-secondary btn-sm">Order</a>
         </div>
       </div>
-    </div>
-
-    <div class="alert alert-secondary" role="alert">
-      AMB team: please inform us of your preferred filters, search and sorting parameters as well as export format.
     </div>
 
     <div class="table-responsive">

@@ -8,6 +8,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView as BaseLoginView, LogoutView as BaseLogoutView
 from django.contrib.auth.models import User
+from django.db import transaction
 from django.db.models import Q, Prefetch
 from django.db.models.aggregates import Count
 from django.forms import modelformset_factory, modelform_factory
@@ -29,8 +30,9 @@ from .forms import (
     ApprovalForm,
     IncidentFilterForm,
 )
-from .models import Solution, Incident, UserAction, Section, Equipment, IncidentImage, Approval, Area, Feedback
+from .models import Solution, Incident, Section, Equipment, IncidentImage, Approval, Area, Feedback
 from .timelines import TimelineEntry
+from .actions import get_user_actions
 
 
 def index(request):
@@ -53,7 +55,7 @@ def home(request):
             .filter(count__gte=1)
             .values_list("name", "count", named=True)
         ),
-        "user_actions": (UserAction.objects.select_related("incident").filter(user=request.user, time_dismissed=None).order_by("time_required")),
+        "user_actions": get_user_actions(request.user),
         "approvals": Approval.objects.select_related("incident", "created_by").filter(user=request.user, outcome=""),
     }
 
@@ -73,11 +75,11 @@ def incident_list(request):
 
     if query:
         search_filters = (
-            Q(short_description__icontains=query) |
-            Q(long_description__icontains=query) |
-            Q(code__exact=query) |
-            Q(equipment__name__icontains=query) |
-            Q(possible_effect__icontains=query)
+            Q(short_description__icontains=query)
+            | Q(long_description__icontains=query)
+            | Q(code__exact=query)
+            | Q(equipment__name__icontains=query)
+            | Q(possible_effect__icontains=query)
         )
         incidents = incidents.filter(search_filters)
 
@@ -92,6 +94,10 @@ def incident_list(request):
     operation_id = request.GET.get("operation")
     if operation_id:
         incidents = incidents.filter(operation_id=operation_id)
+
+    status = request.GET.get("status")
+    if status:
+        incidents = incidents.filter(status=status)
 
     context = {"incidents": incidents, "query": query}
 
@@ -737,7 +743,12 @@ def approval_detail(request, pk):
             return render(request, "defects/approval.html", context=context)
 
         else:
-            form.save()
+            with transaction.atomic():
+                obj = form.save()
+                if obj.outcome == Approval.ACCEPTED and obj.type == Approval.NOTIFICATION:
+                    obj.incident.notification_time_approved = now()
+                    obj.incident.save()
+
             messages.success(request, "Approval outcome has been saved.")
             return HttpResponseRedirect(reverse("home"))
 
@@ -799,7 +810,7 @@ def image_update(request, pk):
     """
     image = IncidentImage.objects.get(id=pk)
 
-    Form = modelform_factory(IncidentImage, fields=["description", "index"])
+    Form = modelform_factory(IncidentImage, fields=["description", "index"], labels={"index": "Order"})
 
     if request.method == "POST":
         form = Form(request.POST, instance=image)
@@ -900,6 +911,7 @@ def incident_list_export(request):
 
     return export_table_csv(response, Incident._meta.db_table)
 
+
 @require_GET
 @login_required
 def incident_list_filter(request):
@@ -911,7 +923,7 @@ def incident_list_filter(request):
     """
     form_submission = json.loads(request.headers.get("X-Up-Context", "{}")).get("action", "") == "submit"
     if form_submission:
-        return HttpResponseRedirect(reverse("incident_list") + '?' + request.GET.urlencode())
+        return HttpResponseRedirect(reverse("incident_list") + "?" + request.GET.urlencode())
 
     form = IncidentFilterForm(data=request.GET)
     return render(request, "defects/incident_list_filter.html", context={"form": form})

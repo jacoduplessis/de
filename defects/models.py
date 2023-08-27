@@ -89,9 +89,7 @@ class Incident(models.Model):
     long_description = models.TextField(blank=True)
     preliminary_findings = models.FileField(upload_to="files/", blank=True)
     notification_time_published = models.DateTimeField(blank=True, null=True)
-    notification_am_reviewed = models.BooleanField(default=False)
-    notification_circulated = models.BooleanField(default=False)
-    notification_file = models.FileField(blank=True)
+    notification_time_approved = models.DateTimeField(blank=True, null=True)
     close_out_file = models.FileField(blank=True)
     report_file = models.FileField(blank=True, upload_to="files/")  # RCA report
     production_value_loss = models.DecimalField(blank=True, max_digits=20, decimal_places=10, default=Decimal("0.00"))
@@ -329,39 +327,6 @@ class Approval(models.Model):
     type = models.CharField(max_length=100, choices=TYPE_CHOICES)
     outcome = models.CharField(max_length=100, choices=OUTCOME_CHOICES)
     comment = models.TextField(blank=True)
-
-
-class UserAction(models.Model):
-    """
-    Stores actions that users are required to perform.
-
-    Used to populate the actions on the dashboard page.
-    """
-
-    time_created = models.DateTimeField(auto_now_add=True)
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    time_required = models.DateTimeField(blank=True, null=True)
-    time_dismissed = models.DateTimeField(blank=True, null=True)
-    incident = models.ForeignKey(Incident, on_delete=models.CASCADE, blank=True, null=True)
-    description = models.TextField(blank=True)
-
-    @property
-    def urgency(self):
-        """
-        Three possible classes: info, warning, danger
-        """
-        if not self.time_required:
-            return "info"
-
-        time_remaining = self.time_required - now()
-
-        if time_remaining > timedelta(days=2):
-            return "info"
-
-        elif time_remaining > timedelta(hours=1):
-            return "warning"
-
-        return "danger"
 
 
 auditlog.register(
