@@ -23,15 +23,17 @@
     <div class="row">
 
       <div class="col-12 col-lg-6 my-3">
-        <h6 class="text-body-secondary">Ongoing Reliability Incidents Per Area</h6>
-        <div class="row mt-4">
-          {% for row in area %}
-            <div class="col col-lg-6 text-center">
-              <p class="display-6">{{ row.name }}</p>
-              <p class="display-2 fw-bold">{{ row.count }}</p>
-            </div>
-          {% endfor %}
-        </div>
+        <h6 class="text-body-secondary">Ongoing Reliability Incidents</h6>
+
+        <h6 class="text-body-secondary">Per Operation</h6>
+        {% include 'defects/_dashboard_count_table.html' with rows=operations %}
+
+        <h6 class="text-body-secondary">Per Area</h6>
+        {% include 'defects/_dashboard_count_table.html' with rows=areas %}
+
+        <h6 class="text-body-secondary">Per Section</h6>
+        {% include 'defects/_dashboard_count_table.html' with rows=sections %}
+
       </div>
 
       <div class="col-12 col-lg-6 my-3">
@@ -48,14 +50,14 @@
             </tr>
             </thead>
             <tbody>
-              {% for approval in approvals %}
-                <tr>
-                  <td><a href="{% url 'incident_detail' approval.incident_id %}" class="text-black" up-follow>{{ approval.incident.code }}</a></td>
-                  <td>{{ approval.get_type_display }}</td>
-                  <td>{{ approval.created_by.username }}</td>
-                  <td><a href="{% url 'approval_detail' approval.pk %}" class="text-black" up-layer="new">View</a></td>
-                </tr>
-              {% endfor %}
+            {% for approval in approvals %}
+              <tr>
+                <td><a href="{% url 'incident_detail' approval.incident_id %}" class="text-black" up-follow>{{ approval.incident.code }}</a></td>
+                <td>{{ approval.get_type_display }}</td>
+                <td>{{ approval.created_by.username }}</td>
+                <td><a href="{% url 'approval_detail' approval.pk %}" class="text-black" up-layer="new">View</a></td>
+              </tr>
+            {% endfor %}
             </tbody>
           </table>
         {% endif %}

@@ -30,7 +30,7 @@ from .forms import (
     ApprovalForm,
     IncidentFilterForm,
 )
-from .models import Solution, Incident, Section, Equipment, IncidentImage, Approval, Area, Feedback
+from .models import Solution, Incident, Section, Equipment, IncidentImage, Approval, Area, Feedback, Operation
 from .timelines import TimelineEntry
 from .actions import get_user_actions
 
@@ -49,13 +49,14 @@ def home(request):
     context = {
         "sections": (Section.objects.annotate(count=Count("incidents")).all().values_list("name", "count", named=True)),
         "areas": (Area.objects.annotate(count=Count("incidents")).all().values_list("name", "count", named=True)),
+        "operations": (Operation.objects.annotate(count=Count("incidents")).all().values_list("name", "count", named=True)),
         "equipment": (
             Equipment.objects.filter(incidents__time_start__gte=now() - timedelta(days=365))
             .annotate(count=Count("incidents"))
             .filter(count__gte=1)
             .values_list("name", "count", named=True)
         ),
-        "user_actions": get_user_actions(request.user),
+        "user_actions": get_user_actions(request.user)[:10],  # todo: remove limit of 10
         "approvals": Approval.objects.select_related("incident", "created_by").filter(user=request.user, outcome=""),
     }
 

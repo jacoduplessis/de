@@ -65,7 +65,7 @@ class Incident(models.Model):
     time_created = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="+")
     status = models.CharField(max_length=100, choices=STATUS_CHOICES, default=ACTIVE)
-    operation = models.ForeignKey(Operation, null=True, blank=True, on_delete=models.SET_NULL)
+    operation = models.ForeignKey(Operation, null=True, blank=True, on_delete=models.SET_NULL, related_name="incidents")
     area = models.ForeignKey(Area, null=True, blank=True, on_delete=models.SET_NULL, related_name="incidents")
     section = models.ForeignKey(Section, blank=True, null=True, on_delete=models.SET_NULL, related_name="incidents")
     section_engineer = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL, related_name="+")
