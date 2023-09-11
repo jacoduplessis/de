@@ -48,7 +48,6 @@
 - add pagination to list views ?
 - add ordering, searching to list views
 - custom error templates
-- render possible effect, production loss in notification html view and pdf
 - setup logging
 - figure out incident status
 - permission checks
@@ -111,3 +110,22 @@
 ## Performance Improvements
 
 - search indexes
+
+
+## Demo
+
+engineering manager meeting
+really important
+10 minutes
+thursday
+
+2-3 min introduction
+6 min demo
+
+
+# notes
+
+- rand value calculated
+- script the demo
+- prepare data for input to save time
+- end with value graph to tie it up

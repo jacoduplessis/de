@@ -79,7 +79,7 @@ class IncidentUpdateForm(forms.ModelForm):
             "section_engineer",
             "time_start",
             "time_end",
-            "possible_effect",
+            "trigger",
             "production_value_loss",
             "rand_value_loss",
             "immediate_action_taken",
@@ -108,7 +108,6 @@ class IncidentUpdateForm(forms.ModelForm):
                     "rows": 10,
                 }
             ),
-            "possible_effect": widgets.CheckboxSelectMultiple(choices=EFFECT_CHOICES),
         }
 
     def __init__(self, *args, **kwargs):
@@ -167,7 +166,7 @@ class IncidentNotificationForm(forms.ModelForm):
             "time_end",
             "short_description",
             "long_description",
-            "possible_effect",
+            "trigger",
             "production_value_loss",
             "rand_value_loss",
             "immediate_action_taken",

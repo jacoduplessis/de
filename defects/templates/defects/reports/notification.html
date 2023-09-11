@@ -119,15 +119,15 @@
 </table>
 <table>
   <tr>
-    <th colspan="8">Reliability Incident Effect</th>
+    <th colspan="8">Reliability Incident Trigger</th>
   </tr>
   <tr>
     <td>Estimated Cost of Repair > R250k</td>
-    <td style="text-align: center; font-weight: bold; width: 30px"></td>
+    <td style="text-align: center; font-weight: bold; width: 30px">{% if incident.trigger == incident.REPAIR %}X{% endif %}</td>
     <td>Production Loss > 3h</td>
-    <td style="text-align: center; font-weight: bold; width: 30px">X</td>
+    <td style="text-align: center; font-weight: bold; width: 30px">{% if incident.trigger == incident.PRODUCTION_LOSS %}X{% endif %}</td>
     <td>Loss Of Full Production Shift or Evacuation of Shift</td>
-    <td style="text-align: center; font-weight: bold; width: 30px"></td>
+    <td style="text-align: center; font-weight: bold; width: 30px">{% if incident.trigger == incident.SHIFT_LOSS %}X{% endif %}</td>
     <td>Recorded Production Loss (Pt Ounces)</td>
     <td style="color: red; width: 60px">0 Pt Ounces</td>
   </tr>

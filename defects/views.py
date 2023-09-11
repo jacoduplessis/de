@@ -80,7 +80,6 @@ def incident_list(request):
             | Q(long_description__icontains=query)
             | Q(code__exact=query)
             | Q(equipment__name__icontains=query)
-            | Q(possible_effect__icontains=query)
         )
         incidents = incidents.filter(search_filters)
 

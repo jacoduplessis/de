@@ -37,5 +37,6 @@ class Command(BaseCommand):
             i.significant = random.random() > 0.5
             i.production_value_loss = random.randint(100, 1000)
             i.rand_value_loss = random.randint(0, 10_000_000)
-            i.status = random.choice([s[0] for s in Incident.STATUS_CHOICES])
+            i.status = random.choice([c[0] for c in Incident.STATUS_CHOICES])
+            i.trigger = random.choice([c[0] for c in Incident.TRIGGER_CHOICES])
             i.save()

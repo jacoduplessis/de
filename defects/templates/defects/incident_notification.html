@@ -57,6 +57,10 @@
           <th>Section Engineer</th>
           <td>{{ incident.section_engineer }}</td>
         </tr>
+        <tr>
+          <th>Trigger</th>
+          <td>{{ incident.get_trigger_display }}</td>
+        </tr>
         </tbody>
       </table>
 
@@ -64,8 +68,6 @@
 
       {{ incident.long_description|linebreaks }}
 
-      <h4>Potential reliability incident effect</h4>
-      {{ incident.possible_effect }}
       <h4>Immediate action that was taken</h4>
       {{ incident.immediate_action_taken|linebreaks }}
       <h4>Remaining risk after immediate action was taken</h4>

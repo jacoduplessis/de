@@ -61,6 +61,16 @@ class Incident(models.Model):
         (SCHEDULED, "Scheduled"),
     )
 
+    REPAIR = 'repair'
+    PRODUCTION_LOSS = 'production_loss'
+    SHIFT_LOSS = 'shift_loss'
+
+    TRIGGER_CHOICES = (
+        (REPAIR, "Estimated cost of Repair > R 250K"),
+        (PRODUCTION_LOSS, "Production Loss > 3 hours"),
+        (SHIFT_LOSS, "Loss of Full Production shift or Evacuation of shift"),
+    )
+
     code = models.CharField(unique=True, max_length=200)  # also known as RI_Number
     time_created = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="+")
@@ -80,9 +90,9 @@ class Incident(models.Model):
     notification_time_approved = models.DateTimeField(blank=True, null=True)
     close_out_file = models.FileField(blank=True)
     report_file = models.FileField(blank=True, upload_to="files/")  # RCA report
-    production_value_loss = models.DecimalField(blank=True, max_digits=20, decimal_places=10, default=Decimal("0.00"))
+    production_value_loss = models.DecimalField(blank=True, max_digits=20, decimal_places=4, default=Decimal("0.00"))
     rand_value_loss = models.DecimalField(blank=True, max_digits=20, decimal_places=2, default=Decimal("0.00"))
-    possible_effect = models.TextField(blank=True)
+    trigger = models.CharField(max_length=200, blank=True, choices=TRIGGER_CHOICES)
     immediate_action_taken = models.TextField(blank=True)
     remaining_risk = models.TextField(blank=True)
 
