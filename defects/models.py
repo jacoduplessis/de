@@ -297,10 +297,16 @@ class Solution(models.Model):
     MEDIUM_TERM = "medium_term"
     LONG_TERM = "long_term"
 
-    PRIORITY_CHOICES = (
+    TIMEFRAME_CHOICES = (
         (SHORT_TERM, "Short Term"),
         (MEDIUM_TERM, "Medium Term"),
         (LONG_TERM, "Long Term"),
+    )
+
+    PRIORITY_CHOICES = (
+        ("a", "A"),
+        ("b", "B"),
+        ("c", "C"),
     )
 
     IDENTIFIED = "identified"
@@ -309,23 +315,25 @@ class Solution(models.Model):
 
     STATUS_CHOICES = (
         (IDENTIFIED, "Identified"),
-        (COMPLETED, "Complated"),
+        (COMPLETED, "Completed"),
         (SCHEDULED, "Scheduled"),
     )
 
     incident = models.ForeignKey(Incident, on_delete=models.SET_NULL, null=True, blank=True, related_name="solutions")
-    priority = models.CharField(max_length=200, blank=True, choices=PRIORITY_CHOICES, default=SHORT_TERM)
+    priority = models.CharField(max_length=200, blank=True, choices=PRIORITY_CHOICES, default="A")
+    timeframe = models.CharField(max_length=200, blank=True, choices=TIMEFRAME_CHOICES, default=SHORT_TERM)
     description = models.CharField(max_length=500)
     person_responsible = models.CharField(max_length=200, blank=True)
     status = models.CharField(max_length=200, blank=True, choices=STATUS_CHOICES, default=IDENTIFIED)
     planned_completion_date = models.DateField(blank=True, null=True)
-    planned_completion_date_string = models.CharField(max_length=200, blank=True)
     actual_completion_date = models.DateField(blank=True, null=True)
-    actual_completion_date_string = models.CharField(max_length=200, blank=True)
-    incident_date_string = models.CharField(max_length=200, blank=True)
     dr_number = models.CharField(max_length=200, blank=True)
     remarks = models.TextField(blank=True)
-    area = models.CharField(max_length=200, blank=True)
+
+    @property
+    def status_class(self):
+        _map = {self.SCHEDULED: "primary", self.COMPLETED: "success", self.IDENTIFIED: "secondary"}
+        return _map.get(self.status)
 
 
 class Approval(models.Model):
@@ -393,3 +401,18 @@ class Feedback(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     description = models.TextField(blank=True)
     dismissed = models.BooleanField(default=False)
+
+
+# class Price(models.Model):
+#     """
+#     Tracks the ZAR market price of one ounce of PGM.
+#     """
+#     time_created = models.DateTimeField(auto_now_add=True)
+#     rate = models.DecimalField(decimal_places=2, max_digits=10)
+#
+#
+#     @classmethod
+#     def rand_cost(cls, ounces: Decimal) -> Decimal:
+#
+#         most_recent = cls.objects.order_by('-time_created').first()
+#         return ounces * most_recent.rate

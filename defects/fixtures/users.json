@@ -106,5 +106,23 @@
       "groups": [6],
       "user_permissions": []
     }
+  },
+  {
+    "model": "auth.user",
+    "pk": null,
+    "fields": {
+      "password": "pbkdf2_sha256$600000$vd9jk7PYpcHHXR7MYiFlFU$ZouoaktgzB2Dbp3XKFIi0/ZruxaTPwk5EX3sISRZqF8=",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "asset_management_scheduler",
+      "first_name": "AMS",
+      "last_name": "",
+      "email": "asset_management_scheduler@angloamerican.com",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2023-07-23T17:06:41Z",
+      "groups": [7],
+      "user_permissions": []
+    }
   }
 ]

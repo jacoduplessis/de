@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.views import LoginView as BaseLoginView, LogoutView as BaseLogoutView
 from django.contrib.auth.models import User
 from django.db import transaction
-from django.db.models import Q, Prefetch
+from django.db.models import Q, Prefetch, OuterRef, Subquery
 from django.db.models.aggregates import Count
 from django.forms import modelformset_factory, modelform_factory
 from django.http import HttpResponseRedirect, JsonResponse, HttpResponse, HttpResponseForbidden
@@ -29,6 +29,7 @@ from .forms import (
     IncidentUpdateForm,
     ApprovalForm,
     IncidentFilterForm,
+    SolutionFilterForm,
 )
 from .models import Solution, Incident, Section, Equipment, IncidentImage, Approval, Area, Feedback, Operation
 from .timelines import TimelineEntry
@@ -46,17 +47,29 @@ def apps(request):
 
 @login_required()
 def home(request):
+
+    def _subquery(q_kwarg):
+
+        filters = {q_kwarg: OuterRef('pk')}
+
+        return Subquery(
+                Incident.objects.filter(**filters, status=Incident.ACTIVE)
+                .values(q_kwarg)
+                .annotate(count=Count('*'))
+                .values("count")
+            )
+
     context = {
-        "sections": (Section.objects.annotate(count=Count("incidents")).all().values_list("name", "count", named=True)),
-        "areas": (Area.objects.annotate(count=Count("incidents")).all().values_list("name", "count", named=True)),
-        "operations": (Operation.objects.annotate(count=Count("incidents")).all().values_list("name", "count", named=True)),
+        "sections": (Section.objects.annotate(count=_subquery("section_id")).values_list("name", "count", named=True)),
+        "areas": (Area.objects.annotate(count=_subquery("area_id")).values_list("name", "count", named=True)),
+        "operations": (Operation.objects.annotate(count=_subquery("operation_id")).values_list("name", "count", named=True)),
         "equipment": (
             Equipment.objects.filter(incidents__time_start__gte=now() - timedelta(days=365))
             .annotate(count=Count("incidents"))
             .filter(count__gte=1)
             .values_list("name", "count", named=True)
         ),
-        "user_actions": get_user_actions(request.user)[:10],  # todo: remove limit of 10
+        "user_actions": get_user_actions(request.user)[:13],  # todo: remove limit of 10
         "approvals": Approval.objects.select_related("incident", "created_by").filter(user=request.user, outcome=""),
     }
 
@@ -670,13 +683,27 @@ def solution_list(request):
         if action == "schedule":
             return HttpResponseRedirect(reverse("solution_schedule"))
 
-    qs = Solution.objects.all()
-    if request.GET.get("filter"):
-        qs = qs[:6]
+    solutions = Solution.objects.select_related("incident").all()
 
-    context = {"solutions": qs}
+    query = request.GET.get("query", "")
 
-    return render(request, "defects/solutions_list.html", context)
+    if query:
+        search_filters = (
+            Q(description__icontains=query) | Q(remarks__icontains=query) | Q(person_responsible__icontains=query)
+        )
+        solutions = solutions.filter(search_filters)
+
+    status = request.GET.get("status")
+    if status:
+        solutions = solutions.filter(status=status)
+
+    incident_id = request.GET.get("incident_id")
+    if incident_id:
+        solutions = solutions.filter(incident_id=incident_id)
+
+    context = {"solutions": solutions}
+
+    return render(request, "defects/solution_list.html", context)
 
 
 class LoginView(BaseLoginView):
@@ -913,6 +940,14 @@ def incident_list_export(request):
     return export_table_csv(response, Incident._meta.db_table)
 
 
+@login_required
+def solution_list_export(request):
+    response = HttpResponse(
+        headers={"Content-Type": "text/csv", "Content-Disposition": f"attachment; filename=\"solutions-{now().strftime('%Y-%m-%d')}.csv\""}
+    )
+
+    return export_table_csv(response, Solution._meta.db_table)
+
 @require_GET
 @login_required
 def incident_list_filter(request):
@@ -928,3 +963,19 @@ def incident_list_filter(request):
 
     form = IncidentFilterForm(data=request.GET)
     return render(request, "defects/incident_list_filter.html", context={"form": form})
+
+@require_GET
+@login_required
+def solution_list_filter(request):
+    """
+    Renders in modal.
+
+    Because this is a search form using GET, we use the context as workaround to detect
+    whether the form is submitted or loaded.
+    """
+    form_submission = json.loads(request.headers.get("X-Up-Context", "{}")).get("action", "") == "submit"
+    if form_submission:
+        return HttpResponseRedirect(reverse("solution_list") + "?" + request.GET.urlencode())
+
+    form = SolutionFilterForm(data=request.GET)
+    return render(request, "defects/solution_list_filter.html", context={"form": form})

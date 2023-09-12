@@ -18,14 +18,9 @@
       <div class="col-12 col-lg-6 my-3">
         <h6 class="text-body-secondary">Ongoing Reliability Incidents</h6>
 
-        <h6 class="text-body-secondary">Per Operation</h6>
-        {% include 'defects/_dashboard_count_table.html' with rows=operations %}
-
-        <h6 class="text-body-secondary">Per Area</h6>
-        {% include 'defects/_dashboard_count_table.html' with rows=areas %}
-
-        <h6 class="text-body-secondary">Per Section</h6>
-        {% include 'defects/_dashboard_count_table.html' with rows=sections %}
+        {% include 'defects/_dashboard_count_table.html' with rows=operations title="Operation" %}
+        {% include 'defects/_dashboard_count_table.html' with rows=areas title="Area" %}
+        {% include 'defects/_dashboard_count_table.html' with rows=sections title="Section" %}
 
       </div>
 

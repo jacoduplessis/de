@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from defects.models import Incident, Area, Section, Operation
+from defects.models import Incident, Area, Section, Operation, Solution
 import random
 from datetime import timedelta
 from django.utils.timezone import now
@@ -9,15 +9,17 @@ from django.utils.lorem_ipsum import words, paragraphs
 
 class Command(BaseCommand):
     def add_arguments(self, parser):
-        parser.add_argument("n", type=int, help="number of incidents to generate")
+        parser.add_argument("--incidents", type=int, help="number of incidents to generate", default=0)
+        parser.add_argument("--solutions", type=int, help="number of incidents to generate", default=0)
 
     def handle(self, *args, **options):
+
         areas = list(Area.objects.values_list("id", flat=True))
         sections = list(Section.objects.values_list("id", flat=True))
         operations = list(Operation.objects.values_list("id", flat=True))
         section_engineers = list(User.objects.filter(groups__name__in=["section_engineer"]).values_list("id", flat=True))
 
-        for ix in range(options["n"]):
+        for ix in range(options["incidents"]):
             i = Incident()
             i.created_by_id = 1
             i.equipment_id = random.randint(10, 10_000)
@@ -40,3 +42,16 @@ class Command(BaseCommand):
             i.status = random.choice([c[0] for c in Incident.STATUS_CHOICES])
             i.trigger = random.choice([c[0] for c in Incident.TRIGGER_CHOICES])
             i.save()
+
+        incident_ids = list(Incident.objects.all().values_list("id", flat=True))
+        for ix in range(options["solutions"]):
+            s = Solution()
+            s.incident_id = random.choice(incident_ids)
+            s.description = words(5, common=False)
+            s.person_responsible = "Some Person"
+            s.priority = random.choice([c[0] for c in Solution.PRIORITY_CHOICES])
+            s.timeframe = random.choice([c[0] for c in Solution.TIMEFRAME_CHOICES])
+            s.remarks = "\n\n".join(paragraphs(2, common=False))
+            s.planned_completion_date = now() + timedelta(days=random.randint(10, 300))
+            s.status = random.choice([c[0] for c in Solution.STATUS_CHOICES])
+            s.save()

@@ -129,7 +129,7 @@
     <td>Loss Of Full Production Shift or Evacuation of Shift</td>
     <td style="text-align: center; font-weight: bold; width: 30px">{% if incident.trigger == incident.SHIFT_LOSS %}X{% endif %}</td>
     <td>Recorded Production Loss (Pt Ounces)</td>
-    <td style="color: red; width: 60px">0 Pt Ounces</td>
+    <td style="color: red; width: 60px">{{ incident.production_value_loss }} Pt Ounces</td>
   </tr>
 </table>
 <table>

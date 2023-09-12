@@ -108,17 +108,39 @@
       <div class="header">Short-Term</div>
       <div class="header" style="background-color: green; width: 80px">2024-01</div>
     </div>
-    <div class="content">{% lorem 1 p random %}</div>
+    <div class="content">
+      <ul>
+      {% for solution in incident.solutions.all %}
+        {% if solution.timeframe == solution.SHORT_TERM %}
+          <li>{{ solution.description }}</li>
+        {% endif %}
+      {% endfor %}
+      </ul>
+    </div>
     <div style="display: flex">
       <div class="header">Medium-Term</div>
       <div class="header" style="background-color: orange; width: 80px">2024-06</div>
     </div>
-    <div class="content">{% lorem 1 p random %}</div>
+    <div class="content">
+      <ul>
+      {% for solution in incident.solutions.all %}
+        {% if solution.timeframe == solution.MEDIUM_TERM %}
+          <li>{{ solution.description }}</li>
+        {% endif %}
+      {% endfor %}
+      </ul>
+    </div>
     <div style="display: flex">
       <div class="header">Long-Term</div>
       <div class="header" style="background-color: red; width: 80px">2024-06</div>
     </div>
-    <div class="content">{% lorem 1 p random %}</div>
+    <div class="content"><ul>
+      {% for solution in incident.solutions.all %}
+        {% if solution.timeframe == solution.LONG_TERM %}
+          <li>{{ solution.description }}</li>
+        {% endif %}
+      {% endfor %}
+      </ul></div>
 
     <div style="margin-top: 2rem;">
       <table>

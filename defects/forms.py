@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import widgets
-from .models import Incident, Approval, Area, Operation, Section
+from .models import Incident, Approval, Area, Operation, Section, Solution
 from django.contrib.auth.models import User
 from django.db.models.query_utils import Q
 
@@ -93,6 +93,7 @@ class IncidentUpdateForm(forms.ModelForm):
             "time_start": "Incident Start Time",
             "time_end": "Incident End Time",
             "equipment": "Equipment (from SAP)",
+
         }
 
         help_texts = {
@@ -100,6 +101,8 @@ class IncidentUpdateForm(forms.ModelForm):
             "remaining_risk": "Indicate the remaining risk after immediate action was taken.",
             "immediate_action_taken": "Describe the immediate action taken.",
             "long_description": "Production Loss, Asset Damage, Theft, Fire, Etc.",
+            "production_value_loss": "In Pt Ounces",
+            "rand_value_loss": "This value will be calculated from market data but can optionally be overridden here."
         }
 
         widgets = {
@@ -283,5 +286,16 @@ class IncidentFilterForm(forms.Form):
             ("", "---------"),
         ]
         + list(Incident.STATUS_CHOICES),
+        required=False,
+    )
+
+
+class SolutionFilterForm(forms.Form):
+
+    status = forms.ChoiceField(
+        choices=[
+            ("", "---------"),
+        ]
+        + list(Solution.STATUS_CHOICES),
         required=False,
     )

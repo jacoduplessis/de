@@ -89,7 +89,7 @@
           </tr>
           <tr>
             <th>Production Cost</th>
-            <td>{{ incident.production_value_loss }}</td>
+            <td>{{ incident.production_value_loss }} Pt Ounces</td>
           </tr>
           <tr>
             <th>Rand Cost</th>
@@ -125,7 +125,8 @@
         <div class="d-flex mt-4 justify-content-between">
           <h4>Solutions</h4>
           <div>
-            <a href="{% url 'solution_list' %}?filter=1&solution_status=identified" class="btn btn-sm btn-outline-secondary me-2">View in Solution
+            <a href="{% url 'solution_list' %}?incident_id={{ incident.pk }}" class="btn btn-sm btn-outline-secondary me-2">View in Solution
+
               Tracker</a>
             <a href="{% url 'incident_solution_create' incident.pk %}" up-layer="new" class="btn btn-sm btn-primary">Add</a>
           </div>
@@ -135,62 +136,41 @@
         <table class="table table-bordered mt-2">
           <tbody>
           <tr>
-            <th colspan="2">Short-Term</th>
+            <th>Short-Term</th>
+            <th>Priority</th>
           </tr>
           {% for solution in incident.solutions.all %}
-            {% if solution.priority == solution.SHORT_TERM %}
+            {% if solution.timeframe == solution.SHORT_TERM %}
               <tr>
-                <td>{{ solution.description }}</td>
-                <td>{{ solution.status }}</td>
+                <td><span class="badge text-bg-{{ solution.status_class }}">{{ solution.get_status_display }}</span> {{ solution.description }}</td>
+                <td>{{ solution.get_priority_display }}</td>
               </tr>
             {% endif %}
           {% endfor %}
           <tr>
-            <td>{% lorem 3 w random %}</td>
-            <td class="table-success" style="width: 100px">Complete</td>
-          </tr>
-          <tr>
-            <td>{% lorem 3 w random %}</td>
-            <td class="table-success" style="width: 100px">Complete</td>
-          </tr>
-          <tr>
-            <th colspan="2">Mid-Term</th>
+            <th>Mid-Term</th>
+            <th>Priority</th>
           </tr>
           {% for solution in incident.solutions.all %}
-            {% if solution.priority == solution.MEDIUM_TERM %}
+            {% if solution.timeframe == solution.MEDIUM_TERM %}
               <tr>
-                <td>{{ solution.description }}</td>
-                <td>{{ solution.status }}</td>
+                <td><span class="badge text-bg-{{ solution.status_class }}">{{ solution.get_status_display }}</span> {{ solution.description }}</td>
+                <td>{{ solution.get_priority_display }}</td>
               </tr>
             {% endif %}
           {% endfor %}
           <tr>
-            <td>{% lorem 3 w random %}</td>
-            <td class="table-success" style="width: 100px">Completed</td>
-          </tr>
-          <tr>
-            <td>{% lorem 3 w random %}</td>
-            <td class="table-light" style="width: 100px">Identified</td>
-          </tr>
-          <tr>
-            <th colspan="2">Long-Term</th>
+            <th>Long-Term</th>
+            <th>Priority</th>
           </tr>
           {% for solution in incident.solutions.all %}
-            {% if solution.priority == solution.LONG_TERM %}
+            {% if solution.timeframe == solution.LONG_TERM %}
               <tr>
-                <td>{{ solution.description }}</td>
-                <td>{{ solution.status }}</td>
+                <td><span class="badge text-bg-{{ solution.status_class }}">{{ solution.get_status_display }}</span> {{ solution.description }}</td>
+                <td>{{ solution.get_priority_display }}</td>
               </tr>
             {% endif %}
           {% endfor %}
-          <tr>
-            <td>{% lorem 3 w random %}</td>
-            <td class="table-light" style="width: 100px">Identified</td>
-          </tr>
-          <tr>
-            <td>{% lorem 3 w random %}</td>
-            <td class="table-primary" style="width: 100px">Scheduled</td>
-          </tr>
           </tbody>
         </table>
       </div>

@@ -24,7 +24,6 @@
 
 ## Application Questions
 
-- "circulation to AS&R Team"
 - taxonomy: operation, areas, sections
 - production cost (calculator, how it will be recorded)
 - notifications / emails
@@ -57,6 +56,8 @@
 - add test case that generates pdf
 - global list of issues with incident data
 - maps SRS permissions into concrete db permission / group entries
+- indication that filters are active
+- clear filters button
 
 ## Key Features
 
@@ -111,21 +112,20 @@
 
 - search indexes
 
-
-## Demo
-
-engineering manager meeting
-really important
-10 minutes
-thursday
-
-2-3 min introduction
-6 min demo
-
-
-# notes
+## notes
 
 - rand value calculated
 - script the demo
 - prepare data for input to save time
 - end with value graph to tie it up
+- actively search incident database - maintains referential integrity and allows for deeper data analysis
+- search "distributor"
+
+## Application Questions
+
+- taxonomy clarification: operation, section, area
+- how are the dates for short, medium and long term solution calculated
+- what is solution priority
+- where can we retrieve data relating to market price of platinum group metals
+-
+
