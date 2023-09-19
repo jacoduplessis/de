@@ -129,3 +129,10 @@
 - where can we retrieve data relating to market price of platinum group metals
 -
 
+## demo to-do
+
+calculate rand value loss
+prep close out slide
+"next demo" show anniversaries
+design - simple, intuitive - work efficiently and correctly
+customised per user

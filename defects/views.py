@@ -47,17 +47,10 @@ def apps(request):
 
 @login_required()
 def home(request):
-
     def _subquery(q_kwarg):
+        filters = {q_kwarg: OuterRef("pk")}
 
-        filters = {q_kwarg: OuterRef('pk')}
-
-        return Subquery(
-                Incident.objects.filter(**filters, status=Incident.ACTIVE)
-                .values(q_kwarg)
-                .annotate(count=Count('*'))
-                .values("count")
-            )
+        return Subquery(Incident.objects.filter(**filters, status=Incident.ACTIVE).values(q_kwarg).annotate(count=Count("*")).values("count"))
 
     context = {
         "sections": (Section.objects.annotate(count=_subquery("section_id")).values_list("name", "count", named=True)),
@@ -89,10 +82,7 @@ def incident_list(request):
 
     if query:
         search_filters = (
-            Q(short_description__icontains=query)
-            | Q(long_description__icontains=query)
-            | Q(code__exact=query)
-            | Q(equipment__name__icontains=query)
+            Q(short_description__icontains=query) | Q(long_description__icontains=query) | Q(code__exact=query) | Q(equipment__name__icontains=query)
         )
         incidents = incidents.filter(search_filters)
 
@@ -589,6 +579,31 @@ def incident_notification_pdf(request, pk):
 
 
 @login_required
+def incident_anniversary_pdf(request, pk):
+    from weasyprint import HTML
+    from .reports import url_fetcher
+
+    qs = Incident.objects.prefetch_related("images")
+
+    incident = get_object_or_404(qs, pk=pk)
+
+    context = {"incident": incident, "images": incident.images.all()}
+
+    markup = render_to_string("defects/reports/anniversary.html", context=context, request=request)
+
+    response = HttpResponse(
+        headers={
+            "Content-Type": "application/pdf",
+            # "Content-Disposition": f'attachment; filename="notification-{incident.code}.pdf"',
+        }
+    )
+
+    doc = HTML(string=markup, url_fetcher=url_fetcher)
+    doc.write_pdf(target=response)
+    return response
+
+
+@login_required
 def incident_close_pdf(request, pk):
     from weasyprint import HTML
     from .reports import url_fetcher
@@ -684,24 +699,28 @@ def solution_list(request):
             return HttpResponseRedirect(reverse("solution_schedule"))
 
     solutions = Solution.objects.select_related("incident").all()
+    context = {}
 
     query = request.GET.get("query", "")
 
     if query:
-        search_filters = (
-            Q(description__icontains=query) | Q(remarks__icontains=query) | Q(person_responsible__icontains=query)
-        )
+        search_filters = Q(description__icontains=query) | Q(remarks__icontains=query) | Q(person_responsible__icontains=query)
         solutions = solutions.filter(search_filters)
 
     status = request.GET.get("status")
     if status:
         solutions = solutions.filter(status=status)
 
+    timeframe = request.GET.get("timeframe")
+    if timeframe:
+        solutions = solutions.filter(timeframe=timeframe)
+
     incident_id = request.GET.get("incident_id")
     if incident_id:
+        context["incident"] = Incident.objects.get(id=incident_id)
         solutions = solutions.filter(incident_id=incident_id)
 
-    context = {"solutions": solutions}
+    context["solutions"] = solutions
 
     return render(request, "defects/solution_list.html", context)
 
@@ -866,6 +885,7 @@ def incident_solution_create(request, pk):
     Form = modelform_factory(
         Solution,
         fields=[
+            "timeframe",
             "priority",
             "description",
             "person_responsible",
@@ -948,6 +968,7 @@ def solution_list_export(request):
 
     return export_table_csv(response, Solution._meta.db_table)
 
+
 @require_GET
 @login_required
 def incident_list_filter(request):
@@ -964,6 +985,7 @@ def incident_list_filter(request):
     form = IncidentFilterForm(data=request.GET)
     return render(request, "defects/incident_list_filter.html", context={"form": form})
 
+
 @require_GET
 @login_required
 def solution_list_filter(request):
@@ -979,3 +1001,44 @@ def solution_list_filter(request):
 
     form = SolutionFilterForm(data=request.GET)
     return render(request, "defects/solution_list_filter.html", context={"form": form})
+
+
+@login_required
+def solution_update(request, pk):
+    solution = get_object_or_404(Solution, pk=pk)
+
+    context = {
+        "solution": solution,
+    }
+
+    Form = modelform_factory(
+        Solution,
+        fields=[
+            "description",
+            "status",
+            "timeframe",
+            "priority",
+            "person_responsible",
+            "planned_completion_date",
+            "actual_completion_date",
+            "remarks",
+            "dr_number",
+        ],
+    )
+
+    if request.method == "GET":
+        form = Form(instance=solution)
+        context["form"] = form
+        return render(request, "defects/solution_update.html", context=context)
+
+    if request.method == "POST":
+        form = Form(request.POST, request.FILES, instance=solution)
+        if not form.is_valid():
+            context["form"] = form
+            return render(request, "defects/solution_update.html", context=context)
+
+        form.save()
+        messages.success(request, "Solution updated.")
+        return HttpResponseRedirect(
+            reverse("solution_list"),
+        )

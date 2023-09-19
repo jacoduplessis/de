@@ -61,9 +61,9 @@ class Incident(models.Model):
         (SCHEDULED, "Scheduled"),
     )
 
-    REPAIR = 'repair'
-    PRODUCTION_LOSS = 'production_loss'
-    SHIFT_LOSS = 'shift_loss'
+    REPAIR = "repair"
+    PRODUCTION_LOSS = "production_loss"
+    SHIFT_LOSS = "shift_loss"
 
     TRIGGER_CHOICES = (
         (REPAIR, "Estimated cost of Repair > R 250K"),
@@ -403,16 +403,15 @@ class Feedback(models.Model):
     dismissed = models.BooleanField(default=False)
 
 
-# class Price(models.Model):
-#     """
-#     Tracks the ZAR market price of one ounce of PGM.
-#     """
-#     time_created = models.DateTimeField(auto_now_add=True)
-#     rate = models.DecimalField(decimal_places=2, max_digits=10)
-#
-#
-#     @classmethod
-#     def rand_cost(cls, ounces: Decimal) -> Decimal:
-#
-#         most_recent = cls.objects.order_by('-time_created').first()
-#         return ounces * most_recent.rate
+class ResourcePrice(models.Model):
+    """
+    Tracks the ZAR market price of one ounce of PGM.
+    """
+
+    time_created = models.DateTimeField(auto_now_add=True)
+    rate = models.DecimalField(decimal_places=2, max_digits=10, help_text="Price in ZAR of the resource per ounce.")
+
+    @classmethod
+    def rand_cost(cls, ounces: Decimal) -> Decimal:
+        most_recent = cls.objects.order_by("-time_created").first()
+        return (ounces * most_recent.rate).quantize(Decimal("1.00"))

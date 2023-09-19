@@ -299,3 +299,11 @@ class SolutionFilterForm(forms.Form):
         + list(Solution.STATUS_CHOICES),
         required=False,
     )
+
+    timeframe = forms.ChoiceField(
+        choices=[
+            ("", "---------"),
+        ]
+        + list(Solution.TIMEFRAME_CHOICES),
+        required=False,
+    )

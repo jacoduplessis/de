@@ -62,7 +62,7 @@ def reliability_engineer_actions(user_id) -> List[UserAction]:
     message = "Confirm RCA requirement"
 
     # 3
-    message = "Upload RCA"
+    message = "Upload RCA Report"
     for i in incidents:
         if not i.significant:
             continue

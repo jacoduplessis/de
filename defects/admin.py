@@ -1,7 +1,7 @@
 from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
 from import_export.resources import ModelResource
-from .models import Solution, Incident, Equipment, Section, Area, Operation, Feedback
+from .models import Solution, Incident, Equipment, Section, Area, Operation, Feedback, ResourcePrice
 
 admin.site.site_header = "Anglo DE Tool Admin"
 admin.site.site_title = "Anglo DE Tool"
@@ -38,7 +38,6 @@ class SolutionAdmin(ImportExportModelAdmin):
     ]
 
 
-
 @admin.register(Area)
 class AreaAdmin(admin.ModelAdmin):
     pass
@@ -56,4 +55,9 @@ class OperationAdmin(admin.ModelAdmin):
 
 @admin.register(Feedback)
 class FeedbackAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(ResourcePrice)
+class ResourcePriceAdmin(admin.ModelAdmin):
     pass

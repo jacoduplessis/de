@@ -25,8 +25,17 @@
     font-weight: normal;
   }
 
-  ol, ul {
+  ol {
     list-style: none;
+  }
+
+  ul {
+    list-style: disc;
+  }
+
+  li {
+    padding-top: 0.2rem;
+    padding-bottom: 0.2rem;
   }
 
   img {
@@ -91,7 +100,7 @@
 </div>
 
 <div class="header" style="text-align: center; margin-bottom: 1rem">
-  {{ incident.code }} – {{ incident.time_start|date:"Y-m-d" }}
+  {{ incident.code }} – {{ incident.short_description }} – {{ incident.time_start|date:"Y-m-d" }}
 </div>
 
 <div style="display: flex;">
@@ -99,7 +108,7 @@
     <div class="header">Immediate Cause</div>
     <div class="content">{% lorem 1 p random %}</div>
     <div class="header">Root Cause</div>
-    <div class="content">{% lorem 3 p random %}</div>
+    <div class="content">{% lorem 1 p random %}</div>
     <div class="header">Downtime & Repair Cost</div>
     <div class="content">{% lorem 12 w random %}</div>
   </div>

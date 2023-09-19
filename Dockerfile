@@ -1,10 +1,21 @@
+FROM python:3.11-bullseye as builder
+
+WORKDIR /app
+
+# Copying requirements.txt first for better cache on rebuilds
+COPY requirements.txt /app/
+
+# Install pip requirements
+RUN pip install --no-cache-dir -r requirements.txt
+
 FROM python:3.11-bullseye
 
 ENV STATIC_ROOT /app/static/
 WORKDIR /app
 
+COPY --from=builder /usr/local /usr/local
+
 COPY . /app
-RUN pip install -r requirements.txt
 RUN python manage.py collectstatic --no-input
 
 EXPOSE 8000

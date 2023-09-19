@@ -74,10 +74,10 @@
             <td>{{ incident.time_start|date:'Y-m-d H:i' }}{% if incident.time_end %} – {{ incident.time_end|date:'Y-m-d H:i' }}{% endif %}</td>
           </tr>
           {% if incident.time_end %}
-          <tr>
-            <th>Duration</th>
-            <td>{{ incident.duration_text }}</td>
-          </tr>
+            <tr>
+              <th>Duration</th>
+              <td>{{ incident.duration_text }}</td>
+            </tr>
           {% endif %}
           <tr>
             <th>Equipment</th>
@@ -103,7 +103,7 @@
           {% endif %}
           <tr>
             <th>48h Notification</th>
-            <td><a href="{% url 'incident_notification' incident.pk %}">View</a>, <a href="{% url 'incident_notification_pdf' incident.pk%}" target="_blank">Download PDF</a></td>
+            <td><a href="{% url 'incident_notification' incident.pk %}">View</a>, <a href="{% url 'incident_notification_pdf' incident.pk %}" target="_blank">Download PDF</a></td>
           </tr>
           <tr>
             <th>Close Out</th>
@@ -136,37 +136,40 @@
         <table class="table table-bordered mt-2">
           <tbody>
           <tr>
-            <th>Short-Term</th>
+            <th colspan="2">Short-Term</th>
             <th>Priority</th>
           </tr>
           {% for solution in incident.solutions.all %}
             {% if solution.timeframe == solution.SHORT_TERM %}
               <tr>
-                <td><span class="badge text-bg-{{ solution.status_class }}">{{ solution.get_status_display }}</span> {{ solution.description }}</td>
+                <td><span class="badge text-bg-{{ solution.status_class }}">{{ solution.get_status_display }}</span></td>
+                <td>{{ solution.description }}</td>
                 <td>{{ solution.get_priority_display }}</td>
               </tr>
             {% endif %}
           {% endfor %}
           <tr>
-            <th>Mid-Term</th>
+            <th colspan="2">Mid-Term</th>
             <th>Priority</th>
           </tr>
           {% for solution in incident.solutions.all %}
             {% if solution.timeframe == solution.MEDIUM_TERM %}
               <tr>
-                <td><span class="badge text-bg-{{ solution.status_class }}">{{ solution.get_status_display }}</span> {{ solution.description }}</td>
+                <td><span class="badge text-bg-{{ solution.status_class }}">{{ solution.get_status_display }}</span></td>
+                <td>{{ solution.description }}</td>
                 <td>{{ solution.get_priority_display }}</td>
               </tr>
             {% endif %}
           {% endfor %}
           <tr>
-            <th>Long-Term</th>
+            <th colspan="2">Long-Term</th>
             <th>Priority</th>
           </tr>
           {% for solution in incident.solutions.all %}
             {% if solution.timeframe == solution.LONG_TERM %}
               <tr>
-                <td><span class="badge text-bg-{{ solution.status_class }}">{{ solution.get_status_display }}</span> {{ solution.description }}</td>
+                <td><span class="badge text-bg-{{ solution.status_class }}">{{ solution.get_status_display }}</span></td>
+                <td>{{ solution.description }}</td>
                 <td>{{ solution.get_priority_display }}</td>
               </tr>
             {% endif %}

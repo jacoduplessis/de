@@ -173,9 +173,9 @@ LOGGING = {
             "level": LOG_LEVEL,
             "propagate": False,
         },
-        "django.db": {
-            "level": "DEBUG",
-        },
+        # "django.db": {
+        #     "level": "DEBUG",
+        # },
         "weasyprint": {"handlers": ["console"], "level": "WARNING"},
     },
 }

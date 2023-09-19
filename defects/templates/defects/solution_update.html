@@ -1,0 +1,19 @@
+{% load crispy_forms_filters static %}
+
+{% include "defects/_messages.html" %}
+
+<main>
+  <h2>Update Solution</h2>
+  <hr>
+  <div>
+    <form method="post" up-submit>
+      {% csrf_token %}
+      {{ form|crispy }}
+      <input type="submit" value="Submit" class="btn btn-primary">
+    </form>
+  </div>
+
+</main>
+
+
+
