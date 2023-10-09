@@ -14,13 +14,13 @@ build==1.0.3
     # via pip-tools
 certifi==2023.7.22
     # via sentry-sdk
-cffi==1.15.1
+cffi==1.16.0
     # via weasyprint
 click==8.1.7
     # via
     #   black
     #   pip-tools
-coverage==7.3.1
+coverage==7.3.2
     # via anglo-defects (pyproject.toml)
 crispy-bootstrap5==0.7
     # via anglo-defects (pyproject.toml)
@@ -32,7 +32,7 @@ diff-match-patch==20230430
     # via django-import-export
 dj-database-url==2.1.0
     # via anglo-defects (pyproject.toml)
-django==4.2.5
+django==4.2.6
     # via
     #   anglo-defects (pyproject.toml)
     #   crispy-bootstrap5
@@ -46,17 +46,17 @@ django-crispy-forms==2.0
     # via
     #   anglo-defects (pyproject.toml)
     #   crispy-bootstrap5
-django-import-export==3.2.0
+django-import-export==3.3.1
     # via anglo-defects (pyproject.toml)
 et-xmlfile==1.1.0
     # via openpyxl
-fonttools[woff]==4.42.1
+fonttools[woff]==4.43.1
     # via weasyprint
 gunicorn==21.2.0
     # via anglo-defects (pyproject.toml)
 html5lib==1.1
     # via weasyprint
-huey==2.4.5
+huey==2.5.0
     # via anglo-defects (pyproject.toml)
 markuppy==1.14
     # via tablib
@@ -66,24 +66,24 @@ odfpy==1.4.1
     # via tablib
 openpyxl==3.1.2
     # via tablib
-packaging==23.1
+packaging==23.2
     # via
     #   black
     #   build
     #   gunicorn
 pathspec==0.11.2
     # via black
-pillow==10.0.0
+pillow==10.0.1
     # via
     #   anglo-defects (pyproject.toml)
     #   weasyprint
 pip-tools==7.3.0
     # via anglo-defects (pyproject.toml)
-platformdirs==3.10.0
+platformdirs==3.11.0
     # via black
 pycparser==2.21
     # via cffi
-pydyf==0.7.0
+pydyf==0.8.0
     # via weasyprint
 pyphen==0.14.0
     # via weasyprint
@@ -95,9 +95,9 @@ python-dotenv==1.0.0
     # via anglo-defects (pyproject.toml)
 pyyaml==6.0.1
     # via tablib
-redis==5.0.0
+redis==5.0.1
     # via anglo-defects (pyproject.toml)
-sentry-sdk==1.30.0
+sentry-sdk==1.31.0
     # via anglo-defects (pyproject.toml)
 six==1.16.0
     # via
@@ -111,11 +111,11 @@ tinycss2==1.2.1
     # via
     #   cssselect2
     #   weasyprint
-typing-extensions==4.7.1
+typing-extensions==4.8.0
     # via dj-database-url
-urllib3==2.0.4
+urllib3==2.0.6
     # via sentry-sdk
-weasyprint==59.0
+weasyprint==60.1
     # via anglo-defects (pyproject.toml)
 webencodings==0.5.1
     # via
