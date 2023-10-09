@@ -90,5 +90,24 @@
   {{ incident.code }} – {{ incident.short_description }} – {{ incident.time_start|date:"Y-m-d" }}
 </div>
 
-
+<table>
+  <thead>
+    <tr>
+      <th>Proposed Solution</th>
+      <th>Progress Status</th>
+      <th>Solution Verified</th>
+      <th>Verification Comment</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for solution in incident.solutions.all %}
+      <tr>
+        <td>{{ solution.description }}</td>
+        <td>{{ solution.get_status_display }}</td>
+        <td>{% if solution.time_verified %}Yes{% else %}No{% endif %}</td>
+        <td>{{ solution.verification_comment }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
 </html>

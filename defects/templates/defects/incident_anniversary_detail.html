@@ -1,0 +1,15 @@
+<main>
+  <h2>{{ incident.code }} Anniversary</h2>
+  <hr>
+
+  <p><strong>Actions</strong></p>
+
+  <div class="d-flex">
+      <a href="{% url 'incident_detail' incident.pk %}" up-follow up-layer="parent" class="btn btn-secondary me-2">View Incident</a>
+      <a href="{% url 'incident_anniversary_pdf' incident.pk %}" target="_blank" class="btn btn-primary me-2">View Anniversary PDF</a>
+      <form method="post" action="{% url 'incident_anniversary_detail' incident.pk %}" up-submit up-layer="parent">
+        {% csrf_token %}
+        <input type="submit" class="btn btn-danger" value="Mark as Reviewed">
+      </form>
+  </div>
+</main>

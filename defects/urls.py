@@ -41,6 +41,7 @@ urlpatterns = [
     path("incidents/close/form/", views.incident_close_form, name="incident_close_form"),
     path("incidents/<int:pk>/close/pdf/", views.incident_close_pdf, name="incident_close_pdf"),
     path("incidents/<int:pk>/anniversary/pdf/", views.incident_anniversary_pdf, name="incident_anniversary_pdf"),
+    path("incidents/<int:pk>/anniversary/", views.incident_anniversary_detail, name="incident_anniversary_detail"),
     path("approvals/<int:pk>/", views.approval_detail, name="approval_detail"),
     path("solutions/", views.solution_list, name="solution_list"),
     path("solutions/<int:pk>/edit/", views.solution_update, name="solution_update"),

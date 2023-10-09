@@ -36,7 +36,7 @@
 - anniversaries
 
 - should user actions be dismissible
-- fonts / Arial? ATM it uses dejavu sans on the serverr
+- fonts / Arial? ATM it uses dejavu sans on the server
 
 ## TODO
 
@@ -58,6 +58,8 @@
 - maps SRS permissions into concrete db permission / group entries
 - indication that filters are active
 - clear filters button
+- mark solution as verified
+- add solution verification comment
 
 ## Key Features
 
@@ -127,12 +129,6 @@
 - how are the dates for short, medium and long term solution calculated
 - what is solution priority
 - where can we retrieve data relating to market price of platinum group metals
--
-
-## demo to-do
-
-calculate rand value loss
-prep close out slide
-"next demo" show anniversaries
-design - simple, intuitive - work efficiently and correctly
-customised per user
+- dashboards (compliance, value, home)
+- values / units
+- close-out process

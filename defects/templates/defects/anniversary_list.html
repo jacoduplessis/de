@@ -7,13 +7,9 @@
       <h2>One-Year Anniversary Incidents</h2>
     </div>
     <div class="d-flex justify-content-between">
-      <p>Viewing significant RIs for <strong>Amandelbult Mine, Section: Concentrators</strong>.<br>
-        Time period: <strong>2023-03-01 – 2023-04-30</strong>. <small class="text-body-secondary">Change period using filter.</small>
-      </p>
+      <p>Viewing significant RIs due for review.</p>
       <div>
-        <a href="#" class="btn btn-outline-secondary btn-sm">Export</a>
-        <a href="#" class="btn btn-outline-secondary btn-sm">Filter</a>
-        <a href="#" class="btn btn-primary btn-sm">Download Report</a>
+       <!-- placeholder for action buttons -->
       </div>
     </div>
 
@@ -33,9 +29,10 @@
         <tbody>
         {% for incident in incidents %}
           <tr>
-            <td class="text-nowrap"><a class="text-black"
-                                       href="{% url 'incident_detail_demo' %}?state=17">{{ incident.code }}</a></td>
-            <td>6 / 6</td>
+            <td class="text-nowrap">
+              <a class="text-black" href="{% url 'incident_anniversary_detail' incident.pk %}" up-layer="new" up-history="false">{{ incident.code }}</a>
+            </td>
+            <td>{{ incident.num_completed_solutions }} / {{ incident.solutions.all|length }}</td>
             <td class="font-monospace text-nowrap">{{ incident.time_start|date:'Y-m-d' }}</td>
             <td class="text-nowrap">{{ incident.section }}</td>
             <td class="text-nowrap">{{ incident.section_engineer }}</td>

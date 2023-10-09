@@ -10,6 +10,7 @@ from django.contrib.auth.models import User
 from django.utils.timezone import now
 from datetime import timedelta
 
+
 class TestAuditLog(TestCase):
     fixtures = [
         "defects/fixtures/groups.json",
@@ -96,4 +97,14 @@ class TestUserActions(TestCase):
         self.assertEqual(get_user_actions(re_user)[0].urgency, Urgency.DANGER)
 
 
+class TestIncidentCalculations(TestCase):
+    def test_notification_overdue(self):
+        ten_hours_ago = now() - timedelta(hours=10)
+        sixty_hours_ago = now() - timedelta(hours=60)
+        incident = Incident.objects.create(time_start=ten_hours_ago, code=Incident.generate_incident_code())
+        self.assertFalse(incident.notification_overdue)
+        incident.time_start = sixty_hours_ago
+        self.assertTrue(incident.notification_overdue)
+        incident.notification_time_published = now()
+        self.assertFalse(incident.notification_overdue)
 

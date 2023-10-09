@@ -583,11 +583,11 @@ def incident_anniversary_pdf(request, pk):
     from weasyprint import HTML
     from .reports import url_fetcher
 
-    qs = Incident.objects.prefetch_related("images")
+    qs = Incident.objects.prefetch_related("solutions")
 
     incident = get_object_or_404(qs, pk=pk)
 
-    context = {"incident": incident, "images": incident.images.all()}
+    context = {"incident": incident}
 
     markup = render_to_string("defects/reports/anniversary.html", context=context, request=request)
 
@@ -602,6 +602,21 @@ def incident_anniversary_pdf(request, pk):
     doc.write_pdf(target=response)
     return response
 
+@login_required
+def incident_anniversary_detail(request, pk):
+    """
+    Renders in modal
+    """
+    incident = get_object_or_404(Incident, pk=pk)
+    if request.method == "GET":
+        return render(request, "defects/incident_anniversary_detail.html", context={"incident": incident})
+
+    if request.method == "POST":
+        "this marks the anniversary as reviewed"
+        incident.time_anniversary_reviewed = now()
+        incident.save()
+        messages.success(request, "Anniversary has been marked as reviewed.")
+        return HttpResponseRedirect(reverse("anniversary_list"))
 
 @login_required
 def incident_close_pdf(request, pk):
@@ -646,7 +661,12 @@ def incident_close_form(request):
 
 @login_required
 def anniversary_list(request):
-    incidents = Incident.objects.all()[:10]
+    incidents = (
+        Incident.objects.prefetch_related("solutions")
+        .filter(significant=True)
+        .filter(time_start__lt=now()-timedelta(days=360))
+        .filter(time_anniversary_reviewed=None)
+    )
 
     context = {"incidents": incidents}
 
@@ -684,6 +704,11 @@ def value_dashboard(request):
 
 @login_required
 def compliance_dashboard(request):
+
+    grouping = request.GET.get("grouping")
+
+
+
     return render(request, "defects/compliance_dashboard.html")
 
 
@@ -1023,7 +1048,15 @@ def solution_update(request, pk):
             "actual_completion_date",
             "remarks",
             "dr_number",
+            "time_verified",
+            "verification_comment",
         ],
+        labels={
+            "dr_number": "DR Number"
+        },
+        help_texts={
+            "time_verified": "Add a date here to mark the solution as verified. Format: YYYY-MM-DD"
+        }
     )
 
     if request.method == "GET":

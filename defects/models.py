@@ -95,6 +95,7 @@ class Incident(models.Model):
     trigger = models.CharField(max_length=200, blank=True, choices=TRIGGER_CHOICES)
     immediate_action_taken = models.TextField(blank=True)
     remaining_risk = models.TextField(blank=True)
+    time_anniversary_reviewed = models.DateTimeField(null=True, blank=True, help_text="Records when the 1-year anniversary review was completed.")
 
     history = AuditlogHistoryField(delete_related=False)
 
@@ -135,8 +136,10 @@ class Incident(models.Model):
 
     @property
     def notification_overdue(self):
-        # todo: implement
-        return False
+        if not self.time_start:
+            return True
+
+        return self.notification_time_published is None and (self.time_start + timedelta(hours=48)) < now()
 
     @property
     def report_overdue(self):
@@ -283,6 +286,11 @@ class Incident(models.Model):
 
         return actions
 
+    @property
+    def num_completed_solutions(self):
+        # do the filtering in python to avoid additional db queries
+        return len([s for s in self.solutions.all() if s.status == Solution.COMPLETED])
+
 
 class IncidentImage(models.Model):
     incident = models.ForeignKey(Incident, on_delete=models.CASCADE, related_name="images", blank=True, null=True)
@@ -329,6 +337,8 @@ class Solution(models.Model):
     actual_completion_date = models.DateField(blank=True, null=True)
     dr_number = models.CharField(max_length=200, blank=True)
     remarks = models.TextField(blank=True)
+    time_verified = models.DateTimeField(blank=True, null=True)
+    verification_comment = models.TextField(blank=True)
 
     @property
     def status_class(self):
