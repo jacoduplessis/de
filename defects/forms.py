@@ -47,6 +47,10 @@ class IncidentCreateForm(forms.ModelForm):
             "preliminary_findings": "Preliminary Findings",
         }
 
+        help_texts = {
+            "preliminary_findings": "Upload 5-why’s (or any preliminary findings)."
+        }
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["equipment"].choices = []  # load options with ajax
