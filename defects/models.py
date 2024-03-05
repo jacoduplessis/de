@@ -17,23 +17,35 @@ from auditlog.models import AuditlogHistoryField
 
 class Operation(models.Model):
     name = models.CharField(max_length=200)
+    order_index = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        ordering = ["order_index"]
 
 
 class Area(models.Model):
     name = models.CharField(max_length=200)
+    order_index = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        ordering = ["order_index"]
 
 
 class Section(models.Model):
     name = models.CharField(max_length=200)
+    order_index = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        ordering = ["order_index"]
 
 
 class Equipment(models.Model):
