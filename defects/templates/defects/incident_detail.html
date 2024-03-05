@@ -130,9 +130,7 @@
         <div class="d-flex mt-4 justify-content-between">
           <h4>Solutions</h4>
           <div>
-            <a href="{% url 'solution_list' %}?incident_id={{ incident.pk }}" class="btn btn-sm btn-outline-secondary me-2">View in Solution
-
-              Tracker</a>
+            <a href="{% url 'solution_list' %}?incident_id={{ incident.pk }}" class="btn btn-sm btn-outline-secondary me-2">View in Solution Tracker</a>
             <a href="{% url 'incident_solution_create' incident.pk %}" up-layer="new" class="btn btn-sm btn-primary">Add</a>
           </div>
         </div>

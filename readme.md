@@ -14,13 +14,23 @@
 ## Technical Questions
 
 - OS / VPS
+- 2Gb Ram
 - docker available / install?
-- network limitations
-- access to server
+- network limitations / firewalls
+- access to server / VPN,
 - SMTP server
 - SSO / AD
 - storage
 - backups
+
+## Hardware Requirements
+
+Windows Server 2019/2022
+MS SQL Server 2019/2022
+4GB Ram
+2 CPU cores
+MS IIS
+MS WSL
 
 ## Application Questions
 

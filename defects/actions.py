@@ -38,7 +38,7 @@ def reliability_engineer_actions(user_id) -> List[UserAction]:
     incidents = list(
         Incident.objects.filter(
             created_by_id=user_id,
-        )
+        ).prefetch_related("approvals")
     )
     # might need to add another filter to only consider
     # incidents that are "recent"
@@ -58,8 +58,11 @@ def reliability_engineer_actions(user_id) -> List[UserAction]:
             urgency = Urgency.INFO
         actions.append(UserAction(message=message, time_required=time_required, urgency=urgency, incident=i))
 
-    # 2  todo: confirm about this action
-    message = "Confirm RCA requirement"
+    # 2 - text changed from SRS document
+    message = "Resubmit Rejected 48H Notification"
+    for i in incidents:
+        if i.notification_rejected:
+            actions.append(UserAction(message=message, time_required=now(), urgency=Urgency.DANGER, incident=i))
 
     # 3
     message = "Upload RCA Report"

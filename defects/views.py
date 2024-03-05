@@ -75,6 +75,7 @@ def about(request):
 
 
 @login_required()
+@login_required()
 def incident_list(request):
     incidents = Incident.objects.select_related("created_by", "equipment", "section", "section_engineer").order_by("-time_start")
 
@@ -435,7 +436,7 @@ def incident_create(request):
         if not form.is_valid():
             messages.error(request, "Please correct the form inputs and submit again.")
             context = {"form": form}
-            return render(request, template_name, context)
+            return render(request, template_name, context=context, status=422)
         obj = form.save(commit=False)
         obj.code = Incident.generate_incident_code()
         obj.created_by = request.user
@@ -934,7 +935,7 @@ def incident_solution_create(request, pk):
                 "form": form,
                 "incident": incident,
             }
-            return render(request, template_name="defects/incident_solution_create.html", context=context)
+            return render(request, template_name="defects/incident_solution_create.html", context=context, status=422)
 
         obj = form.save(commit=False)
         obj.created_by = request.user
@@ -969,7 +970,7 @@ def incident_rca_report_upload(request, pk):
         form = Form(request.POST, request.FILES, instance=incident)
         if not form.is_valid():
             context["form"] = form
-            return render(request, "defects/incident_rca_upload.html", context=context)
+            return render(request, "defects/incident_rca_upload.html", context=context, status=422)
 
         form.save()
         messages.success(request, "Incident RCA Report uploaded.")
@@ -1068,7 +1069,7 @@ def solution_update(request, pk):
         form = Form(request.POST, request.FILES, instance=solution)
         if not form.is_valid():
             context["form"] = form
-            return render(request, "defects/solution_update.html", context=context)
+            return render(request, "defects/solution_update.html", context=context, status=422)
 
         form.save()
         messages.success(request, "Solution updated.")

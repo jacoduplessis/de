@@ -88,7 +88,6 @@ class IncidentUpdateForm(forms.ModelForm):
             "rand_value_loss",
             "immediate_action_taken",
             "remaining_risk",
-            "significant",
         ]
         labels = {
             "short_description": "Short Description",

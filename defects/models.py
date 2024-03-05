@@ -269,6 +269,14 @@ class Incident(models.Model):
     def notification_approved(self):
         return self.approvals.filter(type=Approval.NOTIFICATION, outcome=Approval.ACCEPTED).exists()
 
+    @cached_property
+    def notification_rejected(self):
+        return (
+            self.notification_time_published is not None
+            and self.approvals.filter(type=Approval.NOTIFICATION).count() > 0
+            and not self.notification_approved
+        )
+
     @property
     def notification_deadline_text(self):
         deadline_time = self.time_start + timedelta(hours=48)
@@ -280,15 +288,32 @@ class Incident(models.Model):
     @property
     def actions(self):
         actions = []
+
         if not self.notification_time_published:
             actions.append(
                 TimelineEntry(
                     icon="clock",
-                    title="Create 48-hour notification report",
+                    title="Create 48H notification report",
                     time=self.time_start + timedelta(hours=48),
                     text=self.notification_deadline_text,  # TODO: implement
                     link_text="Add Information",
                     link_url=reverse("incident_update", args=[self.pk]),
+                    link_attrs="up-layer=new up-size=large",
+                    secondary_link_url=reverse("incident_notification_publish", args=[self.pk]),
+                    secondary_link_text="Publish & Submit For Review",
+                    secondary_link_attrs="up-layer=new",
+                )
+            )
+
+        if not self.notification_time_published and len(self.images.all()) == 0:
+            actions.append(
+                TimelineEntry(
+                    icon="clock",
+                    title="Upload incident images to 48H notification report",
+                    time=self.time_start + timedelta(hours=48),
+                    text="Upload images and figures if applicable.",
+                    link_text="Add Images",
+                    link_url=reverse("incident_images", args=[self.pk]),
                     link_attrs="up-layer=new up-size=large",
                     secondary_link_url=reverse("incident_notification_publish", args=[self.pk]),
                     secondary_link_text="Publish & Submit For Review",

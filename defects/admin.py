@@ -31,11 +31,17 @@ class SolutionAdmin(ImportExportModelAdmin):
     ]
 
     list_display = [
+        "incident",
         "description",
         "status",
         "planned_completion_date",
         "dr_number",
     ]
+
+    list_display_links = ["description"]
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related("incident")
 
 
 @admin.register(Area)
