@@ -7,7 +7,9 @@
       <h2>Reliability Incident {{ incident.code }} 48H Notification</h2>
       <div>
         <a href="{% url 'incident_detail' incident.pk %}" class="btn btn-secondary btn-sm">Back to Incident</a>
+        {% if perms.defects.request_notification_approval %}
         <a href="{% url 'incident_notification_publish' incident.pk %}" up-layer="new" class="btn btn-primary btn-sm">Request Approval</a>
+        {% endif %}
         <a href="{% url 'incident_notification_pdf' incident.pk %}" target="_blank" class="btn btn-primary btn-sm">Download PDF</a>
       </div>
     </div>

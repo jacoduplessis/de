@@ -84,8 +84,20 @@
             <td>{{ incident.equipment.name }} ({{ incident.equipment.code }})</td>
           </tr>
           <tr>
-            <th>Significant</th>
-            <td>{% if incident.significant %}Yes{% else %}No{% endif %}</td>
+            <th>Significant / RCA required</th>
+            <td class="d-flex align-items-baseline justify-content-between">{% if incident.significant %}Yes
+              <form method="post" action="{% url 'incident_significance_update' incident.pk %}" up-submit>
+                {% csrf_token %}
+                <input name="significant" value="false" type="hidden">
+                <input type="submit" class="btn btn-sm btn-outline-primary" value="Change to not significant">
+              </form>
+            {% else %}No
+              <form method="post" action="{% url 'incident_significance_update' incident.pk %}" up-submit>
+                {% csrf_token %}
+                <input name="significant" value="true" type="hidden">
+                <input type="submit" class="btn btn-sm btn-outline-primary" value="Change to significant">
+              </form>
+            {% endif %}</td>
           </tr>
           <tr>
             <th>Production Cost</th>
@@ -118,10 +130,10 @@
             <td><a href="{% url 'incident_images' incident.pk %}" up-layer="new" up-size="large">{{ incident.images.all|length }} image{{ incident.images.all|length|pluralize }}</a></td>
           </tr>
           {% if incident.time_anniversary_reviewed %}
-          <tr>
-            <th>1-Year Anniversary Reviewed</th>
-            <td>{{ incident.time_anniversary_reviewed|date:"Y-m-d" }}</td>
-          </tr>
+            <tr>
+              <th>1-Year Anniversary Reviewed</th>
+              <td>{{ incident.time_anniversary_reviewed|date:"Y-m-d" }}</td>
+            </tr>
           {% endif %}
           </tbody>
         </table>
@@ -184,5 +196,21 @@
     </div>
 
   </main>
+
+  <script>
+    document.querySelectorAll("a[clipboard-copy-link]").forEach(el => {
+      el.addEventListener("click", event => {
+        event.preventDefault()
+        const dummy = document.createElement('input');
+        document.body.appendChild(dummy);
+        const url = window.location.origin + el.getAttribute("href")
+        dummy.setAttribute('value', url);
+        dummy.select();
+        document.execCommand('copy');
+        document.body.removeChild(dummy);
+        alert("Link copied to clipboard");
+      })
+    })
+  </script>
 
 {% endblock %}

@@ -11,8 +11,8 @@ from django.contrib.auth.models import User
 from django.db import transaction
 from django.db.models import Q, Prefetch, OuterRef, Subquery
 from django.db.models.aggregates import Count
-from django.forms import modelformset_factory, modelform_factory
-from django.http import HttpResponseRedirect, JsonResponse, HttpResponse, HttpResponseForbidden
+from django.forms import modelformset_factory, modelform_factory, Textarea
+from django.http import HttpResponseRedirect, JsonResponse, HttpResponse, HttpResponseForbidden, HttpResponseBadRequest
 from django.shortcuts import render, get_object_or_404
 from django.template.loader import render_to_string
 from django.urls import reverse
@@ -23,15 +23,15 @@ from django.views.decorators.http import require_POST, require_GET
 from .exports import export_table_csv
 from .forms import (
     IncidentCreateForm,
-    IncidentNotificationForm,
     IncidentNotificationApprovalSendForm,
     IncidentCloseForm,
     IncidentUpdateForm,
     ApprovalForm,
     IncidentFilterForm,
     SolutionFilterForm,
+    IncidentSignificanceUpdateForm,
 )
-from .models import Solution, Incident, Section, Equipment, IncidentImage, Approval, Area, Feedback, Operation
+from .models import Solution, Incident, Section, Equipment, IncidentImage, Approval, Area, Feedback, Operation, ResourcePrice
 from .timelines import TimelineEntry
 from .actions import get_user_actions
 
@@ -466,6 +466,12 @@ def incident_update(request, pk):
             context = {"form": form}
             return render(request, template_name, context)
         obj = form.save()
+
+        most_recent_resource_price = ResourcePrice.objects.order_by("-time_created").select_related("created_by").first()
+        submitted_resource_price = form.cleaned_data["resource_price"]
+        if submitted_resource_price != most_recent_resource_price.rate:
+            ResourcePrice.objects.create(rate=submitted_resource_price, created_by=request.user)
+            messages.success(request, "Default resource price updated.")
         messages.success(request, "Incident updated.")
         return HttpResponseRedirect(reverse("incident_detail", args=[obj.pk]))
 
@@ -491,8 +497,9 @@ def incident_images(request, pk):
             "image",
             "description",
         ],
-        extra=5,
+        extra=3,
         can_order=False,
+        widgets={"description": Textarea(attrs={"rows": 2})},
     )
 
     if request.method == "GET":
@@ -523,35 +530,6 @@ def incident_images(request, pk):
             messages.success(request, "Images uploaded.")
 
         return HttpResponseRedirect(reverse("incident_images", args=[pk]))
-
-
-@login_required
-def incident_notification_form(request, pk):
-    incident = get_object_or_404(Incident, pk=pk)
-
-    if request.method == "POST":
-        form = IncidentNotificationForm(request.POST, request.FILES, instance=incident)
-        if not form.is_valid():
-            messages.error(request, "Please correct the form inputs and submit again.")
-            context = {"form": form}
-            return render(request, "defects/incident_notification_form.html", context)
-
-        form.save()
-        action = request.POST.get("action", "").lower()
-        if action == "save":
-            # redirect to self
-            return HttpResponseRedirect(reverse("incident_notification_form", args=[incident.pk]))
-        if "download" in action:
-            # todo: build a file
-            response = HttpResponse(content_type="")
-            response.headers["content-disposition"] = 'attachment; filename="filename.jpg"'
-            return
-
-    if request.method == "GET":
-        context = {
-            "form": IncidentNotificationForm(instance=incident),
-        }
-        return render(request, "defects/incident_notification_form.html", context)
 
 
 @login_required
@@ -603,6 +581,7 @@ def incident_anniversary_pdf(request, pk):
     doc.write_pdf(target=response)
     return response
 
+
 @login_required
 def incident_anniversary_detail(request, pk):
     """
@@ -618,6 +597,7 @@ def incident_anniversary_detail(request, pk):
         incident.save()
         messages.success(request, "Anniversary has been marked as reviewed.")
         return HttpResponseRedirect(reverse("anniversary_list"))
+
 
 @login_required
 def incident_close_pdf(request, pk):
@@ -665,7 +645,7 @@ def anniversary_list(request):
     incidents = (
         Incident.objects.prefetch_related("solutions")
         .filter(significant=True)
-        .filter(time_start__lt=now()-timedelta(days=360))
+        .filter(time_start__lt=now() - timedelta(days=360))
         .filter(time_anniversary_reviewed=None)
     )
 
@@ -705,10 +685,7 @@ def value_dashboard(request):
 
 @login_required
 def compliance_dashboard(request):
-
     grouping = request.GET.get("grouping")
-
-
 
     return render(request, "defects/compliance_dashboard.html")
 
@@ -724,7 +701,7 @@ def solution_list(request):
         if action == "schedule":
             return HttpResponseRedirect(reverse("solution_schedule"))
 
-    solutions = Solution.objects.select_related("incident").all()
+    solutions = Solution.objects.select_related("incident").exclude(incident=None)
     context = {}
 
     query = request.GET.get("query", "")
@@ -939,7 +916,7 @@ def incident_solution_create(request, pk):
 
         obj = form.save(commit=False)
         obj.created_by = request.user
-        obj.incident_id = pk
+        obj.incident = incident
         obj.save()
         return HttpResponseRedirect(reverse("incident_detail", args=[pk]))
 
@@ -1052,12 +1029,8 @@ def solution_update(request, pk):
             "time_verified",
             "verification_comment",
         ],
-        labels={
-            "dr_number": "DR Number"
-        },
-        help_texts={
-            "time_verified": "Add a date here to mark the solution as verified. Format: YYYY-MM-DD"
-        }
+        labels={"dr_number": "DR Number"},
+        help_texts={"time_verified": "Add a date here to mark the solution as verified. Format: YYYY-MM-DD"},
     )
 
     if request.method == "GET":
@@ -1075,4 +1048,18 @@ def solution_update(request, pk):
         messages.success(request, "Solution updated.")
         return HttpResponseRedirect(
             reverse("solution_list"),
+        )
+
+
+@login_required
+def incident_significance_update(request, pk):
+    incident = get_object_or_404(Incident, pk=pk)
+
+    if request.method == "POST":
+        form = IncidentSignificanceUpdateForm(request.POST, instance=incident)
+        if not form.is_valid():
+            return HttpResponseBadRequest()
+        form.save()
+        return HttpResponseRedirect(
+            reverse("incident_detail", args=[incident.pk])
         )

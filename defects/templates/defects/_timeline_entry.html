@@ -10,12 +10,11 @@
   {% if entry.text %}
     <p class="text-body-secondary">{{ entry.text }}</p>
   {% endif %}
-  {% if entry.link_text and entry.link_url %}
+  {% if entry.links|length > 0 %}
     <p>
-      <a href="{{ entry.link_url }}" class="btn btn-sm btn-primary" {{ entry.link_attrs }}>{{ entry.link_text }}</a>
-      {% if entry.secondary_link_url and entry.secondary_link_text %}
-        <a href="{{ entry.secondary_link_url }}" class="btn btn-sm btn-secondary" {{ entry.secondary_link_attrs }}>{{ entry.secondary_link_text }}</a>
-      {% endif %}
+      {% for link in entry.links %}
+      <a href="{{ link.url }}" class="btn btn-sm btn-{{ link.cls }}" {{ link.attrs }}>{{ link.text }}</a>
+      {% endfor %}
     </p>
   {% endif %}
 </li>

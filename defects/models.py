@@ -9,7 +9,7 @@ from django.utils.crypto import get_random_string
 from django.urls import reverse
 from django.utils.functional import cached_property
 
-from defects.timelines import TimelineEntry
+from defects.timelines import TimelineEntry, Link
 
 from auditlog.registry import auditlog
 from auditlog.models import AuditlogHistoryField
@@ -93,7 +93,7 @@ class Incident(models.Model):
     section_engineer = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL, related_name="+")
     time_start = models.DateTimeField(blank=True, null=True)
     time_end = models.DateTimeField(blank=True, null=True)
-    significant = models.BooleanField(default=False)
+    significant = models.BooleanField(default=True)
     equipment = models.ForeignKey(Equipment, on_delete=models.SET_NULL, null=True, blank=True, related_name="incidents")
     short_description = models.CharField(max_length=200, blank=True)
     long_description = models.TextField(blank=True)
@@ -114,6 +114,7 @@ class Incident(models.Model):
     class Meta:
         verbose_name = "Incident"
         verbose_name_plural = "Incidents"
+        permissions = (("request_notification_approval", "Can request approval of incident notification"),)
 
     def __str__(self):
         return self.code
@@ -215,9 +216,13 @@ class Incident(models.Model):
                     icon="clock",
                     title="48-hour notification report published",
                     time=self.notification_time_published,
-                    link_text="View Notification Report",
-                    link_url=reverse("incident_notification", args=[self.pk]),
-                    link_attrs="up-follow",
+                    links=[
+                        Link(
+                            text="View Notification Report",
+                            url=reverse("incident_notification", args=[self.pk]),
+                            attrs="up-follow",
+                        )
+                    ],
                 )
             )
             for approval in self.approvals.filter(type=Approval.NOTIFICATION).order_by("time_created"):
@@ -227,8 +232,7 @@ class Incident(models.Model):
                             icon="clock",
                             title="Awaiting SEM approval for 48h Notification",
                             text=f"SEM reviewing: {approval.name}",
-                            link_text="Approval Link",
-                            link_url=reverse("approval_detail", args=[approval.id]),
+                            links=[Link(text="Copy Approval Link", url=reverse("approval_detail", args=[approval.id]), attrs="clipboard-copy-link")],
                         )
                     )
 
@@ -256,13 +260,17 @@ class Incident(models.Model):
                 TimelineEntry(
                     icon="clock",
                     title="RCA Report",
-                    text="Is a full RCA Report required? Note that full RCA investigation must be scheduled, conducted and the full RCA report must be submitted within 14 days of submitting the 48Hr Notification Report.",
-                    secondary_link_text="Not Required",
-                    secondary_link_url="#",
-                    link_text="Mark Incident As Significant",
-                    link_url="#",
+                    text="Is a full RCA Report required? Note that full RCA investigation must be scheduled, conducted and the full RCA report must be submitted within 14 days of submitting the 48H Notification Report.",
+                    links=[
+                        Link(
+                            text="RCA Required",
+                            url="#",
+                        ),
+                        Link(text="Not Required", url="#", cls="secondary"),
+                    ],
                 )
             )
+
         return entries
 
     @cached_property
@@ -295,29 +303,45 @@ class Incident(models.Model):
                     icon="clock",
                     title="Create 48H notification report",
                     time=self.time_start + timedelta(hours=48),
-                    text=self.notification_deadline_text,  # TODO: implement
-                    link_text="Add Information",
-                    link_url=reverse("incident_update", args=[self.pk]),
-                    link_attrs="up-layer=new up-size=large",
-                    secondary_link_url=reverse("incident_notification_publish", args=[self.pk]),
-                    secondary_link_text="Publish & Submit For Review",
-                    secondary_link_attrs="up-layer=new",
+                    text=self.notification_deadline_text,
+                    links=[
+                        Link(
+                            text="Add Information",
+                            url=reverse("incident_update", args=[self.pk]),
+                            attrs="up-layer=new up-size=large",
+                        ),
+                        Link(
+                            text="Add Images",
+                            url=reverse("incident_images", args=[self.pk]),
+                            attrs="up-layer=new up-size=large",
+                        ),
+                        Link(
+                            url=reverse("incident_notification_publish", args=[self.pk]),
+                            text="Publish & Submit For Review",
+                            attrs="up-layer=new",
+                            cls="secondary",
+                        ),
+                    ],
                 )
             )
 
-        if not self.notification_time_published and len(self.images.all()) == 0:
+        if self.notification_approved and not self.significant:
             actions.append(
                 TimelineEntry(
                     icon="clock",
-                    title="Upload incident images to 48H notification report",
-                    time=self.time_start + timedelta(hours=48),
-                    text="Upload images and figures if applicable.",
-                    link_text="Add Images",
-                    link_url=reverse("incident_images", args=[self.pk]),
-                    link_attrs="up-layer=new up-size=large",
-                    secondary_link_url=reverse("incident_notification_publish", args=[self.pk]),
-                    secondary_link_text="Publish & Submit For Review",
-                    secondary_link_attrs="up-layer=new",
+                    title="Create Close-Out Slide",
+                    links=[
+                        Link(
+                            text="Add Info",
+                            url="#",
+                        ),
+                        Link(
+                            url="#",
+                            text="Publish & Submit For Review",
+                            attrs="up-layer=new",
+                            cls="secondary",
+                        ),
+                    ],
                 )
             )
 
@@ -364,7 +388,7 @@ class Solution(models.Model):
         (SCHEDULED, "Scheduled"),
     )
 
-    incident = models.ForeignKey(Incident, on_delete=models.SET_NULL, null=True, blank=True, related_name="solutions")
+    incident = models.ForeignKey(Incident, on_delete=models.CASCADE, null=True, blank=True, related_name="solutions")
     priority = models.CharField(max_length=200, blank=True, choices=PRIORITY_CHOICES, default="A")
     timeframe = models.CharField(max_length=200, blank=True, choices=TIMEFRAME_CHOICES, default=SHORT_TERM)
     description = models.CharField(max_length=500)
@@ -457,6 +481,7 @@ class ResourcePrice(models.Model):
 
     time_created = models.DateTimeField(auto_now_add=True)
     rate = models.DecimalField(decimal_places=2, max_digits=10, help_text="Price in ZAR of the resource per ounce.")
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
 
     @classmethod
     def rand_cost(cls, ounces: Decimal) -> Decimal:

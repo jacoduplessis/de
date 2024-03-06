@@ -66,4 +66,12 @@ class FeedbackAdmin(admin.ModelAdmin):
 
 @admin.register(ResourcePrice)
 class ResourcePriceAdmin(admin.ModelAdmin):
-    pass
+
+    list_display = [
+        "time_created",
+        "rate",
+        "created_by",
+    ]
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related("created_by")

@@ -152,6 +152,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 LOGIN_REDIRECT_URL = "/apps/"
 LOGOUT_REDIRECT_URL = "/login/"
+LOGIN_URL = "/login/"
 
 LOG_LEVEL = os.getenv("DJANGO_LOG_LEVEL", "INFO")
 
