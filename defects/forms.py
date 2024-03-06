@@ -252,10 +252,46 @@ class SolutionFilterForm(forms.Form):
         required=False,
     )
 
-class IncidentSignificanceUpdateForm(forms.ModelForm):
 
+class IncidentSignificanceUpdateForm(forms.ModelForm):
     class Meta:
         model = Incident
         fields = [
             "significant",
         ]
+
+
+class IncidentCloseOutForm(forms.ModelForm):
+    class Meta:
+        model = Incident
+        fields = [
+            "close_out_immediate_cause",
+            "close_out_root_cause",
+            "close_out_downtime_repair_cost",
+            "close_out_short_term_actions",
+            "close_out_medium_term_actions",
+            "close_out_long_term_actions",
+            "close_out_confidence",
+        ]
+
+        help_texts = {
+            "close_out_short_term_actions": "One action per line",
+            "close_out_medium_term_actions": "One action per line",
+            "close_out_long_term_actions": "One action per line",
+        }
+
+        labels = {
+            "close_out_immediate_cause": "Immediate Cause",
+            "close_out_root_cause": "Root Cause",
+            "close_out_downtime_repair_cost": "Downtime & Repair Cost",
+            "close_out_short_term_actions": "Short Term Actions",
+            "close_out_medium_term_actions": "Medium Term Actions",
+            "close_out_long_term_actions": "Long Term Actions",
+            "close_out_confidence": "RE Confidence Rating",
+        }
+
+        widgets = {
+            "close_out_confidence": widgets.Select(
+                choices=[(f"{x}", f"{x}") for x in range(1, 6)],
+            )
+        }

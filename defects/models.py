@@ -109,6 +109,14 @@ class Incident(models.Model):
     remaining_risk = models.TextField(blank=True)
     time_anniversary_reviewed = models.DateTimeField(null=True, blank=True, help_text="Records when the 1-year anniversary review was completed.")
 
+    close_out_immediate_cause = models.TextField(blank=True)
+    close_out_root_cause = models.TextField(blank=True)
+    close_out_downtime_repair_cost = models.TextField(blank=True)
+    close_out_short_term_actions = models.TextField(blank=True)
+    close_out_medium_term_actions = models.TextField(blank=True)
+    close_out_long_term_actions = models.TextField(blank=True)
+    close_out_confidence = models.PositiveIntegerField(default=0)
+
     history = AuditlogHistoryField(delete_related=False)
 
     class Meta:
@@ -294,6 +302,26 @@ class Incident(models.Model):
         return "Deadline has expired"
 
     @property
+    def close_out_short_term_actions_list(self):
+        return self.close_out_short_term_actions.strip().split("\n")
+
+    @property
+    def close_out_medium_term_actions_list(self):
+        return self.close_out_medium_term_actions.strip().split("\n")
+
+    @property
+    def close_out_long_term_actions_list(self):
+        return self.close_out_long_term_actions.strip().split("\n")
+
+    @property
+    def close_out_confidence_filled_stars(self):
+        return range(self.close_out_confidence)
+
+    @property
+    def close_out_confidence_empty_stars(self):
+        return range(self.close_out_confidence, 1, -1)
+
+    @property
     def actions(self):
         actions = []
 
@@ -331,10 +359,7 @@ class Incident(models.Model):
                     icon="clock",
                     title="Create Close-Out Slide",
                     links=[
-                        Link(
-                            text="Add Info",
-                            url="#",
-                        ),
+                        Link(text="Add Info", url=reverse("incident_close_form", args=[self.pk]), attrs="up-layer=new"),
                         Link(
                             url="#",
                             text="Publish & Submit For Review",
