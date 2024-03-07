@@ -102,6 +102,7 @@ class Incident(models.Model):
     notification_time_approved = models.DateTimeField(blank=True, null=True)
     close_out_file = models.FileField(blank=True)
     report_file = models.FileField(blank=True, upload_to="files/")  # RCA report
+    rca_report_time_published = models.DateTimeField(blank=True, null=True)
     production_value_loss = models.DecimalField(blank=True, max_digits=20, decimal_places=4, default=Decimal("0.00"))
     rand_value_loss = models.DecimalField(blank=True, max_digits=20, decimal_places=2, default=Decimal("0.00"))
     trigger = models.CharField(max_length=200, blank=True, choices=TRIGGER_CHOICES)
@@ -119,6 +120,7 @@ class Incident(models.Model):
     close_out_long_term_date = models.DateField(null=True, blank=True)
     close_out_long_term_actions = models.TextField(blank=True)
     close_out_confidence = models.PositiveIntegerField(default=0)
+    close_out_time_published = models.DateTimeField(blank=True, null=True)
 
     history = AuditlogHistoryField(delete_related=False)
 
@@ -266,21 +268,109 @@ class Incident(models.Model):
                         )
                     )
 
-        if self.notification_approved:
+        if self.rca_report_time_published:
             entries.append(
                 TimelineEntry(
                     icon="clock",
-                    title="RCA Report",
-                    text="Is a full RCA Report required? Note that full RCA investigation must be scheduled, conducted and the full RCA report must be submitted within 14 days of submitting the 48H Notification Report.",
+                    title="RCA report published",
+                    time=self.notification_time_published,
                     links=[
                         Link(
-                            text="RCA Required",
-                            url="#",
-                        ),
-                        Link(text="Not Required", url="#", cls="secondary"),
+                            text="View RCA Report",
+                            url=self.report_file.url,
+                            attrs="target=_blank",
+                        )
                     ],
                 )
             )
+            for approval in self.approvals.filter(type=Approval.RCA).order_by("time_created"):
+                if approval.outcome == "":
+                    entries.append(
+                        TimelineEntry(
+                            icon="clock",
+                            title=f"Awaiting {approval.get_role_display()} approval for RCA report",
+                            text=f"{approval.get_role_display()} reviewing: {approval.name}",
+                            links=[Link(text="Copy Approval Link", url=reverse("approval_detail", args=[approval.id]), attrs="clipboard-copy-link")],
+                        )
+                    )
+
+                if approval.outcome == Approval.ACCEPTED:
+                    entries.append(
+                        TimelineEntry(
+                            icon="clock",
+                            title=f"RCA report approved by {approval.get_role_display()}",
+                            time=approval.time_modified,
+                            text=f"Comment: {approval.comment}",
+                        )
+                    )
+                if approval.outcome == Approval.REJECTED:
+                    entries.append(
+                        TimelineEntry(
+                            icon="clock",
+                            title=f"RCA report rejected by {approval.get_role_display()}",
+                            time=approval.time_modified,
+                            text=f"Comment: {approval.comment}",
+                        )
+                    )
+
+        if self.notification_approved:
+
+            # check for RCA Requirement
+            if self.significant and not self.report_file:
+
+                entries.append(
+                    TimelineEntry(
+                        icon="clock",
+                        title="Upload RCA Report",
+                        text="Is a full RCA Report required? Note that full RCA investigation must be scheduled, conducted and the full RCA report must be submitted within 14 days of submitting the 48H Notification Report. If not required, update the incident's significance.",
+                        links=[
+                            Link(
+                                text="Upload RCA Report",
+                                url="#",
+                            ),
+                        ],
+                    )
+                )
+
+
+        if self.close_out_time_published:
+            entries.append(
+                TimelineEntry(
+                    icon="clock",
+                    title="Close-out slide published",
+                    time=self.close_out_time_published,
+                    text="Close-out submitted for ranking by SE & SEM.",
+                    links=[
+                        Link(
+                            text="View Close-Out Slide PDF",
+                            url=reverse("incident_close_pdf", args=[self.pk]),
+                            attrs="target=_blank",
+                        )
+                    ],
+                )
+            )
+
+            for approval in self.approvals.filter(type=Approval.CLOSE_OUT).order_by("time_created"):
+                if approval.score == 0:
+                    entries.append(
+                        TimelineEntry(
+                            icon="clock",
+                            title=f"Awaiting {approval.get_role_display()} close-out rating",
+                            text=f"{approval.get_role_display()} reviewing: {approval.name}",
+                            links=[Link(text="Copy Approval Link", url=reverse("approval_detail", args=[approval.id]), attrs="clipboard-copy-link")],
+                        )
+                    )
+
+                else:
+                    entries.append(
+                        TimelineEntry(
+                            icon="clock",
+                            title=f"Close-out rated by {approval.get_role_display()}",
+                            time=approval.time_modified,
+                            text=f"Score: {approval.score}/5. Comment: {approval.comment}",
+                        )
+                    )
+
 
         return entries
 
@@ -356,15 +446,31 @@ class Incident(models.Model):
                 )
             )
 
-        if self.notification_approved and not self.significant:
+        if self.notification_approved and self.significant and self.report_file and not self.rca_report_time_published:
             actions.append(
                 TimelineEntry(
                     icon="clock",
-                    title="Create Close-Out Slide",
+                    title="Publish RCA Report",
+                    links=[
+                        Link(
+                            url=reverse("incident_rca_publish_publish", args=[self.pk]),
+                            text="Publish & Submit For Review",
+                            attrs="up-layer=new",
+                            cls="secondary",
+                        ),
+                    ],
+                )
+            )
+
+        if self.notification_approved and not self.close_out_time_published:
+            actions.append(
+                TimelineEntry(
+                    icon="clock",
+                    title="Publish Close-Out Slide",
                     links=[
                         Link(text="Add Info", url=reverse("incident_close_form", args=[self.pk]), attrs="up-layer=new"),
                         Link(
-                            url="#",
+                            url=reverse("incident_close_publish", args=[self.pk]),
                             text="Publish & Submit For Review",
                             attrs="up-layer=new",
                             cls="secondary",
@@ -406,22 +512,14 @@ class Solution(models.Model):
         ("c", "C"),
     )
 
-    IDENTIFIED = "identified"
     COMPLETED = "completed"
     SCHEDULED = "scheduled"
-
-    STATUS_CHOICES = (
-        (IDENTIFIED, "Identified"),
-        (COMPLETED, "Completed"),
-        (SCHEDULED, "Scheduled"),
-    )
 
     incident = models.ForeignKey(Incident, on_delete=models.CASCADE, null=True, blank=True, related_name="solutions")
     priority = models.CharField(max_length=200, blank=True, choices=PRIORITY_CHOICES, default="A")
     timeframe = models.CharField(max_length=200, blank=True, choices=TIMEFRAME_CHOICES, default=SHORT_TERM)
     description = models.CharField(max_length=500)
     person_responsible = models.CharField(max_length=200, blank=True)
-    status = models.CharField(max_length=200, blank=True, choices=STATUS_CHOICES, default=IDENTIFIED)
     planned_completion_date = models.DateField(blank=True, null=True)
     actual_completion_date = models.DateField(blank=True, null=True)
     dr_number = models.CharField(max_length=200, blank=True)
@@ -431,9 +529,14 @@ class Solution(models.Model):
 
     @property
     def status_class(self):
-        _map = {self.SCHEDULED: "primary", self.COMPLETED: "success", self.IDENTIFIED: "secondary"}
+        _map = {self.SCHEDULED: "primary", self.COMPLETED: "success"}
         return _map.get(self.status)
 
+    @property
+    def status(self):
+        if self.time_verified is not None:
+            return self.COMPLETED
+        return self.SCHEDULED
 
 class Approval(models.Model):
     ACCEPTED = "accepted"
@@ -446,17 +549,17 @@ class Approval(models.Model):
 
     NOTIFICATION = "notification"
     RCA = "rca"
+    CLOSE_OUT = "close_out"
 
-    TYPE_CHOICES = (
-        (NOTIFICATION, "Notification"),
-        (RCA, "RCA"),
-    )
+    TYPE_CHOICES = ((NOTIFICATION, "Notification"), (RCA, "RCA"), (CLOSE_OUT, "Close-Out"))
 
+    SECTION_ENGINEER = "section_engineer"
     ENGINEERING_MANAGER = "engineering_manager"
     SECTION_ENGINEERING_MANAGER = "section_engineering_manager"
     SENIOR_ASSET_MANAGER = "senior_asset_manager"
 
     ROLE_CHOICES = (
+        (SECTION_ENGINEER, "SE"),
         (ENGINEERING_MANAGER, "EM"),
         (SECTION_ENGINEERING_MANAGER, "SEM"),
         (SENIOR_ASSET_MANAGER, "Senior AM"),
@@ -472,6 +575,7 @@ class Approval(models.Model):
     type = models.CharField(max_length=100, choices=TYPE_CHOICES)
     outcome = models.CharField(max_length=100, choices=OUTCOME_CHOICES)
     comment = models.TextField(blank=True)
+    score = models.PositiveIntegerField(default=0, blank=True)  # only approvals of type close-out will have a score (1-5 inclusive).
 
 
 auditlog.register(

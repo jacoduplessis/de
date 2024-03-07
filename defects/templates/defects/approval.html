@@ -16,6 +16,15 @@
         downloaded as PDF <a href="{% url 'incident_notification_pdf' incident.pk %}" target="_blank">here</a>.</p>
     {% endif %}
 
+    {% if approval.type == approval.CLOSE_OUT %}
+      <p>You have been requested to rate the close-out for reliability incident "{{ incident.code }}".</p>
+      <p>The close-out slide can be viewed as PDF <a href="{% url 'incident_close_pdf' incident.pk %}" target="_blank">here</a>.</p>
+    {% endif %}
+
+    {% if approval.type == approval.RCA %}
+      <p>You have been requested to approve the RCA report for reliability incident "{{ incident.code }}".</p>
+      <p>The report can be viewed <a href="{{ incident.report_file.url }}" target="_blank">here</a>.</p>
+    {% endif %}
 
     <form method="post">
       {% csrf_token %}

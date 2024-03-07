@@ -30,6 +30,8 @@ from .forms import (
     SolutionFilterForm,
     IncidentSignificanceUpdateForm,
     IncidentCloseOutForm,
+    IncidentCloseApprovalSendForm,
+    IncidentRCAApprovalSendForm,
 )
 from .models import Solution, Incident, Section, Equipment, IncidentImage, Approval, Area, Feedback, Operation, ResourcePrice
 from .timelines import TimelineEntry
@@ -387,7 +389,6 @@ def incident_close_form(request, pk):
     incident = get_object_or_404(Incident, pk=pk)
 
     if request.method == "GET":
-
         initial = {
             "close_out_downtime_repair_cost": f"Downtime: {incident.duration_text}\nProduction Value Lost: {incident.production_value_loss} Pt Oz\nRand Value Lost: R{incident.rand_value_loss}",
             "close_out_short_term_date": now() + timedelta(days=30),
@@ -403,7 +404,6 @@ def incident_close_form(request, pk):
         return render(request, "defects/incident_close_form.html", context=context)
 
     if request.method == "POST":
-
         form = IncidentCloseOutForm(request.POST, request.FILES, instance=incident)
 
         if not form.is_valid():
@@ -575,7 +575,7 @@ def approval_detail(request, pk):
                 "form": form,
             }
             messages.error(request, "Please correct the errors and try again.")
-            return render(request, "defects/approval.html", context=context)
+            return render(request, "defects/approval.html", context=context, status=422)
 
         else:
             with transaction.atomic():
@@ -676,6 +676,7 @@ def incident_solution_create(request, pk):
             "timeframe",
             "priority",
             "description",
+            "dr_number",
             "person_responsible",
             "planned_completion_date",
             "remarks",
@@ -846,3 +847,121 @@ def incident_significance_update(request, pk):
             return HttpResponseBadRequest()
         form.save()
         return HttpResponseRedirect(reverse("incident_detail", args=[incident.pk]))
+
+
+@login_required
+def incident_close_approval_request(request, pk):
+    """
+    Rendered in modal.
+    """
+
+    incident = Incident.objects.select_related("section", "created_by", "section_engineer", "equipment").prefetch_related("images").get(pk=pk)
+
+    if request.method == "GET":
+        form = IncidentCloseApprovalSendForm()
+
+        context = {
+            "incident": incident,
+            "form": form,
+        }
+
+        return render(request, template_name="defects/incident_close_approval_request.html", context=context)
+
+    if request.method == "POST":
+        form = IncidentCloseApprovalSendForm(request.POST)
+
+        if not form.is_valid():
+            context = {
+                "incident": incident,
+                "form": form,
+            }
+            return render(request, template_name="defects/incident_close_approval_request.html", context=context)
+
+        else:
+            sem_user = form.cleaned_data["sem_user"]
+            se_user = form.cleaned_data["se_user"]
+
+            with transaction.atomic():
+                # create an approval object for SEM
+                Approval.objects.create(
+                    created_by=request.user,
+                    name=sem_user.username,
+                    user=sem_user,
+                    role=Approval.SECTION_ENGINEERING_MANAGER,
+                    type=Approval.CLOSE_OUT,
+                    incident=incident,
+                )
+
+                Approval.objects.create(
+                    created_by=request.user,
+                    name=se_user.username,
+                    user=se_user,
+                    role=Approval.SECTION_ENGINEER,
+                    type=Approval.CLOSE_OUT,
+                    incident=incident,
+                )
+
+                incident.close_out_time_published = now()
+                incident.save()
+
+            messages.success(request, "Close-Out slide has be sent to SE & SEM for approval.")
+            return HttpResponseRedirect(reverse("incident_detail", args=[incident.pk]))
+
+
+@login_required
+def incident_rca_approval_request(request, pk):
+    """
+    Rendered in modal.
+    """
+
+    incident = Incident.objects.select_related("section", "created_by", "section_engineer", "equipment").prefetch_related("images").get(pk=pk)
+
+    if request.method == "GET":
+        form = IncidentRCAApprovalSendForm()
+
+        context = {
+            "incident": incident,
+            "form": form,
+        }
+
+        return render(request, template_name="defects/incident_rca_approval_request.html", context=context)
+
+    if request.method == "POST":
+        form = IncidentRCAApprovalSendForm(request.POST)
+
+        if not form.is_valid():
+            context = {
+                "incident": incident,
+                "form": form,
+            }
+            return render(request, template_name="defects/incident_rca_approval_request.html", context=context)
+
+        else:
+            sem_user = form.cleaned_data["sem_user"]
+            se_user = form.cleaned_data["se_user"]
+
+            with transaction.atomic():
+                # create an approval object for SEM
+                Approval.objects.create(
+                    created_by=request.user,
+                    name=sem_user.username,
+                    user=sem_user,
+                    role=Approval.SECTION_ENGINEERING_MANAGER,
+                    type=Approval.RCA,
+                    incident=incident,
+                )
+
+                Approval.objects.create(
+                    created_by=request.user,
+                    name=se_user.username,
+                    user=se_user,
+                    role=Approval.SECTION_ENGINEER,
+                    type=Approval.RCA,
+                    incident=incident,
+                )
+
+                incident.rca_report_time_published = now()
+                incident.save()
+
+            messages.success(request, "RCA report has be sent to SE & SEM for approval.")
+            return HttpResponseRedirect(reverse("incident_detail", args=[incident.pk]))

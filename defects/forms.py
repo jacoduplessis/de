@@ -167,6 +167,34 @@ class IncidentNotificationApprovalSendForm(forms.Form):
     )
 
 
+class IncidentCloseApprovalSendForm(forms.Form):
+    se_user = forms.ModelChoiceField(
+        queryset=User.objects.filter(groups__name__in=["section_engineer"]),
+        label="Section Engineer",
+        required=True,
+    )
+
+    sem_user = forms.ModelChoiceField(
+        queryset=User.objects.filter(groups__name__in=["section_engineering_manager"]),
+        label="Section Engineering Manager",
+        required=True,
+    )
+
+
+class IncidentRCAApprovalSendForm(forms.Form):
+    se_user = forms.ModelChoiceField(
+        queryset=User.objects.filter(groups__name__in=["section_engineer"]),
+        label="Section Engineer",
+        required=True,
+    )
+
+    sem_user = forms.ModelChoiceField(
+        queryset=User.objects.filter(groups__name__in=["section_engineering_manager"]),
+        label="Section Engineering Manager",
+        required=True,
+    )
+
+
 class IncidentCloseForm(forms.Form):
     """
     Incident description headline	Greyed out field. (from Log Notification.)
@@ -217,9 +245,25 @@ class ApprovalForm(forms.ModelForm):
     class Meta:
         model = Approval
         fields = [
+            "score",
             "outcome",
             "comment",
         ]
+
+        help_texts = {"score": "Please provide a score between 1-5"}
+
+        widgets = {
+            "score": widgets.Select(
+                choices=[(f"{x}", f"{x}") for x in range(1, 6)],
+            )
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance.type == Approval.CLOSE_OUT:
+            del self.fields["outcome"]
+        if self.instance.type in [Approval.NOTIFICATION, Approval.RCA]:
+            del self.fields["score"]
 
 
 class IncidentFilterForm(forms.Form):
@@ -240,7 +284,10 @@ class SolutionFilterForm(forms.Form):
         choices=[
             ("", "---------"),
         ]
-        + list(Solution.STATUS_CHOICES),
+        + [
+            (Solution.SCHEDULED, "Scheduled"),
+            (Solution.COMPLETED, "Completed"),
+        ],
         required=False,
     )
 

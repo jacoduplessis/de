@@ -1,0 +1,19 @@
+{% load crispy_forms_filters static %}
+
+{% include "defects/_messages.html" %}
+
+<main>
+  <h2>Reliability Incident RCA Report Approval Request</h2>
+  <hr>
+
+  <p>Select a section engineer and section engineering manager below to review the RCA report for incident "{{ incident.code }}".</p>
+
+  <form method="post">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <input type="submit" value="Submit" class="btn btn-primary">
+  </form>
+
+</main>
+
+
