@@ -112,8 +112,11 @@ class Incident(models.Model):
     close_out_immediate_cause = models.TextField(blank=True)
     close_out_root_cause = models.TextField(blank=True)
     close_out_downtime_repair_cost = models.TextField(blank=True)
+    close_out_short_term_date = models.DateField(blank=True, null=True)
     close_out_short_term_actions = models.TextField(blank=True)
+    close_out_medium_term_date = models.DateField(null=True, blank=True)
     close_out_medium_term_actions = models.TextField(blank=True)
+    close_out_long_term_date = models.DateField(null=True, blank=True)
     close_out_long_term_actions = models.TextField(blank=True)
     close_out_confidence = models.PositiveIntegerField(default=0)
 

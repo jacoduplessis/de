@@ -115,7 +115,7 @@
   <div id="right" style="flex-basis: 50%; padding-left: 1rem">
     <div style="display: flex">
       <div class="header">Short-Term</div>
-      <div class="header" style="background-color: green; width: 80px">2024-01</div>
+      <div class="header" style="background-color: green; width: 80px">{{ incident.close_out_short_term_date|date:"Y-m" }}</div>
     </div>
     <div class="content">
       <ul>
@@ -126,7 +126,7 @@
     </div>
     <div style="display: flex">
       <div class="header">Medium-Term</div>
-      <div class="header" style="background-color: orange; width: 80px">2024-06</div>
+      <div class="header" style="background-color: orange; width: 80px">{{ incident.close_out_medium_term_date|date:"Y-m" }}</div>
     </div>
     <div class="content">
       <ul>
@@ -137,7 +137,7 @@
     </div>
     <div style="display: flex">
       <div class="header">Long-Term</div>
-      <div class="header" style="background-color: red; width: 80px">2024-06</div>
+      <div class="header" style="background-color: red; width: 80px">{{ incident.close_out_long_term_date|date:"Y-m" }}</div>
     </div>
     <div class="content">
       <ul>

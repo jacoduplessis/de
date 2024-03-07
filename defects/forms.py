@@ -269,8 +269,11 @@ class IncidentCloseOutForm(forms.ModelForm):
             "close_out_root_cause",
             "close_out_downtime_repair_cost",
             "close_out_short_term_actions",
+            "close_out_short_term_date",
             "close_out_medium_term_actions",
+            "close_out_medium_term_date",
             "close_out_long_term_actions",
+            "close_out_long_term_date",
             "close_out_confidence",
         ]
 
@@ -285,8 +288,11 @@ class IncidentCloseOutForm(forms.ModelForm):
             "close_out_root_cause": "Root Cause",
             "close_out_downtime_repair_cost": "Downtime & Repair Cost",
             "close_out_short_term_actions": "Short Term Actions",
+            "close_out_short_term_date": "Short Term Date",
             "close_out_medium_term_actions": "Medium Term Actions",
+            "close_out_medium_term_date": "Medium Term Date",
             "close_out_long_term_actions": "Long Term Actions",
+            "close_out_long_term_date": "Long Term Date",
             "close_out_confidence": "RE Confidence Rating",
         }
 
