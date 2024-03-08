@@ -34,7 +34,6 @@ from .forms import (
     IncidentRCAApprovalSendForm,
 )
 from .models import Solution, Incident, Section, Equipment, IncidentImage, Approval, Area, Feedback, Operation, ResourcePrice
-from .timelines import TimelineEntry
 from .actions import get_user_actions
 
 

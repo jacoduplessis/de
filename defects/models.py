@@ -453,7 +453,7 @@ class Incident(models.Model):
                     title="Publish RCA Report",
                     links=[
                         Link(
-                            url=reverse("incident_rca_publish_publish", args=[self.pk]),
+                            url=reverse("incident_rca_publish", args=[self.pk]),
                             text="Publish & Submit For Review",
                             attrs="up-layer=new",
                             cls="secondary",
@@ -551,7 +551,11 @@ class Approval(models.Model):
     RCA = "rca"
     CLOSE_OUT = "close_out"
 
-    TYPE_CHOICES = ((NOTIFICATION, "Notification"), (RCA, "RCA"), (CLOSE_OUT, "Close-Out"))
+    TYPE_CHOICES = (
+        (NOTIFICATION, "Notification"),
+        (RCA, "RCA"),
+        (CLOSE_OUT, "Close-Out"),
+    )
 
     SECTION_ENGINEER = "section_engineer"
     ENGINEERING_MANAGER = "engineering_manager"
@@ -575,7 +579,7 @@ class Approval(models.Model):
     type = models.CharField(max_length=100, choices=TYPE_CHOICES)
     outcome = models.CharField(max_length=100, choices=OUTCOME_CHOICES)
     comment = models.TextField(blank=True)
-    score = models.PositiveIntegerField(default=0, blank=True)  # only approvals of type close-out will have a score (1-5 inclusive).
+    score = models.PositiveIntegerField(default=0, blank=True)  # only approvals of type CLOSE_OUT will have a score (1-5 inclusive).
 
 
 auditlog.register(
