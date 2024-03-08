@@ -328,6 +328,9 @@ class IncidentCloseOutForm(forms.ModelForm):
             "close_out_short_term_actions": "One action per line",
             "close_out_medium_term_actions": "One action per line",
             "close_out_long_term_actions": "One action per line",
+            "close_out_short_term_date": "Format: YYYY-MM-DD",
+            "close_out_medium_term_date": "Format: YYYY-MM-DD",
+            "close_out_long_term_date": "Format: YYYY-MM-DD",
         }
 
         labels = {
