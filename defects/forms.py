@@ -95,6 +95,7 @@ class IncidentUpdateForm(forms.ModelForm):
             "production_value_loss",
             "resource_price",
             "rand_value_loss",
+            "repair_cost",
             "immediate_action_taken",
             "remaining_risk",
         ]
@@ -113,6 +114,7 @@ class IncidentUpdateForm(forms.ModelForm):
             "immediate_action_taken": "Describe the immediate action taken.",
             "long_description": "Production Loss, Asset Damage, Theft, Fire, Etc.",
             "production_value_loss": "In Pt Ounces",
+            "trigger": "Choose the trigger that occurred first."
         }
 
         widgets = {
@@ -217,7 +219,6 @@ class IncidentCloseForm(forms.Form):
     incident_date = forms.DateField(required=False)
     immediate_cause = forms.CharField(widget=widgets.Textarea(), required=False)
     root_cause = forms.CharField(widget=widgets.Textarea(), required=False)
-    downtime_repair_cost = forms.CharField(widget=widgets.Textarea(), required=False)
     short_term_action = forms.CharField(widget=widgets.Textarea(), required=False)
     medium_term_action = forms.CharField(widget=widgets.Textarea(), required=False)
     long_term_action = forms.CharField(widget=widgets.Textarea(), required=False)
@@ -314,7 +315,6 @@ class IncidentCloseOutForm(forms.ModelForm):
         fields = [
             "close_out_immediate_cause",
             "close_out_root_cause",
-            "close_out_downtime_repair_cost",
             "close_out_short_term_actions",
             "close_out_short_term_date",
             "close_out_medium_term_actions",
@@ -336,7 +336,6 @@ class IncidentCloseOutForm(forms.ModelForm):
         labels = {
             "close_out_immediate_cause": "Immediate Cause",
             "close_out_root_cause": "Root Cause",
-            "close_out_downtime_repair_cost": "Downtime & Repair Cost",
             "close_out_short_term_actions": "Short Term Actions",
             "close_out_short_term_date": "Short Term Date",
             "close_out_medium_term_actions": "Medium Term Actions",

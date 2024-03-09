@@ -105,6 +105,7 @@ class Incident(models.Model):
     rca_report_time_published = models.DateTimeField(blank=True, null=True)
     production_value_loss = models.DecimalField(blank=True, max_digits=20, decimal_places=4, default=Decimal("0.00"))
     rand_value_loss = models.DecimalField(blank=True, max_digits=20, decimal_places=2, default=Decimal("0.00"))
+    repair_cost = models.DecimalField(blank=True, max_digits=20, decimal_places=2, default=Decimal("0.00"))
     trigger = models.CharField(max_length=200, blank=True, choices=TRIGGER_CHOICES)
     immediate_action_taken = models.TextField(blank=True)
     remaining_risk = models.TextField(blank=True)
@@ -112,7 +113,6 @@ class Incident(models.Model):
 
     close_out_immediate_cause = models.TextField(blank=True)
     close_out_root_cause = models.TextField(blank=True)
-    close_out_downtime_repair_cost = models.TextField(blank=True)
     close_out_short_term_date = models.DateField(blank=True, null=True)
     close_out_short_term_actions = models.TextField(blank=True)
     close_out_medium_term_date = models.DateField(null=True, blank=True)

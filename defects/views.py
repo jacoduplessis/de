@@ -389,7 +389,6 @@ def incident_close_form(request, pk):
 
     if request.method == "GET":
         initial = {
-            "close_out_downtime_repair_cost": f"Downtime: {incident.duration_text}\nProduction Value Lost: {incident.production_value_loss} Pt Oz\nRand Value Lost: R{incident.rand_value_loss}",
             "close_out_short_term_date": now() + timedelta(days=30),
             "close_out_medium_term_date": now() + timedelta(days=180),
             "close_out_long_term_date": now() + timedelta(days=365),

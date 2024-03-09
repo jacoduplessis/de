@@ -110,7 +110,12 @@
     <div class="header">Root Cause</div>
     <div class="content">{{ incident.close_out_root_cause|linebreaks }}</div>
     <div class="header">Downtime & Repair Cost</div>
-    <div class="content">{{ incident.close_out_downtime_repair_cost|linebreaks }}</div>
+    <div class="content">
+      Downtime: {{incident.duration_text}}<br>
+      Production Value Lost: {{ incident.production_value_loss}} Pt Oz<br>
+      Rand Value Lost: R{{ incident.rand_value_loss}}<br>
+      Repair Cost: R{{ incident.repair_cost }}<br>
+    </div>
   </div>
   <div id="right" style="flex-basis: 50%; padding-left: 1rem">
     <div style="display: flex">

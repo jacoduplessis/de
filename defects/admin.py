@@ -46,17 +46,32 @@ class SolutionAdmin(ImportExportModelAdmin):
 
 @admin.register(Area)
 class AreaAdmin(admin.ModelAdmin):
-    pass
+    list_display = [
+        "name",
+        "order_index"
+    ]
+    ordering = ["order_index"]
 
 
 @admin.register(Section)
 class SectionAdmin(admin.ModelAdmin):
-    pass
+    list_display = [
+        "name",
+        "order_index"
+    ]
+
+    ordering = ["order_index"]
 
 
 @admin.register(Operation)
 class OperationAdmin(admin.ModelAdmin):
-    pass
+
+    list_display = [
+        "name",
+        "order_index",
+    ]
+
+    ordering = ["order_index"]
 
 
 @admin.register(Feedback)
