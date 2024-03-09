@@ -71,7 +71,7 @@
       white-space: nowrap;
       -webkit-overflow-scrolling: touch;
     }
-    
+
     .colored-dot {
       width: 12px;
       height: 12px;
@@ -220,9 +220,13 @@
       {% include 'defects/_messages.html' %}
     {% endblock messages %}
 
+    {% block outer_content %}
+    <div class="col-md-9 ms-sm-auto col-lg-10 px-md-4 mt-3">
     {% block content %}
       <main></main>
     {% endblock content %}
+    </div>
+    {% endblock outer_content %}
   </div>
 </div>
 
