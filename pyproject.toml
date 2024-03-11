@@ -5,21 +5,21 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "anglo-defects"
 version = "24.3.090"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 dependencies = [
-  'django==4.2.6',
-  'python-dotenv==1.0.0',
-  'whitenoise==6.5.0',
-  'gunicorn==21.2.0',
-  'dj-database-url==2.1.0',
-  'django-auditlog==2.3.0',
-  'redis==5.0.1',
-  'sentry_sdk==1.31.0',
-  'django-import-export==3.3.1',
-  'django-crispy-forms==2.0',
-  'crispy-bootstrap5==0.7',
-  'pillow==10.0.1',
-  'huey==2.5.0',
+  "django==4.2.6",
+  "python-dotenv==1.0.0",
+  "whitenoise==6.5.0",
+  "gunicorn==21.2.0",
+  "dj-database-url==2.1.0",
+  "django-auditlog==2.3.0",
+  "redis==5.0.1",
+  "sentry_sdk==1.31.0",
+  "django-import-export==3.3.1",
+  "django-crispy-forms==2.0",
+  "crispy-bootstrap5==0.7",
+  "pillow==10.0.1",
+  "huey==2.5.0",
   "weasyprint==60.1",
 ]
 
@@ -29,21 +29,13 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
   "pip-tools",
-  "black",
   "coverage",
 ]
 
 
 [tool.setuptools]
-packages = ['defects']
+packages = ["defects"]
 include-package-data = true
-
-[tool.black]
-target-version = ['py311']
-line-length = 150
-
-[tool.isort]
-profile = "black"
 
 [tool.coverage.run]
 omit = [

@@ -1,4 +1,4 @@
-FROM python:3.11-bullseye as builder
+FROM python:3.12-bullseye as builder
 
 WORKDIR /app
 
@@ -8,7 +8,7 @@ COPY requirements.txt /app/
 # Install pip requirements
 RUN pip install --no-cache-dir -r requirements.txt
 
-FROM python:3.11-bullseye
+FROM python:3.12-bullseye
 
 ENV STATIC_ROOT /app/static/
 WORKDIR /app
