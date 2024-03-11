@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.views import LoginView as BaseLoginView, LogoutView as BaseLogoutView
 from django.contrib.auth.models import User
 from django.db import transaction
-from django.db.models import Q, Prefetch, OuterRef, Subquery
+from django.db.models import Q, Prefetch, OuterRef, Subquery, Value
 from django.db.models.aggregates import Count
 from django.forms import modelformset_factory, modelform_factory, Textarea
 from django.http import HttpResponseRedirect, JsonResponse, HttpResponse, HttpResponseForbidden, HttpResponseBadRequest
@@ -53,6 +53,25 @@ def home(request):
 
         return Subquery(Incident.objects.filter(**filters, status=Incident.ACTIVE).values(q_kwarg).annotate(count=Count("*")).values("count"))
 
+
+    overdue_anniversaries = (
+        Incident.objects.prefetch_related("solutions")
+        .filter(time_start__lt=now() - timedelta(days=365))
+        .filter(time_anniversary_reviewed=None)
+        .order_by("time_start")
+        .annotate(anniversary_status=Value("overdue"))
+    )
+
+    upcoming_anniversaries = (
+        Incident.objects.prefetch_related("solutions")
+        .filter(time_start__gte=now() - timedelta(days=365), time_start__lte=now() - timedelta(days=334))
+        .filter(time_anniversary_reviewed=None)
+        .order_by("time_start")
+        .annotate(anniversary_status=Value("upcoming"))
+    )
+
+    anniversaries = list(overdue_anniversaries) + list(upcoming_anniversaries)
+
     context = {
         "sections": (Section.objects.annotate(count=_subquery("section_id")).values_list("name", "count", named=True)),
         "areas": (Area.objects.annotate(count=_subquery("area_id")).values_list("name", "count", named=True)),
@@ -65,6 +84,7 @@ def home(request):
         ),
         "user_actions": get_user_actions(request.user)[:13],  # todo: remove limit of 10
         "approvals": Approval.objects.select_related("incident", "created_by").filter(user=request.user, outcome=""),
+        "anniversaries": anniversaries
     }
 
     return render(request, template_name="defects/index.html", context=context)
@@ -427,7 +447,6 @@ def incident_close_form(request, pk):
 def anniversary_list(request):
     incidents = (
         Incident.objects.prefetch_related("solutions")
-        .filter(significant=True)
         .filter(time_start__lt=now() - timedelta(days=360))
         .filter(time_anniversary_reviewed=None)
     )
@@ -493,9 +512,10 @@ def solution_list(request):
         search_filters = Q(description__icontains=query) | Q(remarks__icontains=query) | Q(person_responsible__icontains=query)
         solutions = solutions.filter(search_filters)
 
-    status = request.GET.get("status")
-    if status:
-        solutions = solutions.filter(status=status)
+    # todo: this filter needs to be fixed since the db column was removed
+    # status = request.GET.get("status")
+    # if status:
+    #     solutions = solutions.filter(status=status)
 
     timeframe = request.GET.get("timeframe")
     if timeframe:
@@ -802,7 +822,6 @@ def solution_update(request, pk):
         Solution,
         fields=[
             "description",
-            "status",
             "timeframe",
             "priority",
             "person_responsible",
@@ -810,11 +829,14 @@ def solution_update(request, pk):
             "actual_completion_date",
             "remarks",
             "dr_number",
-            "time_verified",
+            "date_verified",
             "verification_comment",
         ],
-        labels={"dr_number": "DR Number"},
-        help_texts={"time_verified": "Add a date here to mark the solution as verified. Format: YYYY-MM-DD"},
+        labels={
+            "dr_number": "DR Number",
+            "date_verified": "Date Verified",
+        },
+        help_texts={"date_verified": "Add a date here to mark the solution as verified. Format: YYYY-MM-DD"},
     )
 
     if request.method == "GET":

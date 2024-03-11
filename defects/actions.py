@@ -83,6 +83,11 @@ def reliability_engineer_actions(user_id) -> List[UserAction]:
             urgency = Urgency.INFO
         actions.append(UserAction(message=message, urgency=urgency, incident=i, time_required=time_required))
 
+
+    # todo: action for close-out slide publish
+    # todo: action for create action list
+    # todo: reminder that planned actions should be verified
+
     return actions
 
 

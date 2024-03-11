@@ -6,5 +6,14 @@
       minuteIncrement: 1,
       allowInput: true,
     });
-  })
+  });
+
+  document.querySelectorAll('.dateinput').forEach(el => {
+    flatpickr(el, {
+      enableTime: false,
+      allowInput: true,
+    });
+  });
+
+
 </script>

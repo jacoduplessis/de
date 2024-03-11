@@ -132,6 +132,26 @@ class Incident(models.Model):
     def __str__(self):
         return self.code
 
+    def calculate_status(self):
+
+        if not self.notification_time_published and (self.time_start + timedelta(hours=48)) < now():
+            return self.OVERDUE
+
+        if self.significant and not self.rca_report_time_published and (self.notification_time_published + timedelta(days=14)) > now():
+            return self.OVERDUE
+
+        solutions = list(self.solutions.all())
+        if len(solutions) > 0:
+            if all([x.status == Solution.COMPLETED for x in solutions]):
+                return self.COMPLETE
+            return self.SCHEDULED
+
+        return self.ACTIVE
+
+    def save(self, *args, **kwargs):
+        self.status = self.calculate_status()
+        super().save(*args, **kwargs)
+
     @classmethod
     def generate_incident_code(cls):
         allowed_chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
@@ -326,8 +346,16 @@ class Incident(models.Model):
                         links=[
                             Link(
                                 text="Upload RCA Report",
-                                url="#",
+                                url=reverse("incident_rca_report_upload", args=[self.pk]),
+                                attrs="up-layer=new"
                             ),
+                            # todo: figure out how to inject a form here
+                            Link(
+                                text="RCA Not Required",
+                                url="#",
+                                cls="secondary"
+                            ),
+
                         ],
                     )
                 )
@@ -415,6 +443,10 @@ class Incident(models.Model):
         return range(self.close_out_confidence, 1, -1)
 
     @property
+    def anniversary_date(self):
+        return self.time_start + timedelta(days=365)
+
+    @property
     def actions(self):
         actions = []
 
@@ -462,6 +494,7 @@ class Incident(models.Model):
                 )
             )
 
+        # todo: add check for whether RCA stage is handled
         if self.notification_approved and not self.close_out_time_published:
             actions.append(
                 TimelineEntry(
@@ -515,6 +548,11 @@ class Solution(models.Model):
     COMPLETED = "completed"
     SCHEDULED = "scheduled"
 
+    STATUS_CHOICES = (
+        (COMPLETED, "Completed"),
+        (SCHEDULED, "Scheduled"),
+    )
+
     incident = models.ForeignKey(Incident, on_delete=models.CASCADE, null=True, blank=True, related_name="solutions")
     priority = models.CharField(max_length=200, blank=True, choices=PRIORITY_CHOICES, default="A")
     timeframe = models.CharField(max_length=200, blank=True, choices=TIMEFRAME_CHOICES, default=SHORT_TERM)
@@ -523,8 +561,9 @@ class Solution(models.Model):
     planned_completion_date = models.DateField(blank=True, null=True)
     actual_completion_date = models.DateField(blank=True, null=True)
     dr_number = models.CharField(max_length=200, blank=True)
+    status = models.CharField(max_length=100, default=SCHEDULED, choices=STATUS_CHOICES)
     remarks = models.TextField(blank=True)
-    time_verified = models.DateTimeField(blank=True, null=True)
+    date_verified = models.DateField(blank=True, null=True)
     verification_comment = models.TextField(blank=True)
 
     @property
@@ -532,11 +571,10 @@ class Solution(models.Model):
         _map = {self.SCHEDULED: "primary", self.COMPLETED: "success"}
         return _map.get(self.status)
 
-    @property
-    def status(self):
-        if self.time_verified is not None:
-            return self.COMPLETED
-        return self.SCHEDULED
+    def save(self, *args, **kwargs):
+        if self.date_verified is not None:
+            self.status = self.COMPLETED
+        super().save(*args, **kwargs)
 
 class Approval(models.Model):
     ACCEPTED = "accepted"

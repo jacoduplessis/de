@@ -119,7 +119,10 @@
           </tr>
           <tr>
             <th>Close Out</th>
-            <td><a href="{% url 'incident_close_pdf' incident.pk %}" target="_blank">Download PDF</a></td>
+            <td>
+              <a href="{% url 'incident_close_form' incident.pk %}" up-layer="new">Edit Info</a>,
+              <a href="{% url 'incident_close_pdf' incident.pk %}" target="_blank">Download PDF</a>
+            </td>
           </tr>
           <tr>
             <th>RCA Report</th>

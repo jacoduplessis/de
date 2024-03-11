@@ -38,7 +38,7 @@
         <tbody>
         {% for incident in incidents %}
           <tr>
-            <td class="text-nowrap"><span class="badge text-bg-{{ incident.status_class }}">{{ incident.get_status_display }}</span></td>
+            <td class="text-nowrap"><span class="badge text-bg-{{ incident.status_class }}">{{ incident.status }}</span></td>
             <td class="text-nowrap"><a class="text-black" href="{% url 'incident_detail' incident.pk %}">{{ incident.code }}</a></td>
             <td class="font-monospace text-nowrap">{{ incident.time_start|date:'Y-m-d' }}</td>
             <td class="text-nowrap">{{ incident.section.name }}</td>

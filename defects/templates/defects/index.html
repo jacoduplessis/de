@@ -70,10 +70,34 @@
           {% endfor %}
           </tbody>
         </table>
+
+        <h6 class="text-body-secondary">Anniversaries</h6>
+
+        <table class="table table-sm table-striped">
+          <thead>
+          <tr>
+            <th>Incident</th>
+            <th>Anniversary Date</th>
+            <th>Anniversary Status</th>
+          </tr>
+          </thead>
+          <tbody>
+            {% for incident in anniversaries %}
+            <tr>
+              <td><a href="{% url 'incident_detail' incident.id %}" class="text-black">{{ incident.code }}</a></td>
+              <td>{{ incident.anniversary_date|date:"Y-m-d" }}</td>
+              <td>
+                <span class="badge text-bg-{% if incident.anniversary_status == "overdue" %}danger{% else %}primary{% endif %}">{{ incident.anniversary_status }}</span>
+                </td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
       </div>
 
     </div>
 
+    {% comment %}
     <div class="row mt-4">
 
       <div class="col-12 col-lg-6">
@@ -146,6 +170,8 @@
     </div>
 
     <script src="{% static "scripts/home-dashboard.js" %}" defer></script>
+    {% endcomment %}
+
   </main>
 {% endblock %}
 
