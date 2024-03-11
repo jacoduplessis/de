@@ -134,6 +134,9 @@ class Incident(models.Model):
 
     def calculate_status(self):
 
+        if not self.notification_time_published:
+            return self.ACTIVE
+
         if not self.notification_time_published and (self.time_start + timedelta(hours=48)) < now():
             return self.OVERDUE
 
