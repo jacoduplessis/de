@@ -404,27 +404,27 @@ class Incident(models.Model):
                         )
                     )
 
-        for solution in self.solutions.all():
-            entries.append(
-                TimelineEntry(
-                    icon="clock",
-                    title=f"Solution Created",
-                    time=solution.time_created,
-                    text=f"{solution.description}",
-                )
-            )
-            if solution.date_verified:
-                text = f"Solution: {solution.description}"
-                if solution.verification_comment:
-                    text += f"\n\nVerification Comment: {solution.verification_comment}"
-                entries.append(
-                    TimelineEntry(
-                        icon="clock",
-                        title=f"Solution Verified",
-                        time=solution.date_verified,
-                        text=text,
-                    )
-                )
+        # for solution in self.solutions.all():
+        #     entries.append(
+        #         TimelineEntry(
+        #             icon="clock",
+        #             title=f"Solution Created",
+        #             time=solution.time_created,
+        #             text=f"{solution.description}",
+        #         )
+        #     )
+        #     if solution.date_verified:
+        #         text = f"Solution: {solution.description}"
+        #         if solution.verification_comment:
+        #             text += f"\n\nVerification Comment: {solution.verification_comment}"
+        #         entries.append(
+        #             TimelineEntry(
+        #                 icon="clock",
+        #                 title=f"Solution Verified",
+        #                 time=solution.date_verified,
+        #                 text=text,
+        #             )
+        #         )
 
         if self.time_anniversary_reviewed:
             entries.append(
