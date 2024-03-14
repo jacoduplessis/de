@@ -110,6 +110,7 @@ class Incident(models.Model):
     immediate_action_taken = models.TextField(blank=True)
     remaining_risk = models.TextField(blank=True)
     time_anniversary_reviewed = models.DateTimeField(null=True, blank=True, help_text="Records when the 1-year anniversary review was completed.")
+    anniversary_reviewed_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
 
     close_out_immediate_cause = models.TextField(blank=True)
     close_out_root_cause = models.TextField(blank=True)
@@ -323,7 +324,7 @@ class Incident(models.Model):
                             icon="clock",
                             title=f"RCA report approved by {approval.get_role_display()}",
                             time=approval.time_modified,
-                            text=f"Comment: {approval.comment}",
+                            text=f"Comment by {approval.name}: {approval.comment}",
                         )
                     )
                 if approval.outcome == Approval.REJECTED:
@@ -332,7 +333,7 @@ class Incident(models.Model):
                             icon="clock",
                             title=f"RCA report rejected by {approval.get_role_display()}",
                             time=approval.time_modified,
-                            text=f"Comment: {approval.comment}",
+                            text=f"Comment by {approval.name}: {approval.comment}",
                         )
                     )
 
@@ -402,8 +403,40 @@ class Incident(models.Model):
                         )
                     )
 
+        for solution in self.solutions.all():
+            entries.append(
+                TimelineEntry(
+                    icon="clock",
+                    title=f"Solution Created",
+                    time=solution.time_modified,
+                    text=f"{solution.description}",
+                )
+            )
+            if solution.date_verified:
+                text = f"Solution: {solution.description}"
+                if solution.verification_comment:
+                    text += f"\n\nVerification Comment: {solution.verification_comment}"
+                entries.append(
+                    TimelineEntry(
+                        icon="clock",
+                        title=f"Solution Verified",
+                        time=solution.date_verified,
+                        text=text,
+                    )
+                )
 
-        return entries
+        if self.time_anniversary_reviewed:
+            entries.append(
+                TimelineEntry(
+                    icon="clock",
+                    title=f"Incident Anniversary Review Completed",
+                    time=self.time_anniversary_reviewed,
+                    text=f"Review completed by {self.anniversary_reviewed_by.email}",
+                )
+            )
+
+
+        return sorted(entries, key=lambda x: x.time)
 
     @cached_property
     def notification_approved(self):

@@ -53,7 +53,6 @@ def home(request):
 
         return Subquery(Incident.objects.filter(**filters, status=Incident.ACTIVE).values(q_kwarg).annotate(count=Count("*")).values("count"))
 
-
     overdue_anniversaries = (
         Incident.objects.prefetch_related("solutions")
         .filter(time_start__lt=now() - timedelta(days=365))
@@ -82,8 +81,8 @@ def home(request):
             .filter(count__gte=1)
             .values_list("name", "count", named=True)
         ),
-        "user_actions": get_user_actions(request.user)[:13],  # todo: remove limit of 10
-        "approvals": Approval.objects.select_related("incident", "created_by").filter(user=request.user, outcome=""),
+        "user_actions": get_user_actions(request.user),
+        "approvals": Approval.objects.select_related("incident", "created_by").filter(user=request.user, outcome=""),  # todo: filter out close out slide approvals with a score
         "anniversaries": anniversaries
     }
 
@@ -95,7 +94,6 @@ def about(request):
     return render(request, "defects/about.html")
 
 
-@login_required()
 @login_required()
 def incident_list(request):
     incidents = Incident.objects.select_related("created_by", "equipment", "section", "section_engineer").order_by("-time_start")
@@ -371,6 +369,7 @@ def incident_anniversary_detail(request, pk):
     if request.method == "POST":
         "this marks the anniversary as reviewed"
         incident.time_anniversary_reviewed = now()
+        incident.anniversary_reviewed_by = request.user
         incident.save()
         messages.success(request, "Anniversary has been marked as reviewed.")
         return HttpResponseRedirect(reverse("anniversary_list"))
