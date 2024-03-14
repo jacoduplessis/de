@@ -150,13 +150,12 @@ Issues
 
 {done} 35
 {done} 30
-29
-28
-25
-22
-14
-6
-
-- add user details to comments in timeline
+{done} 29
+{done} 28
+{done} 25
+{nope} 22 - timeline is sorted by time
+{nope} 14 - we only track publication time once and images can always be added
+{done} 6 - if rejected we have an action, and if approved the next action will follow
+{done} add user details to comments in timeline
 
 

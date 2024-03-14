@@ -4,7 +4,8 @@ from typing import Optional
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.timezone import now
-from datetime import timedelta
+from datetime import timedelta, datetime, time, timezone
+import zoneinfo
 from django.utils.crypto import get_random_string
 from django.urls import reverse
 from django.utils.functional import cached_property
@@ -358,13 +359,13 @@ class Incident(models.Model):
                             Link(
                                 text="RCA Not Required",
                                 url="#",
-                                cls="secondary"
+                                cls="secondary",
+                                attrs="id=trigger-form-incident-not-significant",
                             ),
 
                         ],
                     )
                 )
-
 
         if self.close_out_time_published:
             entries.append(
@@ -404,27 +405,27 @@ class Incident(models.Model):
                         )
                     )
 
-        # for solution in self.solutions.all():
-        #     entries.append(
-        #         TimelineEntry(
-        #             icon="clock",
-        #             title=f"Solution Created",
-        #             time=solution.time_created,
-        #             text=f"{solution.description}",
-        #         )
-        #     )
-        #     if solution.date_verified:
-        #         text = f"Solution: {solution.description}"
-        #         if solution.verification_comment:
-        #             text += f"\n\nVerification Comment: {solution.verification_comment}"
-        #         entries.append(
-        #             TimelineEntry(
-        #                 icon="clock",
-        #                 title=f"Solution Verified",
-        #                 time=solution.date_verified,
-        #                 text=text,
-        #             )
-        #         )
+        for solution in self.solutions.all():
+            entries.append(
+                TimelineEntry(
+                    icon="clock",
+                    title=f"Solution Created",
+                    time=solution.time_created,
+                    text=f"{solution.description}",
+                )
+            )
+            if solution.date_verified:
+                text = f"Solution: {solution.description}"
+                if solution.verification_comment:
+                    text += f"\n\nVerification Comment: {solution.verification_comment}"
+                entries.append(
+                    TimelineEntry(
+                        icon="clock",
+                        title=f"Solution Verified",
+                        time=datetime.combine(solution.date_verified, time(hour=12, minute=0, tzinfo=timezone.utc)),
+                        text=text,
+                    )
+                )
 
         if self.time_anniversary_reviewed:
             entries.append(

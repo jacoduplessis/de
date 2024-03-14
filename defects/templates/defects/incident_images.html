@@ -19,6 +19,7 @@
               <ul class="dropdown-menu">
                 <li><a class="dropdown-item" href="{% url 'image_update' image.pk %}" up-layer="new">Edit</a></li>
                 <li><a class="dropdown-item" href="{{ image.image.url }}" target="_blank">View Full Size</a></li>
+                <li><a class="dropdown-item" href="{{ image.image.url }}" download>Download</a></li>
                 <li><a class="dropdown-item" href="{% url 'image_delete' image.pk %}" up-follow>Delete</a></li>
               </ul>
             </div>

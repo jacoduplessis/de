@@ -2,6 +2,14 @@
 
 {% load static %}
 
+{% block extra_styles %}
+  <style>
+    .bg-anglo {
+      background: linear-gradient(90deg, #031794 30.98%, #1E7CFF 100%);
+    }
+  </style>
+{% endblock %}
+
 {% block header %}{% endblock %}
 {% block sidebar %}{% endblock %}
 {% block messages %}{% endblock %}
@@ -9,4 +17,5 @@
 {% block outer_content %}
   {% block content %}{% endblock %}
 {% endblock %}
+
 

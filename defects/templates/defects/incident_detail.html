@@ -85,8 +85,9 @@
           </tr>
           <tr>
             <th>Significant / RCA required</th>
-            <td class="d-flex align-items-baseline justify-content-between">{% if incident.significant %}Yes
-              <form method="post" action="{% url 'incident_significance_update' incident.pk %}" up-submit>
+            <td class="d-flex align-items-baseline justify-content-between">
+              {% if incident.significant %}Yes
+              <form method="post" action="{% url 'incident_significance_update' incident.pk %}" up-submit id="incident-not-significant-form">
                 {% csrf_token %}
                 <input name="significant" value="false" type="hidden">
                 <input type="submit" class="btn btn-sm btn-outline-primary" value="Change to not significant">
@@ -213,7 +214,15 @@
         document.body.removeChild(dummy);
         alert("Link copied to clipboard");
       })
+    });
+
+    {# please forgive me #}
+    document.querySelector("#trigger-form-incident-not-significant").addEventListener("click", e => {
+      e.preventDefault()
+      document.querySelector('#incident-not-significant-form input[type="submit"]').click()
     })
+
+
   </script>
 
 {% endblock %}
