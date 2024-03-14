@@ -589,6 +589,8 @@ class Solution(models.Model):
         (SCHEDULED, "Scheduled"),
     )
 
+    time_created = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
     incident = models.ForeignKey(Incident, on_delete=models.CASCADE, null=True, blank=True, related_name="solutions")
     priority = models.CharField(max_length=200, blank=True, choices=PRIORITY_CHOICES, default="A")
     timeframe = models.CharField(max_length=200, blank=True, choices=TIMEFRAME_CHOICES, default=SHORT_TERM)
