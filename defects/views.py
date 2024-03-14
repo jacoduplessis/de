@@ -82,7 +82,7 @@ def home(request):
             .values_list("name", "count", named=True)
         ),
         "user_actions": get_user_actions(request.user),
-        "approvals": Approval.objects.select_related("incident", "created_by").filter(user=request.user, outcome=""),  # todo: filter out close out slide approvals with a score
+        "approvals": Approval.objects.select_related("incident", "created_by").filter(user=request.user).filter(Q(outcome="") | Q(score=0)),
         "anniversaries": anniversaries
     }
 
