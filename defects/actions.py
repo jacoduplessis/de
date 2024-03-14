@@ -83,9 +83,23 @@ def reliability_engineer_actions(user_id) -> List[UserAction]:
             urgency = Urgency.INFO
         actions.append(UserAction(message=message, urgency=urgency, incident=i, time_required=time_required))
 
+    for i in incidents:
+        if i.close_out_time_published is None or i.notification_time_published is None:
+            continue
+        if (i.significant and i.rca_report_time_approved) or (not i.significant):
 
-    # todo: action for close-out slide publish
-    # todo: action for create action list
+            time_required = i.notification_time_published + timedelta(days=14)
+            time_remaining = time_required - now()
+            if time_remaining < timedelta(hours=0):
+                urgency = Urgency.DANGER
+            elif time_remaining < timedelta(days=7):
+                urgency = Urgency.WARNING
+            else:
+                urgency = Urgency.INFO
+
+            actions.append(UserAction(message="Publish Close-Out Slide", incident=i, urgency=urgency, time_required=time_required))
+
+    # todo: action for create action list 14 days after close-out slide
     # todo: reminder that planned actions should be verified
 
     return actions

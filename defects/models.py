@@ -103,6 +103,7 @@ class Incident(models.Model):
     close_out_file = models.FileField(blank=True)
     report_file = models.FileField(blank=True, upload_to="files/")  # RCA report
     rca_report_time_published = models.DateTimeField(blank=True, null=True)
+    rca_report_time_approved = models.DateTimeField(blank=True, null=True)
     production_value_loss = models.DecimalField(blank=True, max_digits=20, decimal_places=4, default=Decimal("0.00"))
     rand_value_loss = models.DecimalField(blank=True, max_digits=20, decimal_places=2, default=Decimal("0.00"))
     repair_cost = models.DecimalField(blank=True, max_digits=20, decimal_places=2, default=Decimal("0.00"))
@@ -408,7 +409,7 @@ class Incident(models.Model):
                 TimelineEntry(
                     icon="clock",
                     title=f"Solution Created",
-                    time=solution.time_modified,
+                    time=solution.time_created,
                     text=f"{solution.description}",
                 )
             )
@@ -434,7 +435,6 @@ class Incident(models.Model):
                     text=f"Review completed by {self.anniversary_reviewed_by.email}",
                 )
             )
-
 
         return sorted(entries, key=lambda x: x.time)
 

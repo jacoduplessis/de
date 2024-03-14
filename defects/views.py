@@ -600,6 +600,10 @@ def approval_detail(request, pk):
                 if obj.outcome == Approval.ACCEPTED and obj.type == Approval.NOTIFICATION:
                     obj.incident.notification_time_approved = now()
                     obj.incident.save()
+                if obj.outcome == Approval.ACCEPTED and obj.type == Approval.RCA:
+                    obj.rca_report_time_approved = now()
+                    obj.incident.save()
+                # todo: add logic for saving time approved of close-out slide?
 
             messages.success(request, "Approval outcome has been saved.")
             return HttpResponseRedirect(reverse("home"))
