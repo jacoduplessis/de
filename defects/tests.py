@@ -74,7 +74,7 @@ class TestUserActions(TestCase):
 
     def test_notification_user_action(self):
         re_user = User.objects.get(username="reliability_engineer")
-        incident = Incident.objects.create(created_by=re_user, time_start=now(), code=Incident.generate_incident_code())
+        incident = Incident.objects.create(created_by=re_user, time_start=now(), time_end=now(), code=Incident.generate_incident_code())
 
         ua = get_user_actions(re_user)
         self.assertEqual(len(ua), 1)
@@ -85,14 +85,17 @@ class TestUserActions(TestCase):
         self.assertEqual(action.urgency, Urgency.INFO)
 
         incident.time_start = now() - timedelta(hours=22)
+        incident.time_end = now() - timedelta(hours=22)
         incident.save()
         self.assertEqual(get_user_actions(re_user)[0].urgency, Urgency.INFO)
 
         incident.time_start = now() - timedelta(hours=25)
+        incident.time_end = now() - timedelta(hours=25)
         incident.save()
         self.assertEqual(get_user_actions(re_user)[0].urgency, Urgency.WARNING)
 
         incident.time_start = now() - timedelta(hours=50)
+        incident.time_end = now() - timedelta(hours=50)
         incident.save()
         self.assertEqual(get_user_actions(re_user)[0].urgency, Urgency.DANGER)
 
@@ -101,9 +104,10 @@ class TestIncidentCalculations(TestCase):
     def test_notification_overdue(self):
         ten_hours_ago = now() - timedelta(hours=10)
         sixty_hours_ago = now() - timedelta(hours=60)
-        incident = Incident.objects.create(time_start=ten_hours_ago, code=Incident.generate_incident_code())
+        incident = Incident.objects.create(time_start=ten_hours_ago, time_end=ten_hours_ago, code=Incident.generate_incident_code())
         self.assertFalse(incident.notification_overdue)
         incident.time_start = sixty_hours_ago
+        incident.time_end = sixty_hours_ago
         self.assertTrue(incident.notification_overdue)
         incident.notification_time_published = now()
         self.assertFalse(incident.notification_overdue)
