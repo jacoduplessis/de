@@ -37,6 +37,7 @@ urlpatterns = [
     path("incidents/<int:pk>/significance/", views.incident_significance_update, name="incident_significance_update"),
     path("incidents/<int:pk>/history/", views.incident_history, name="incident_history"),
     path("incidents/<int:pk>/solutions/create/", views.incident_solution_create, name="incident_solution_create"),
+    path("incidents/<int:pk>/findings/upload/", views.incident_findings_upload, name="incident_findings_upload"),
     path("incidents/<int:pk>/rca/upload/", views.incident_rca_report_upload, name="incident_rca_report_upload"),
     path("incidents/<int:pk>/rca/approval/request/", views.incident_rca_approval_request, name="incident_rca_publish"),
     path("incidents/<int:pk>/close/form/", views.incident_close_form, name="incident_close_form"),

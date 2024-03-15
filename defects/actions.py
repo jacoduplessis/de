@@ -48,7 +48,7 @@ def reliability_engineer_actions(user_id) -> List[UserAction]:
     for i in incidents:
         if i.notification_time_published:
             continue
-        time_required = i.time_start + timedelta(hours=48)
+        time_required = i.time_end + timedelta(hours=48)
         time_remaining = time_required - now()
         if time_remaining < timedelta(hours=0):
             urgency = Urgency.DANGER

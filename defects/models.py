@@ -124,6 +124,7 @@ class Incident(models.Model):
     close_out_long_term_actions = models.TextField(blank=True)
     close_out_confidence = models.PositiveIntegerField(default=0)
     close_out_time_published = models.DateTimeField(blank=True, null=True)
+    close_out_time_approved = models.DateTimeField(blank=True, null=True)
 
     history = AuditlogHistoryField(delete_related=False)
 
@@ -140,7 +141,7 @@ class Incident(models.Model):
         if not self.notification_time_published:
             return self.ACTIVE
 
-        if not self.notification_time_published and (self.time_start + timedelta(hours=48)) < now():
+        if not self.notification_time_published and (self.time_end + timedelta(hours=48)) < now():
             return self.OVERDUE
 
         if self.significant and not self.rca_report_time_published and (self.notification_time_published + timedelta(days=14)) > now():
@@ -188,10 +189,10 @@ class Incident(models.Model):
 
     @property
     def notification_overdue(self):
-        if not self.time_start:
+        if not self.time_end:
             return True
 
-        return self.notification_time_published is None and (self.time_start + timedelta(hours=48)) < now()
+        return self.notification_time_published is None and (self.time_end + timedelta(hours=48)) < now()
 
     @property
     def report_overdue(self):
@@ -270,6 +271,7 @@ class Incident(models.Model):
                         TimelineEntry(
                             icon="clock",
                             title="Awaiting SEM approval for 48h Notification",
+                            time=self.notification_time_published + timedelta(minutes=1),
                             text=f"SEM reviewing: {approval.name}",
                             links=[Link(text="Copy Approval Link", url=reverse("approval_detail", args=[approval.id]), attrs="clipboard-copy-link")],
                         )
@@ -281,7 +283,7 @@ class Incident(models.Model):
                             icon="clock",
                             title="48-hour notification report approved by SEM",
                             time=approval.time_modified,
-                            text=f"Comment: {approval.comment}",
+                            text=f"Comment by {approval.name}: {approval.comment or None}",
                         )
                     )
                 if approval.outcome == Approval.REJECTED:
@@ -290,7 +292,7 @@ class Incident(models.Model):
                             icon="clock",
                             title="48-hour notification report rejected by SEM",
                             time=approval.time_modified,
-                            text=f"Comment: {approval.comment}",
+                            text=f"Comment by {approval.name}: {approval.comment or None}",
                         )
                     )
 
@@ -326,7 +328,7 @@ class Incident(models.Model):
                             icon="clock",
                             title=f"RCA report approved by {approval.get_role_display()}",
                             time=approval.time_modified,
-                            text=f"Comment by {approval.name}: {approval.comment}",
+                            text=f"Comment by {approval.name}: {approval.comment or None}",
                         )
                     )
                 if approval.outcome == Approval.REJECTED:
@@ -335,7 +337,7 @@ class Incident(models.Model):
                             icon="clock",
                             title=f"RCA report rejected by {approval.get_role_display()}",
                             time=approval.time_modified,
-                            text=f"Comment by {approval.name}: {approval.comment}",
+                            text=f"Comment by {approval.name}: {approval.comment or None}",
                         )
                     )
 
@@ -355,7 +357,6 @@ class Incident(models.Model):
                                 url=reverse("incident_rca_report_upload", args=[self.pk]),
                                 attrs="up-layer=new"
                             ),
-                            # todo: figure out how to inject a form here
                             Link(
                                 text="RCA Not Required",
                                 url="#",
@@ -389,6 +390,7 @@ class Incident(models.Model):
                     entries.append(
                         TimelineEntry(
                             icon="clock",
+                            time=self.close_out_time_published + timedelta(minutes=1),
                             title=f"Awaiting {approval.get_role_display()} close-out rating",
                             text=f"{approval.get_role_display()} reviewing: {approval.name}",
                             links=[Link(text="Copy Approval Link", url=reverse("approval_detail", args=[approval.id]), attrs="clipboard-copy-link")],
@@ -401,9 +403,18 @@ class Incident(models.Model):
                             icon="clock",
                             title=f"Close-out rated by {approval.get_role_display()}",
                             time=approval.time_modified,
-                            text=f"Score: {approval.score}/5. Comment: {approval.comment}",
+                            text=f"Score: {approval.score}/5. Comment: {approval.comment or None}",
                         )
                     )
+
+        if self.close_out_time_approved:
+            entries.append(
+                TimelineEntry(
+                    icon="clock",
+                    title=f"Close-out approved by SE and SEM",
+                    time=self.close_out_time_approved,
+                )
+            )
 
         for solution in self.solutions.all():
             entries.append(
@@ -453,7 +464,7 @@ class Incident(models.Model):
 
     @property
     def notification_deadline_text(self):
-        deadline_time = self.time_start + timedelta(hours=48)
+        deadline_time = self.time_end + timedelta(hours=48)
         remaining = deadline_time - now()
         if remaining > timedelta(seconds=1):
             return f"{int(remaining.total_seconds() / 3600)} hours until deadline"
@@ -481,7 +492,7 @@ class Incident(models.Model):
 
     @property
     def anniversary_date(self):
-        return self.time_start + timedelta(days=365)
+        return self.time_end + timedelta(days=365)
 
     @property
     def actions(self):
@@ -492,7 +503,7 @@ class Incident(models.Model):
                 TimelineEntry(
                     icon="clock",
                     title="Create 48H notification report",
-                    time=self.time_start + timedelta(hours=48),
+                    time=self.time_end + timedelta(hours=48),
                     text=self.notification_deadline_text,
                     links=[
                         Link(
@@ -531,8 +542,7 @@ class Incident(models.Model):
                 )
             )
 
-        # todo: add check for whether RCA stage is handled
-        if self.notification_approved and not self.close_out_time_published:
+        if self.notification_approved and (not self.significant or self.rca_report_time_approved) and not self.close_out_time_published:
             actions.append(
                 TimelineEntry(
                     icon="clock",
@@ -546,6 +556,30 @@ class Incident(models.Model):
                             cls="secondary",
                         ),
                     ],
+                )
+            )
+
+
+        if self.close_out_time_approved:
+            actions.append(
+                TimelineEntry(
+                    icon="clock",
+                    title="Create Solutions",
+                    time=self.close_out_time_approved + timedelta(minutes=1),
+                    text="Since the close-out slide has been approved, you can now create solutions for this incident.",
+                    links=[
+                        Link(
+                            url=reverse("incident_solution_create", args=[self.pk]),
+                            text="Add solution",
+                            attrs="up-layer=new",
+                        ),
+                        Link(
+                            url=reverse("solution_list") + f"?incident_id={self.pk}",
+                            text="View in Solution Tracker",
+                            attrs="target=_blank",
+                            cls="secondary",
+                        )
+                    ]
                 )
             )
 

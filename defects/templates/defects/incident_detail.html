@@ -87,18 +87,18 @@
             <th>Significant / RCA required</th>
             <td class="d-flex align-items-baseline justify-content-between">
               {% if incident.significant %}Yes
-              <form method="post" action="{% url 'incident_significance_update' incident.pk %}" up-submit id="incident-not-significant-form">
-                {% csrf_token %}
-                <input name="significant" value="false" type="hidden">
-                <input type="submit" class="btn btn-sm btn-outline-primary" value="Change to not significant">
-              </form>
-            {% else %}No
-              <form method="post" action="{% url 'incident_significance_update' incident.pk %}" up-submit>
-                {% csrf_token %}
-                <input name="significant" value="true" type="hidden">
-                <input type="submit" class="btn btn-sm btn-outline-primary" value="Change to significant">
-              </form>
-            {% endif %}</td>
+                <form method="post" action="{% url 'incident_significance_update' incident.pk %}" up-submit id="incident-not-significant-form">
+                  {% csrf_token %}
+                  <input name="significant" value="false" type="hidden">
+                  <input type="submit" class="btn btn-sm btn-outline-primary" value="Change to not significant">
+                </form>
+              {% else %}No
+                <form method="post" action="{% url 'incident_significance_update' incident.pk %}" up-submit>
+                  {% csrf_token %}
+                  <input name="significant" value="true" type="hidden">
+                  <input type="submit" class="btn btn-sm btn-outline-primary" value="Change to significant">
+                </form>
+              {% endif %}</td>
           </tr>
           <tr>
             <th>Production Cost</th>
@@ -108,15 +108,20 @@
             <th>Rand Cost</th>
             <td>{{ incident.rand_value_loss }}</td>
           </tr>
-          {% if incident.preliminary_findings %}
-            <tr>
-              <th>Preliminary Findings</th>
-              <td><a href="{{ incident.preliminary_findings.url }}" download>Download</a></td>
-            </tr>
-          {% endif %}
+          <tr>
+            <th>Preliminary Findings</th>
+            <td>
+              {% if incident.preliminary_findings %}<a href="{{ incident.preliminary_findings.url }}" download>Download</a>,{% endif %}
+              <a href="{% url 'incident_findings_upload' incident.pk %}" up-layer="new" up-history="false">Upload</a>
+            </td>
+          </tr>
           <tr>
             <th>48h Notification</th>
             <td><a href="{% url 'incident_notification' incident.pk %}">View</a>, <a href="{% url 'incident_notification_pdf' incident.pk %}" target="_blank">Download PDF</a></td>
+          </tr>
+          <tr>
+            <th>Notification Images</th>
+            <td><a href="{% url 'incident_images' incident.pk %}" up-layer="new" up-size="large">{{ incident.images.all|length }} image{{ incident.images.all|length|pluralize }}</a></td>
           </tr>
           <tr>
             <th>Close Out</th>
@@ -129,10 +134,7 @@
             <th>RCA Report</th>
             <td>{% if incident.report_file %}<a href="{{ incident.report_file.url }}" target="_blank">Download Report</a>, {% endif %}<a href="{% url 'incident_rca_report_upload' incident.pk %}" up-layer="new">Upload Report</a></td>
           </tr>
-          <tr>
-            <th>Images</th>
-            <td><a href="{% url 'incident_images' incident.pk %}" up-layer="new" up-size="large">{{ incident.images.all|length }} image{{ incident.images.all|length|pluralize }}</a></td>
-          </tr>
+
           {% if incident.time_anniversary_reviewed %}
             <tr>
               <th>1-Year Anniversary Reviewed</th>

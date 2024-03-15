@@ -1,0 +1,15 @@
+{% load crispy_forms_filters static %}
+
+{% include "defects/_messages.html" %}
+
+<main>
+  <h2>Upload Preliminary Findings</h2>
+  <hr>
+
+  <form method="post" action="{% url 'incident_findings_upload' incident.pk %}" enctype="multipart/form-data" up-submit up-layer="parent">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <input type="submit" value="Submit" class="btn btn-primary">
+  </form>
+</main>
+

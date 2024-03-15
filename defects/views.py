@@ -82,7 +82,12 @@ def home(request):
             .values_list("name", "count", named=True)
         ),
         "user_actions": get_user_actions(request.user),
-        "approvals": Approval.objects.select_related("incident", "created_by").filter(user=request.user).filter(Q(outcome="") | Q(score=0)),
+        "approvals": (
+            Approval.objects
+                .select_related("incident", "created_by")
+                .filter(user=request.user)
+                .filter(Q(outcome="", type__in=[Approval.RCA, Approval.NOTIFICATION]) | Q(score=0, type=Approval.CLOSE_OUT))
+        ),
         "anniversaries": anniversaries
     }
 
@@ -601,9 +606,22 @@ def approval_detail(request, pk):
                     obj.incident.notification_time_approved = now()
                     obj.incident.save()
                 if obj.outcome == Approval.ACCEPTED and obj.type == Approval.RCA:
-                    obj.rca_report_time_approved = now()
-                    obj.incident.save()
-                # todo: add logic for saving time approved of close-out slide?
+
+                    se_approved = obj.incident.approvals.filter(outcome=Approval.ACCEPTED, type=Approval.RCA, role=Approval.SECTION_ENGINEER).exists()
+                    sem_approved = obj.incident.approvals.filter(outcome=Approval.ACCEPTED, type=Approval.RCA, role=Approval.SECTION_ENGINEERING_MANAGER).exists()
+
+                    if se_approved and sem_approved:
+                        obj.incident.rca_report_time_approved = now()
+                        obj.incident.save()
+
+                if obj.type == Approval.CLOSE_OUT:
+
+                    se_approved = obj.incident.approvals.filter(score__gte=3, type=Approval.CLOSE_OUT, role=Approval.SECTION_ENGINEER).exists()
+                    sem_approved = obj.incident.approvals.filter(score__gte=3, type=Approval.CLOSE_OUT, role=Approval.SECTION_ENGINEERING_MANAGER).exists()
+
+                    if se_approved and sem_approved:
+                        obj.incident.close_out_time_approved = now()
+                        obj.incident.save()
 
             messages.success(request, "Approval outcome has been saved.")
             return HttpResponseRedirect(reverse("home"))
@@ -760,6 +778,37 @@ def incident_rca_report_upload(request, pk):
         messages.success(request, "Incident RCA Report uploaded.")
         return HttpResponseRedirect(reverse("incident_detail", args=[incident.pk]))
 
+@login_required
+def incident_findings_upload(request, pk):
+    """
+    Renders in modal.
+    """
+    incident = get_object_or_404(Incident, id=pk)
+    context = {
+        "incident": incident,
+    }
+
+    Form = modelform_factory(
+        Incident,
+        fields=[
+            "preliminary_findings",
+        ],
+        labels={"preliminary_findings": "Upload Preliminary Findings"},
+    )
+
+    if request.method == "GET":
+        context["form"] = Form(instance=incident)
+        return render(request, "defects/incident_findings_upload.html", context=context)
+
+    if request.method == "POST":
+        form = Form(request.POST, request.FILES, instance=incident)
+        if not form.is_valid():
+            context["form"] = form
+            return render(request, "defects/incident_findings_upload.html", context=context, status=422)
+
+        form.save()
+        messages.success(request, "Incident preliminary findings uploaded.")
+        return HttpResponseRedirect(reverse("incident_detail", args=[incident.pk]))
 
 @login_required
 def incident_list_export(request):
