@@ -341,33 +341,6 @@ class Incident(models.Model):
                         )
                     )
 
-        if self.notification_approved:
-
-            # check for RCA Requirement
-            if self.significant and not self.report_file:
-
-                entries.append(
-                    TimelineEntry(
-                        icon="clock",
-                        title="Upload RCA Report",
-                        text="Is a full RCA Report required? Note that full RCA investigation must be scheduled, conducted and the full RCA report must be submitted within 14 days of submitting the 48H Notification Report. If not required, update the incident's significance.",
-                        links=[
-                            Link(
-                                text="Upload RCA Report",
-                                url=reverse("incident_rca_report_upload", args=[self.pk]),
-                                attrs="up-layer=new"
-                            ),
-                            Link(
-                                text="RCA Not Required",
-                                url="#",
-                                cls="secondary",
-                                attrs="id=trigger-form-incident-not-significant",
-                            ),
-
-                        ],
-                    )
-                )
-
         if self.close_out_time_published:
             entries.append(
                 TimelineEntry(
@@ -458,8 +431,27 @@ class Incident(models.Model):
     def notification_rejected(self):
         return (
             self.notification_time_published is not None
-            and self.approvals.filter(type=Approval.NOTIFICATION).count() > 0
+            and self.approvals.filter(type=Approval.NOTIFICATION).exclude(outcome="").count() > 0
             and not self.notification_approved
+        )
+
+    @cached_property
+    def rca_report_rejected(self):
+        if not self.significant:
+            return False
+
+        return (
+            self.rca_report_time_published
+            and self.approvals.filter(type=Approval.RCA).exclude(outcome="").count() > 0
+            and not self.rca_report_time_approved
+        )
+
+    @cached_property
+    def close_out_rejected(self):
+        return (
+            self.close_out_time_published
+            and self.approvals.filter(type=Approval.CLOSE_OUT).exclude(score=0).count() > 1
+            and not self.close_out_time_approved
         )
 
     @property
@@ -526,12 +518,60 @@ class Incident(models.Model):
                 )
             )
 
+        if self.notification_approved:
+
+            # check for RCA Requirement
+            if self.significant and not self.report_file:
+
+                actions.append(
+                    TimelineEntry(
+                        icon="clock",
+                        title="Upload RCA Report",
+                        text="Is a full RCA Report required? Note that full RCA investigation must be scheduled, conducted and the full RCA report must be submitted within 14 days of submitting the 48H Notification Report. If not required, update the incident's significance.",
+                        links=[
+                            Link(
+                                text="Upload RCA Report",
+                                url=reverse("incident_rca_report_upload", args=[self.pk]),
+                                attrs="up-layer=new"
+                            ),
+                            Link(
+                                text="RCA Not Required",
+                                url="#",
+                                cls="secondary",
+                                attrs="id=trigger-form-incident-not-significant",
+                            ),
+
+                        ],
+                    )
+                )
+
         if self.notification_approved and self.significant and self.report_file and not self.rca_report_time_published:
             actions.append(
                 TimelineEntry(
                     icon="clock",
                     title="Publish RCA Report",
                     links=[
+                        Link(
+                            url=reverse("incident_rca_publish", args=[self.pk]),
+                            text="Publish & Submit For Review",
+                            attrs="up-layer=new",
+                            cls="secondary",
+                        ),
+                    ],
+                )
+            )
+
+        if self.rca_report_rejected:
+            actions.append(
+                TimelineEntry(
+                    icon="clock",
+                    title="Resubmit RCA Report",
+                    links=[
+                        Link(
+                            text="Upload Updated RCA Report",
+                            url=reverse("incident_rca_report_upload", args=[self.pk]),
+                            attrs="up-layer=new"
+                        ),
                         Link(
                             url=reverse("incident_rca_publish", args=[self.pk]),
                             text="Publish & Submit For Review",
@@ -559,6 +599,22 @@ class Incident(models.Model):
                 )
             )
 
+        if self.close_out_rejected:
+            actions.append(
+                TimelineEntry(
+                    icon="clock",
+                    title="Resubmit Close-Out Slide",
+                    links=[
+                        Link(text="Edit Close-Out Slide", url=reverse("incident_close_form", args=[self.pk]), attrs="up-layer=new"),
+                        Link(
+                            url=reverse("incident_close_publish", args=[self.pk]),
+                            text="Publish & Submit For Review",
+                            attrs="up-layer=new",
+                            cls="secondary",
+                        ),
+                    ],
+                )
+            )
 
         if self.close_out_time_approved:
             actions.append(

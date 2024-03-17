@@ -1,6 +1,8 @@
 import enum
 from typing import List
 
+from django.db.models import Count
+
 from .models import Incident
 from dataclasses import dataclass
 from datetime import datetime, timedelta
@@ -38,7 +40,8 @@ def reliability_engineer_actions(user_id) -> List[UserAction]:
     incidents = list(
         Incident.objects.filter(
             created_by_id=user_id,
-        ).prefetch_related("approvals")
+        )
+        .prefetch_related("approvals", "solutions")
     )
     # might need to add another filter to only consider
     # incidents that are "recent"
@@ -71,7 +74,7 @@ def reliability_engineer_actions(user_id) -> List[UserAction]:
             continue
         if i.report_file != "":
             continue
-        if i.notification_time_published is None:
+        if i.notification_time_approved is None:
             continue
         time_required = i.notification_time_published + timedelta(days=14)
         time_remaining = time_required - now()
@@ -83,8 +86,15 @@ def reliability_engineer_actions(user_id) -> List[UserAction]:
             urgency = Urgency.INFO
         actions.append(UserAction(message=message, urgency=urgency, incident=i, time_required=time_required))
 
+    message = "Resubmit Rejected RCA Report"
     for i in incidents:
-        if i.close_out_time_published is None or i.notification_time_published is None:
+        if i.rca_report_rejected:
+            actions.append(UserAction(message=message, time_required=now(), urgency=Urgency.DANGER, incident=i))
+
+    for i in incidents:
+        if i.close_out_time_published is not None:
+            continue
+        if i.close_out_time_approved:
             continue
         if (i.significant and i.rca_report_time_approved) or (not i.significant):
 
@@ -99,11 +109,25 @@ def reliability_engineer_actions(user_id) -> List[UserAction]:
 
             actions.append(UserAction(message="Publish Close-Out Slide", incident=i, urgency=urgency, time_required=time_required))
 
-    # todo: action for create action list 14 days after close-out slide
-    # todo: reminder that planned actions should be verified
+    message = "Resubmit Rejected Close-Out Slide"
+    for i in incidents:
+        if i.close_out_rejected:
+            actions.append(UserAction(message=message, time_required=now(), urgency=Urgency.DANGER, incident=i))
+
+    message = "Add Solutions"
+    for i in incidents:
+        if i.close_out_time_approved and len(i.solutions.all()) == 0:
+            actions.append(UserAction(message=message, time_required=i.close_out_time_approved + timedelta(days=14), urgency=Urgency.INFO, incident=i))
+
+    message = "Verify Completion Date"
+    for i in incidents:
+        if not i.close_out_time_approved:
+            continue
+        for s in i.solutions.all():
+            if s.completion_date and s.completion_date <= now() and not s.date_verified:
+                actions.append(UserAction(message=message, time_required=now(), urgency=Urgency.INFO, incident=i))
 
     return actions
-
 
 def get_user_actions(user) -> List[UserAction]:
     groups = list([g.name for g in user.groups.all()])
