@@ -1,9 +1,6 @@
 import enum
 from typing import List
-
-from django.db.models import Count
-
-from .models import Incident
+from .models import Incident, Approval
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from django.utils.timezone import now
@@ -64,7 +61,7 @@ def reliability_engineer_actions(user_id) -> List[UserAction]:
     # 2 - text changed from SRS document
     message = "Resubmit Rejected 48H Notification"
     for i in incidents:
-        if i.notification_rejected:
+        if i.notification_rejected and not i.has_pending_approval(Approval.NOTIFICATION):
             actions.append(UserAction(message=message, time_required=now(), urgency=Urgency.DANGER, incident=i))
 
     # 3
@@ -88,7 +85,7 @@ def reliability_engineer_actions(user_id) -> List[UserAction]:
 
     message = "Resubmit Rejected RCA Report"
     for i in incidents:
-        if i.rca_report_rejected:
+        if i.rca_report_rejected and not i.has_pending_approval(Approval.RCA):
             actions.append(UserAction(message=message, time_required=now(), urgency=Urgency.DANGER, incident=i))
 
     for i in incidents:
@@ -111,7 +108,7 @@ def reliability_engineer_actions(user_id) -> List[UserAction]:
 
     message = "Resubmit Rejected Close-Out Slide"
     for i in incidents:
-        if i.close_out_rejected:
+        if i.close_out_rejected and not i.has_pending_approval(Approval.CLOSE_OUT):
             actions.append(UserAction(message=message, time_required=now(), urgency=Urgency.DANGER, incident=i))
 
     message = "Add Solutions"
@@ -124,7 +121,7 @@ def reliability_engineer_actions(user_id) -> List[UserAction]:
         if not i.close_out_time_approved:
             continue
         for s in i.solutions.all():
-            if s.completion_date and s.completion_date <= now() and not s.date_verified:
+            if s.planned_completion_date and s.planned_completion_date <= now() and not s.date_verified:
                 actions.append(UserAction(message=message, time_required=now(), urgency=Urgency.INFO, incident=i))
 
     return actions

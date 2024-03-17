@@ -316,6 +316,7 @@ class Incident(models.Model):
                     entries.append(
                         TimelineEntry(
                             icon="clock",
+                            time=self.rca_report_time_published + timedelta(minutes=1),
                             title=f"Awaiting {approval.get_role_display()} approval for RCA report",
                             text=f"{approval.get_role_display()} reviewing: {approval.name}",
                             links=[Link(text="Copy Approval Link", url=reverse("approval_detail", args=[approval.id]), attrs="clipboard-copy-link")],
@@ -423,6 +424,16 @@ class Incident(models.Model):
 
         return sorted(entries, key=lambda x: x.time)
 
+    def has_pending_approval(self, approval_type):
+        for approval in self.approvals.all():
+            if approval.type == approval_type:
+                if approval_type in (Approval.RCA, Approval.NOTIFICATION) and approval.outcome == "":
+                    return True
+                if approval_type == Approval.CLOSE_OUT and approval.score == 0:
+                    return True
+        return False
+
+
     @cached_property
     def notification_approved(self):
         return self.approvals.filter(type=Approval.NOTIFICATION, outcome=Approval.ACCEPTED).exists()
@@ -527,6 +538,7 @@ class Incident(models.Model):
                     TimelineEntry(
                         icon="clock",
                         title="Upload RCA Report",
+                        time=self.notification_time_approved + timedelta(minutes=1),
                         text="Is a full RCA Report required? Note that full RCA investigation must be scheduled, conducted and the full RCA report must be submitted within 14 days of submitting the 48H Notification Report. If not required, update the incident's significance.",
                         links=[
                             Link(
@@ -550,6 +562,7 @@ class Incident(models.Model):
                 TimelineEntry(
                     icon="clock",
                     title="Publish RCA Report",
+                    time=self.notification_time_approved + timedelta(minutes=1),
                     links=[
                         Link(
                             url=reverse("incident_rca_publish", args=[self.pk]),
@@ -561,11 +574,12 @@ class Incident(models.Model):
                 )
             )
 
-        if self.rca_report_rejected:
+        if self.rca_report_rejected and not self.has_pending_approval(Approval.RCA):
             actions.append(
                 TimelineEntry(
                     icon="clock",
                     title="Resubmit RCA Report",
+                    time=self.rca_report_time_published + timedelta(minutes=1),
                     links=[
                         Link(
                             text="Upload Updated RCA Report",
@@ -587,6 +601,7 @@ class Incident(models.Model):
                 TimelineEntry(
                     icon="clock",
                     title="Publish Close-Out Slide",
+                    time=self.notification_time_approved + timedelta(minutes=1),
                     links=[
                         Link(text="Add Info", url=reverse("incident_close_form", args=[self.pk]), attrs="up-layer=new"),
                         Link(
@@ -599,11 +614,12 @@ class Incident(models.Model):
                 )
             )
 
-        if self.close_out_rejected:
+        if self.close_out_rejected and not self.has_pending_approval(Approval.CLOSE_OUT):
             actions.append(
                 TimelineEntry(
                     icon="clock",
                     title="Resubmit Close-Out Slide",
+                    time=self.close_out_time_published + timedelta(minutes=1),
                     links=[
                         Link(text="Edit Close-Out Slide", url=reverse("incident_close_form", args=[self.pk]), attrs="up-layer=new"),
                         Link(
