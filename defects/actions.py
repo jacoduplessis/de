@@ -121,7 +121,7 @@ def reliability_engineer_actions(user_id) -> List[UserAction]:
         if not i.close_out_time_approved:
             continue
         for s in i.solutions.all():
-            if s.planned_completion_date and s.planned_completion_date <= now() and not s.date_verified:
+            if s.planned_completion_date and s.planned_completion_date <= now().date() and not s.date_verified:
                 actions.append(UserAction(message=message, time_required=now(), urgency=Urgency.INFO, incident=i))
 
     return actions
