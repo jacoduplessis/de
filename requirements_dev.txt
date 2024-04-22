@@ -4,11 +4,11 @@
 #
 #    pip-compile --extra=dev --output-file=requirements_dev.txt pyproject.toml
 #
-asgiref==3.7.2
+asgiref==3.8.1
     # via django
 brotli==1.1.0
     # via fonttools
-build==1.1.1
+build==1.2.1
     # via pip-tools
 certifi==2024.2.2
     # via sentry-sdk
@@ -16,9 +16,9 @@ cffi==1.16.0
     # via weasyprint
 click==8.1.7
     # via pip-tools
-coverage==7.4.3
+coverage==7.4.4
     # via anglo-defects (pyproject.toml)
-crispy-bootstrap5==0.7
+crispy-bootstrap5==2024.2
     # via anglo-defects (pyproject.toml)
 cssselect2==0.7.0
     # via weasyprint
@@ -28,7 +28,7 @@ diff-match-patch==20230430
     # via django-import-export
 dj-database-url==2.1.0
     # via anglo-defects (pyproject.toml)
-django==4.2.6
+django==5.0.4
     # via
     #   anglo-defects (pyproject.toml)
     #   crispy-bootstrap5
@@ -36,19 +36,19 @@ django==4.2.6
     #   django-auditlog
     #   django-crispy-forms
     #   django-import-export
-django-auditlog==2.3.0
+django-auditlog==3.0.0
     # via anglo-defects (pyproject.toml)
-django-crispy-forms==2.0
+django-crispy-forms==2.1
     # via
     #   anglo-defects (pyproject.toml)
     #   crispy-bootstrap5
-django-import-export==3.3.1
+django-import-export==3.3.8
     # via anglo-defects (pyproject.toml)
 et-xmlfile==1.1.0
     # via openpyxl
-fonttools[woff]==4.49.0
+fonttools[woff]==4.51.0
     # via weasyprint
-gunicorn==21.2.0
+gunicorn==22.0.0
     # via anglo-defects (pyproject.toml)
 html5lib==1.1
     # via weasyprint
@@ -64,13 +64,13 @@ packaging==24.0
     # via
     #   build
     #   gunicorn
-pillow==10.0.1
+pillow==10.3.0
     # via
     #   anglo-defects (pyproject.toml)
     #   weasyprint
 pip-tools==7.4.1
     # via anglo-defects (pyproject.toml)
-pycparser==2.21
+pycparser==2.22
     # via cffi
 pydyf==0.9.0
     # via weasyprint
@@ -82,19 +82,19 @@ pyproject-hooks==1.0.0
     #   pip-tools
 python-dateutil==2.9.0.post0
     # via django-auditlog
-python-dotenv==1.0.0
+python-dotenv==1.0.1
     # via anglo-defects (pyproject.toml)
 pyyaml==6.0.1
     # via tablib
-redis==5.0.1
+redis==5.0.3
     # via anglo-defects (pyproject.toml)
-sentry-sdk==1.31.0
+sentry-sdk==1.45.0
     # via anglo-defects (pyproject.toml)
 six==1.16.0
     # via
     #   html5lib
     #   python-dateutil
-sqlparse==0.4.4
+sqlparse==0.5.0
     # via django
 tablib[html,ods,xls,xlsx,yaml]==3.5.0
     # via django-import-export
@@ -102,20 +102,20 @@ tinycss2==1.2.1
     # via
     #   cssselect2
     #   weasyprint
-typing-extensions==4.10.0
+typing-extensions==4.11.0
     # via dj-database-url
 urllib3==2.2.1
     # via sentry-sdk
-weasyprint==60.1
+weasyprint==61.2
     # via anglo-defects (pyproject.toml)
 webencodings==0.5.1
     # via
     #   cssselect2
     #   html5lib
     #   tinycss2
-wheel==0.42.0
+wheel==0.43.0
     # via pip-tools
-whitenoise==6.5.0
+whitenoise==6.6.0
     # via anglo-defects (pyproject.toml)
 xlrd==2.0.1
     # via tablib
