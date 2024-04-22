@@ -16,7 +16,7 @@
     <div class="row" up-poll up-interval="4000" id="dashboard-data-row">
 
       <div class="col-12 col-lg-6 my-3">
-        <h6 class="text-body-secondary">Ongoing Reliability Incidents</h6>
+        <h6 class="text-body-secondary">Ongoing RIs</h6>
 
         {% include 'defects/_dashboard_count_table.html' with rows=operations title="Operation" %}
         {% include 'defects/_dashboard_count_table.html' with rows=areas title="Area" %}
@@ -31,7 +31,7 @@
           <table class="table table-sm table-striped">
             <thead>
             <tr>
-              <th>Incident</th>
+              <th>RI No</th>
               <th>Type</th>
               <th>Requester</th>
               <th>Action</th>
@@ -55,7 +55,7 @@
         <table class="table table-sm table-striped">
           <thead>
           <tr>
-            <th>Incident</th>
+            <th>RI No</th>
             <th>Action</th>
             <th>Required By</th>
           </tr>
@@ -76,7 +76,7 @@
         <table class="table table-sm table-striped">
           <thead>
           <tr>
-            <th>Incident</th>
+            <th>RI No</th>
             <th>Anniversary Date</th>
             <th>Anniversary Status</th>
           </tr>
