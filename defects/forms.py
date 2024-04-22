@@ -42,11 +42,11 @@ class IncidentCreateForm(forms.ModelForm):
             "preliminary_findings",
         ]
         labels = {
-            "short_description": "Short Description",
+            "short_description": "Incident Description Header",
             "section_engineer": "Section Engineer",
             "time_start": "Incident Start Time",
             "time_end": "Incident End Time",
-            "equipment": "Equipment (from SAP)",
+            "equipment": "Functional Location",
             "preliminary_findings": "Preliminary Findings",
         }
 
