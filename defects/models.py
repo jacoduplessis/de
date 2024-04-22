@@ -40,6 +40,7 @@ class Area(models.Model):
 
 class Section(models.Model):
     name = models.CharField(max_length=200)
+    code = models.CharField(max_length=100, blank=True)
     order_index = models.PositiveIntegerField(default=0)
 
     def __str__(self):

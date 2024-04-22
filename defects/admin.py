@@ -57,6 +57,7 @@ class AreaAdmin(admin.ModelAdmin):
 class SectionAdmin(admin.ModelAdmin):
     list_display = [
         "name",
+        "code",
         "order_index"
     ]
 
