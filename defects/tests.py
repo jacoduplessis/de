@@ -41,7 +41,7 @@ class TestApprovals(TestCase):
         re_user = User.objects.get(username="reliability_engineer")
         sem_user = User.objects.get(username="section_engineering_manager")
 
-        incident = Incident.objects.create(created_by=re_user, time_start=now(), code=Incident.generate_incident_code())
+        incident = Incident.objects.create(created_by=re_user, time_start=now(), code=Incident.generate_incident_code("TEST"))
         approval = Approval.objects.create(user=sem_user, created_by=re_user, incident=incident, type=Approval.NOTIFICATION)
 
         self.assertIsNone(incident.notification_time_approved)
@@ -74,7 +74,7 @@ class TestUserActions(TestCase):
 
     def test_notification_user_action(self):
         re_user = User.objects.get(username="reliability_engineer")
-        incident = Incident.objects.create(created_by=re_user, time_start=now(), time_end=now(), code=Incident.generate_incident_code())
+        incident = Incident.objects.create(created_by=re_user, time_start=now(), time_end=now(), code=Incident.generate_incident_code("TEST"))
 
         ua = get_user_actions(re_user)
         self.assertEqual(len(ua), 1)
@@ -104,7 +104,7 @@ class TestIncidentCalculations(TestCase):
     def test_notification_overdue(self):
         ten_hours_ago = now() - timedelta(hours=10)
         sixty_hours_ago = now() - timedelta(hours=60)
-        incident = Incident.objects.create(time_start=ten_hours_ago, time_end=ten_hours_ago, code=Incident.generate_incident_code())
+        incident = Incident.objects.create(time_start=ten_hours_ago, time_end=ten_hours_ago, code=Incident.generate_incident_code("TEST"))
         self.assertFalse(incident.notification_overdue)
         incident.time_start = sixty_hours_ago
         incident.time_end = sixty_hours_ago

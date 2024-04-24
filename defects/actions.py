@@ -95,6 +95,7 @@ def reliability_engineer_actions(user_id) -> List[UserAction]:
             continue
         if (i.significant and i.rca_report_time_approved) or (not i.significant):
 
+            print(i.code, i.id, i.notification_time_published)
             time_required = i.notification_time_published + timedelta(days=14)
             time_remaining = time_required - now()
             if time_remaining < timedelta(hours=0):

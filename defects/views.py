@@ -23,7 +23,6 @@ from .exports import export_table_csv
 from .forms import (
     IncidentCreateForm,
     IncidentNotificationApprovalSendForm,
-    IncidentCloseForm,
     IncidentUpdateForm,
     ApprovalForm,
     IncidentFilterForm,
@@ -218,7 +217,17 @@ def incident_create(request):
             context = {"form": form}
             return render(request, template_name, context=context, status=422)
         obj = form.save(commit=False)
-        obj.code = Incident.generate_incident_code()
+
+        section_id = obj.section_id
+        section_code = "XXX"
+        try:
+            assert section_id is not None
+            section_code = Section.objects.get(id=section_id).code
+            assert section_code != ""
+        except (AssertionError, Section.DoesNotExist):
+            pass
+
+        obj.code = Incident.generate_incident_code(section_code=section_code, incident_type="RI")
         obj.created_by = request.user
         obj.save()
         messages.success(request, f"Incident created with RI Number {obj.code}")
@@ -317,7 +326,7 @@ def incident_notification_pdf(request, pk):
     from weasyprint import HTML
     from .reports import url_fetcher
 
-    qs = Incident.objects.prefetch_related("images")
+    qs = Incident.objects.prefetch_related("images").select_related("section")
 
     incident = get_object_or_404(qs, pk=pk)
 
@@ -325,10 +334,12 @@ def incident_notification_pdf(request, pk):
 
     markup = render_to_string("defects/reports/notification.html", context=context, request=request)
 
+    file_name = f"AMB 48H RI - {incident.section.code} - {incident.short_description} - ({incident.time_start.strftime("%d.%m.%Y")}).pdf"
+
     response = HttpResponse(
         headers={
             "Content-Type": "application/pdf",
-            # "Content-Disposition": f'attachment; filename="notification-{incident.code}.pdf"',
+            "Content-Disposition": f'attachment; filename="{file_name}"',
         }
     )
 
@@ -413,9 +424,9 @@ def incident_close_form(request, pk):
 
     if request.method == "GET":
         initial = {
-            "close_out_short_term_date": now() + timedelta(days=30),
-            "close_out_medium_term_date": now() + timedelta(days=180),
-            "close_out_long_term_date": now() + timedelta(days=365),
+            "close_out_short_term_date": incident.time_start + timedelta(days=30),
+            "close_out_medium_term_date": incident.time_start + timedelta(days=180),
+            "close_out_long_term_date": incident.time_start + timedelta(days=365),
         }
 
         context = {
@@ -442,7 +453,7 @@ def incident_close_form(request, pk):
     initial = {"incident_date": now(), "short_description": words(8)}
 
     context = {
-        "form": IncidentCloseForm(initial=initial),
+        "form": IncidentCloseOutForm(initial=initial),
     }
     return render(request, "defects/incident_close_form.html", context)
 
@@ -715,7 +726,6 @@ def incident_solution_create(request, pk):
             "timeframe",
             "priority",
             "description",
-            "dr_number",
             "person_responsible",
             "planned_completion_date",
             "remarks",

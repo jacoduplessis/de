@@ -3,7 +3,7 @@
 <main>
 
   <div class="d-flex justify-content-between">
-    <h2>Reliability Incident Close Out Data</h2>
+    <h2>RI Close-Out Slide</h2>
 
   </div>
 
@@ -15,10 +15,11 @@
       {{ form|crispy }}
       <input type="submit" value="Save" class="btn btn-primary">
     </form>
-  </div>
-  <div>
+
+    {% include "defects/_datepicker.html" %}
 
   </div>
+
 
 </main>
 

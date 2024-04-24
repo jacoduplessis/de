@@ -41,6 +41,7 @@ class IncidentCreateForm(forms.ModelForm):
             "time_end",
             "preliminary_findings",
         ]
+
         labels = {
             "short_description": "Incident Description Header",
             "section_engineer": "Section Engineer",
@@ -100,21 +101,24 @@ class IncidentUpdateForm(forms.ModelForm):
             "remaining_risk",
         ]
         labels = {
-            "short_description": "Short Description",
-            "long_description": "Long Description",
+            "short_description": "Incident Description Header",
+            "long_description": "Incident Description (Production Loss, Asset Damage, Theft, Fire, etc.)",
             "section_engineer": "Section Engineer",
             "time_start": "Incident Start Time",
             "time_end": "Incident End Time",
-            "equipment": "Equipment (from SAP)",
+            "equipment": "Functional Location",
+            "trigger": "Reliability Incident Effect",
+            "production_value_loss": "Production Value Loss",
+            "repair_cost": "Repair Cost",
+            "immediate_action_taken": "Immediate Action That Was Taken (Describe the Immediate Action Taken)",
+            "remaining_risk": "Indicate the Remaining Risk (After Immediate Action Was Taken)",
         }
 
         help_texts = {
             "significant": "Is this a significant incident?",
-            "remaining_risk": "Indicate the remaining risk after immediate action was taken.",
-            "immediate_action_taken": "Describe the immediate action taken.",
-            "long_description": "Production Loss, Asset Damage, Theft, Fire, Etc.",
             "production_value_loss": "In Pt Ounces",
-            "trigger": "Choose the trigger that occurred first."
+            "repair_cost": "In South African Rand (ZAR)",
+            "trigger": "Choose the reliability incident effect (i.e. trigger) that occurred first."
         }
 
         widgets = {
@@ -196,50 +200,6 @@ class IncidentRCAApprovalSendForm(forms.Form):
         required=True,
     )
 
-
-class IncidentCloseForm(forms.Form):
-    """
-    Incident description headline	Greyed out field. (from Log Notification.)
-    Date of Incident Ocurrance	    Greyed out field. (from Log Notification.)
-    Immediate Cause	                Freeform text input field. Info pop up icon showing "Incident Description (Production Loss, Asset Damage, Theft, Fire, Etc.)" (from Create 48H Notification Report). Ability to upload photos or pull in  photo(s) from Create 48H Notification Report.
-    Root Cause	                    Freeform text input field.
-    Downtime & Repair Cost	        "Precalculate downtime from incident start and end times in Create 48H Notification Report.
-                                    Precaculate ounces values lost and rand value lost from Create 48H Notification Report.
-                                    Ability to override if necessary for some additional cost / downtime to be incorporated."
-    Short Term Action	            Bullet list entries with accompanying date when to implement dd:mm
-    Medium Term Action	            Bullet list entries with accompanying date when to implement dd:mm
-    Long Term Action	            Bullet list entries with accompanying date when to implement dd:mm
-    Reliability Engineering
-    Close Out Confidence	        Rating out of 5 Stars
-    Email the following people
-    to rate Close out confidience	Dropdown searchable list of other SE and SEM to complete close out rating
-    """
-
-    short_description = forms.CharField(required=False)
-    incident_date = forms.DateField(required=False)
-    immediate_cause = forms.CharField(widget=widgets.Textarea(), required=False)
-    root_cause = forms.CharField(widget=widgets.Textarea(), required=False)
-    short_term_action = forms.CharField(widget=widgets.Textarea(), required=False)
-    medium_term_action = forms.CharField(widget=widgets.Textarea(), required=False)
-    long_term_action = forms.CharField(widget=widgets.Textarea(), required=False)
-    re_close_out_confidence_rating = forms.ChoiceField(
-        choices=[(f"{x}", f"{x}") for x in range(1, 6)],
-        label="RE Close-Out Confidence rating",
-        required=False,
-        help_text="Provide confidence rating out of 5.",
-    )
-    se_close_out_confidence = forms.ChoiceField(
-        choices=[],
-        required=False,
-        label="SE Close-Out Confidence",
-        help_text="The SE selected here will be notified and asked to provide a confidence rating.",
-    )
-    sem_close_out_confidence = forms.ChoiceField(
-        choices=[],
-        required=False,
-        label="SEM Close-Out Confidence",
-        help_text="The SEM selected here will be notified and asked to provide a confidence rating.",
-    )
 
 
 class ApprovalForm(forms.ModelForm):
@@ -331,17 +291,18 @@ class IncidentCloseOutForm(forms.ModelForm):
             "close_out_short_term_date": "Format: YYYY-MM-DD",
             "close_out_medium_term_date": "Format: YYYY-MM-DD",
             "close_out_long_term_date": "Format: YYYY-MM-DD",
+            "close_out_confidence": "A rating of 3+ (out of 5) suggests you are confident that the root cause has been identified and sufficiently addressed.",
         }
 
         labels = {
             "close_out_immediate_cause": "Immediate Cause",
             "close_out_root_cause": "Root Cause",
-            "close_out_short_term_actions": "Short Term Actions",
-            "close_out_short_term_date": "Short Term Date",
-            "close_out_medium_term_actions": "Medium Term Actions",
-            "close_out_medium_term_date": "Medium Term Date",
-            "close_out_long_term_actions": "Long Term Actions",
-            "close_out_long_term_date": "Long Term Date",
+            "close_out_short_term_actions": "Short-Term Actions (complete in 3 months)",
+            "close_out_short_term_date": "Short-Term Date",
+            "close_out_medium_term_actions": "Medium-Term Actions (complete in 3-6 months)",
+            "close_out_medium_term_date": "Medium-Term Date",
+            "close_out_long_term_actions": "Long-Term Actions (complete in 6-12 months)",
+            "close_out_long_term_date": "Long-Term Date",
             "close_out_confidence": "RE Confidence Rating",
         }
 

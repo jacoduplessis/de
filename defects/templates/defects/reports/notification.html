@@ -6,12 +6,25 @@
   @page {
     size: A4; /* Change from the default size of A4 */
     margin: 1cm; /* Set margin on each page */
+    margin-bottom: 3cm;
+  }
+
+  @page {
+    @bottom-left {
+      content: "Disclaimer: The information contained in this document is not prescriptive. It is indicative of good practice and is intended as information for site specific interpretation and application by the responsible parties within the Anglo American plc Group. The material contained herein is based on information believed to be reliable, however, no representation or warranty, express or implied, as to the accuracy or completeness thereof is made. No responsibility is accepted by Anglo American plc or any of its subsidiaries or associated companies for any loss or damage of whatsoever nature arising out of the use of, adherence to or the lack thereof to any part of this information."
+    }
+  }
+
+  @page {
+    @top-right {
+      content: "[Official]"
+    }
   }
 
   /* start reset */
   html {
     box-sizing: border-box;
-    font-size: 12px;
+    font-size: 8pt;
     font-family: Arial, "Helvetica Neue", sans-serif;
   }
 
@@ -56,7 +69,7 @@
   table,
   th,
   td {
-    padding: 5px 4px;
+    padding: 8px 6px;
     border: 1px solid black;
     border-collapse: collapse;
   }
@@ -72,7 +85,11 @@
 
 </style>
 
-<img src="static:anglo-american-logo-colour.png" style="width: 200px">
+<div style="display: flex; justify-content: space-between; align-items: baseline">
+  <img src="static:anglo-american-logo-colour.png" style="width: 200px">
+  <img src="static:slogan.png" style="width: 200px;">
+</div>
+
 <div style="text-align: center; padding-bottom: 1rem">
   <h1 style="color: red; font-weight: bold; font-size: 1.7rem" class="uppercase">Reliability Incident 48 Hour Notification</h1>
 </div>
@@ -83,7 +100,7 @@
     <th>Area</th>
     <th>Section</th>
     <th>Functional Location</th>
-    <th>RI Number</th>
+    <th>RI No.</th>
   </tr>
   <tr>
     <td>{{ incident.operation }}</td>
@@ -109,17 +126,15 @@
 </table>
 <table>
   <tr>
-    <th>
-      Incident Description
-    </th>
+    <th>Incident Description (Production Loss, Asset Damage, Theft, Fire, etc.)</th>
   </tr>
   <tr>
-    <td>{{ incident.long_description|linebreaks }}</td>
+    <td style="text-align: justify">{{ incident.long_description|linebreaks }}</td>
   </tr>
 </table>
 <table>
   <tr>
-    <th colspan="8">Reliability Incident Trigger</th>
+    <th colspan="8">Potential Reliability Incident Effect</th>
   </tr>
   <tr>
     <td>Estimated Cost of Repair > R250k</td>
@@ -134,20 +149,20 @@
 </table>
 <table>
   <tr>
-    <th>Immediate action that was taken</th>
+    <th>Immediate action that was taken (describe the immediate action taken)</th>
   </tr>
   <tr>
-    <td>{{ incident.immediate_action_taken|linebreaks }}</td>
+    <td style="text-align: justify">{{ incident.immediate_action_taken|linebreaks }}</td>
   </tr>
   <tr>
     <th>Indicate the remaining risk (After immediate action was taken)</th>
   </tr>
   <tr>
-    <td>{{ incident.remaining_risk|linebreaks }}</td>
+    <td style="text-align: justify">{{ incident.remaining_risk|linebreaks }}</td>
   </tr>
   {% if images %}
     <tr>
-      <th>Pictures</th>
+      <th>Pictures (if applicable)</th>
     </tr>
     <tr>
       <td>

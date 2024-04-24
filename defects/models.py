@@ -161,9 +161,10 @@ class Incident(models.Model):
         super().save(*args, **kwargs)
 
     @classmethod
-    def generate_incident_code(cls):
-        allowed_chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
-        return now().strftime("%Y%m") + "_" + get_random_string(length=6, allowed_chars=allowed_chars)
+    def generate_incident_code(cls, section_code, incident_type="RI"):
+        prefix = f"{section_code}_{incident_type}_{now().strftime("%Y")}"
+        count = 1 + Incident.objects.filter(code__startswith=prefix).count()
+        return f"{prefix}_{count}"
 
     @property
     def status_class(self):
@@ -434,6 +435,11 @@ class Incident(models.Model):
                     return True
         return False
 
+    @property
+    def notification_notice_text(self):
+        return """The Reliability Engineer (RE) and the Section Engineer (SE) must collaborate
+        to create the 48H notification report, which requires both parties to agree on its content
+        before the RE submits it to the Section Engineering Manager (SEM) for approval."""
 
     @cached_property
     def notification_approved(self):
@@ -508,7 +514,7 @@ class Incident(models.Model):
                     icon="clock",
                     title="Create 48H notification report",
                     time=self.time_end + timedelta(hours=48),
-                    text=self.notification_deadline_text,
+                    text=self.notification_deadline_text + "\n\n" + self.notification_notice_text,
                     links=[
                         Link(
                             text="Add Information",
@@ -601,10 +607,11 @@ class Incident(models.Model):
             actions.append(
                 TimelineEntry(
                     icon="clock",
-                    title="Publish Close-Out Slide",
+                    title="Create Close-Out Slide",
                     time=self.notification_time_approved + timedelta(minutes=1),
+                    text="The Reliability Engineer (RE) and the Section Engineer (SE) must collaborate to create the Close-Out Slide, which requires both parties to agree on its content before the RE submits it to the Section Engineering Manager (SEM) for approval.",
                     links=[
-                        Link(text="Add Info", url=reverse("incident_close_form", args=[self.pk]), attrs="up-layer=new"),
+                        Link(text="Add Information", url=reverse("incident_close_form", args=[self.pk]), attrs="up-layer=new"),
                         Link(
                             url=reverse("incident_close_publish", args=[self.pk]),
                             text="Publish & Submit For Review",
@@ -678,9 +685,9 @@ class Solution(models.Model):
     LONG_TERM = "long_term"
 
     TIMEFRAME_CHOICES = (
-        (SHORT_TERM, "Short Term"),
-        (MEDIUM_TERM, "Medium Term"),
-        (LONG_TERM, "Long Term"),
+        (SHORT_TERM, "Short-Term Actions (complete in 3 months)"),
+        (MEDIUM_TERM, "Medium-Term Actions (complete in 3-6 months)"),
+        (LONG_TERM, "Long-Term Actions (complete in 6-12 months)"),
     )
 
     PRIORITY_CHOICES = (
