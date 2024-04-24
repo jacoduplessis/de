@@ -161,9 +161,10 @@ class Incident(models.Model):
         super().save(*args, **kwargs)
 
     @classmethod
-    def generate_incident_code(cls, section_code, incident_type="RI"):
+    def generate_incident_code(cls, section_code, incident_type="RI", count=None):
         prefix = f"{section_code}_{incident_type}_{now().strftime("%Y")}"
-        count = 1 + Incident.objects.filter(code__startswith=prefix).count()
+        if count is None:
+            count = 1 + Incident.objects.filter(code__startswith=prefix).count()
         return f"{prefix}_{count}"
 
     @property

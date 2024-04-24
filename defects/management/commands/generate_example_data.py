@@ -108,7 +108,7 @@ class Command(BaseCommand):
 
             incidents = [
                 Incident(
-                    code=Incident.generate_incident_code(),
+                    code=Incident.generate_incident_code("TEST", count=1),
                     section=tumela,
                     operation=amb,
                     status=Incident.ACTIVE,
@@ -121,7 +121,7 @@ class Command(BaseCommand):
                     long_description="\n\n".join(paragraphs(3, common=False)),
                 ),
                 Incident(
-                    code=Incident.generate_incident_code(),
+                    code=Incident.generate_incident_code("TEST", count=2),
                     section=aps,
                     operation=amb,
                     status=Incident.ACTIVE,
@@ -134,7 +134,7 @@ class Command(BaseCommand):
                     long_description="\n\n".join(paragraphs(3, common=False)),
                 ),
                 Incident(
-                    code=Incident.generate_incident_code(),
+                    code=Incident.generate_incident_code("TEST", count=3),
                     section=dishaba,
                     operation=amb,
                     status=Incident.ACTIVE,
@@ -147,7 +147,7 @@ class Command(BaseCommand):
                     long_description="\n\n".join(paragraphs(3, common=False)),
                 ),
                 Incident(
-                    code=Incident.generate_incident_code(),
+                    code=Incident.generate_incident_code("TEST", count=4),
                     section=concentrators,
                     operation=amb,
                     status=Incident.OVERDUE,
