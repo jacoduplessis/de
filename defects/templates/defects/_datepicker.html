@@ -1,18 +1,32 @@
 <script>
   document.querySelectorAll('.datetimeinput').forEach(el => {
-    flatpickr(el, {
+
+    const config = {
       enableTime: true,
       time_24hr: true,
       minuteIncrement: 1,
       allowInput: true,
-    });
+    }
+
+    if (el.hasAttribute("historic")) {
+      config.maxDate = new Date()
+    }
+
+    flatpickr(el, config);
   });
 
   document.querySelectorAll('.dateinput').forEach(el => {
-    flatpickr(el, {
+
+    const config = {
       enableTime: false,
       allowInput: true,
-    });
+    }
+
+    if (el.hasAttribute("historic")) {
+      config.maxDate = new Date()
+    }
+
+    flatpickr(el, config);
   });
 
 

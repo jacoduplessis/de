@@ -58,6 +58,10 @@ class IncidentCreateForm(forms.ModelForm):
         self.fields["equipment"].choices = []  # load options with ajax
         self.fields["section_engineer"].queryset = User.objects.filter(groups__name__in=["section_engineer"]).distinct()
 
+        self.fields["time_start"].widget.attrs.update({"historic": ""})
+        self.fields["time_end"].widget.attrs.update({"historic": ""})
+
+
     def clean(self):
         super().clean()
         time_start = self.cleaned_data.get("time_start")
