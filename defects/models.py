@@ -16,6 +16,11 @@ from auditlog.registry import auditlog
 from auditlog.models import AuditlogHistoryField
 
 
+"""
+Hierarchy
+Operation > Area > Section
+"""
+
 class Operation(models.Model):
     name = models.CharField(max_length=200)
     order_index = models.PositiveIntegerField(default=0)
