@@ -215,7 +215,14 @@ class ApprovalForm(forms.ModelForm):
             "comment",
         ]
 
-        help_texts = {"score": "Please provide a score between 1-5"}
+        labels = {
+            "score": "Confidence Rating"
+        }
+
+        help_texts = {
+            "score": "A rating of 3+ (out of 5) suggests you are confident that the root cause has been identified and sufficiently addressed.",
+            "comment": "A comment should be provided in the case of rejecting an approval request."
+        }
 
         widgets = {
             "score": widgets.Select(
@@ -225,10 +232,16 @@ class ApprovalForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.instance.type == Approval.CLOSE_OUT:
-            del self.fields["outcome"]
         if self.instance.type in [Approval.NOTIFICATION, Approval.RCA]:
             del self.fields["score"]
+
+    def clean(self):
+        super().clean()
+        comment = self.cleaned_data.get("comment")
+        outcome = self.cleaned_data.get("outcome")
+
+        if outcome == Approval.REJECTED and comment == "":
+            self.add_error("comment", "A comment must be provided when an approval request is rejected.")
 
 
 class IncidentFilterForm(forms.Form):

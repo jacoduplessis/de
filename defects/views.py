@@ -627,8 +627,8 @@ def approval_detail(request, pk):
 
                 if obj.type == Approval.CLOSE_OUT:
 
-                    se_approved = obj.incident.approvals.filter(score__gte=3, type=Approval.CLOSE_OUT, role=Approval.SECTION_ENGINEER).exists()
-                    sem_approved = obj.incident.approvals.filter(score__gte=3, type=Approval.CLOSE_OUT, role=Approval.SECTION_ENGINEERING_MANAGER).exists()
+                    se_approved = obj.incident.approvals.filter(outcome=Approval.ACCEPTED, type=Approval.CLOSE_OUT, role=Approval.SECTION_ENGINEER).exists()
+                    sem_approved = obj.incident.approvals.filter(outcome=Approval.ACCEPTED, type=Approval.CLOSE_OUT, role=Approval.SECTION_ENGINEERING_MANAGER).exists()
 
                     if se_approved and sem_approved:
                         obj.incident.close_out_time_approved = now()

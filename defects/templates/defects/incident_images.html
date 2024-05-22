@@ -31,6 +31,7 @@
 
 
   <h4>Upload Images</h4>
+  <p>Please note that you can only upload three images (with captions) at a time.</p>
   <form method="post" enctype="multipart/form-data" up-submit>
     {% csrf_token %}
     {{ formset|crispy }}
