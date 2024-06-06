@@ -235,7 +235,7 @@ def incident_create(request):
 
     if request.method == "GET":
         context = {
-            "form": IncidentCreateForm(initial={"time_start": now() - timedelta(hours=2), "time_end": now() + timedelta(hours=2)}),
+            "form": IncidentCreateForm(initial={"time_start": now() - timedelta(hours=2), "time_end": now()}),
         }
         return render(request, template_name, context)
 
