@@ -424,7 +424,7 @@ def incident_close_form(request, pk):
 
     if request.method == "GET":
         initial = {
-            "close_out_short_term_date": incident.time_start + timedelta(days=30),
+            "close_out_short_term_date": incident.time_start + timedelta(days=90),
             "close_out_medium_term_date": incident.time_start + timedelta(days=180),
             "close_out_long_term_date": incident.time_start + timedelta(days=365),
         }
