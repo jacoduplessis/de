@@ -339,7 +339,7 @@ def incident_notification_pdf(request, pk):
     response = HttpResponse(
         headers={
             "Content-Type": "application/pdf",
-            "Content-Disposition": f'attachment; filename="{file_name}"',
+            "Content-Disposition": f'filename="{file_name}"',
         }
     )
 
@@ -364,7 +364,7 @@ def incident_anniversary_pdf(request, pk):
     response = HttpResponse(
         headers={
             "Content-Type": "application/pdf",
-            # "Content-Disposition": f'attachment; filename="notification-{incident.code}.pdf"',
+            "Content-Disposition": f'filename="anniversary-{incident.code}.pdf"',
         }
     )
 
@@ -409,7 +409,7 @@ def incident_close_pdf(request, pk):
     response = HttpResponse(
         headers={
             "Content-Type": "application/pdf",
-            #   "Content-Disposition": f'attachment; filename="close-{incident.code}.pdf"',
+            "Content-Disposition": f'filename="close-{incident.code}.pdf"',
         }
     )
 
