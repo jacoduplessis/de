@@ -128,9 +128,10 @@ class Incident(models.Model):
     close_out_medium_term_actions = models.TextField(blank=True)
     close_out_long_term_date = models.DateField(null=True, blank=True)
     close_out_long_term_actions = models.TextField(blank=True)
-    close_out_confidence = models.PositiveIntegerField(default=0)
+    close_out_confidence = models.PositiveIntegerField(default=0)  # RE score
     close_out_time_published = models.DateTimeField(blank=True, null=True)
     close_out_time_approved = models.DateTimeField(blank=True, null=True)
+    close_out_rating = models.PositiveIntegerField(default=0, editable=False)  # SEM rating / Final Score
 
     history = AuditlogHistoryField(delete_related=False)
 
@@ -532,11 +533,11 @@ class Incident(models.Model):
 
     @property
     def close_out_confidence_filled_stars(self):
-        return range(self.close_out_confidence)
+        return range(self.close_out_rating)
 
     @property
     def close_out_confidence_empty_stars(self):
-        return range(self.close_out_confidence, 1, -1)
+        return range(self.close_out_rating, 1, -1)
 
     @property
     def anniversary_date(self):

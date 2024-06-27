@@ -398,7 +398,17 @@ def incident_close_pdf(request, pk):
 
     incident = get_object_or_404(Incident, pk=pk)
 
-    context = {"incident": incident}
+    se_approval = Approval.objects.select_related("user").order_by("-time_modified").filter(incident=incident, role=Approval.SECTION_ENGINEER, type=Approval.CLOSE_OUT).first()
+    sem_approval = Approval.objects.select_related("user").order_by("-time_modified").filter(incident=incident, role=Approval.SECTION_ENGINEERING_MANAGER, type=Approval.CLOSE_OUT).first()
+
+    # ["name", 1, <date>|<datetime>]
+    ratings = {
+        "re": [incident.created_by.username, incident.close_out_confidence, incident.close_out_time_published],
+        "se": ["---", 0, None] if se_approval is None else [se_approval.user.username, se_approval.score, sem_approval.time_modified],
+        "sem": ["---", 0, None] if sem_approval is None else [sem_approval.user.username, sem_approval.score, sem_approval.time_modified],
+    }
+
+    context = {"incident": incident, "ratings": ratings}
 
     markup = render_to_string("defects/reports/closeout.html", context=context, request=request)
 
@@ -629,7 +639,7 @@ def approval_detail(request, pk):
                 if obj.outcome == Approval.ACCEPTED and obj.type == Approval.CLOSE_OUT and obj.role == Approval.SECTION_ENGINEERING_MANAGER:
 
                     obj.incident.close_out_time_approved = now()
-                    obj.incident.close_out_confidence = obj.score
+                    obj.incident.close_out_rating = obj.score
                     obj.incident.save()
 
             messages.success(request, "Approval outcome has been saved.")
