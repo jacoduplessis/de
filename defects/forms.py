@@ -192,19 +192,26 @@ class IncidentCloseApprovalSendForm(forms.Form):
 
 
 class IncidentRCAApprovalSendForm(forms.Form):
-    se_user = forms.ModelChoiceField(
-        queryset=User.objects.filter(groups__name__in=["section_engineer"]),
-        label="Section Engineer",
+
+
+    def __init__(self, *args, **kwargs):
+
+        role = kwargs.pop("role")
+
+        super().__init__(*args, **kwargs)
+
+        if role == Approval.SENIOR_ASSET_MANAGER:
+            self.fields["user"].label = "Senior Asset Manager"
+            self.fields["user"].queryset = User.objects.filter(groups__name__in=["senior_asset_manager"])
+        elif role == Approval.SECTION_ENGINEERING_MANAGER:
+            self.fields["user"].label = "Section Engineering Manager"
+            self.fields["user"].queryset = User.objects.filter(groups__name__in=["section_engineering_manager"])
+
+    user = forms.ModelChoiceField(
+        queryset=User.objects.all(),
+        label="User",
         required=True,
     )
-
-    sem_user = forms.ModelChoiceField(
-        queryset=User.objects.filter(groups__name__in=["section_engineering_manager"]),
-        label="Section Engineering Manager",
-        required=True,
-    )
-
-
 
 class ApprovalForm(forms.ModelForm):
     class Meta:
@@ -233,6 +240,8 @@ class ApprovalForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if self.instance.type in [Approval.NOTIFICATION, Approval.RCA]:
+            del self.fields["score"]
+        if self.instance.type == Approval.CLOSE_OUT and self.instance.role == Approval.SECTION_ENGINEER:
             del self.fields["score"]
 
     def clean(self):

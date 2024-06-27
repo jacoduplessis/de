@@ -447,6 +447,14 @@ class Incident(models.Model):
         to create the 48H notification report, which requires both parties to agree on its content
         before the RE submits it to the Section Engineering Manager (SEM) for approval."""
 
+
+    @property
+    def rca_notice_text(self):
+        return """The Reliability Engineer (RE) and the Section Engineer (SE) must collaborate
+        to create the RCA Report, which requires both parties to agree on its content.
+        Moreover, before the RE submits it to the Senior Asset Manager (SnrAM) for approval,
+        the RCA Report must have been reviewed by a Senior Reliability Engineer."""
+
     @cached_property
     def notification_approved(self):
         return self.approvals.filter(type=Approval.NOTIFICATION, outcome=Approval.ACCEPTED).exists()
@@ -459,16 +467,40 @@ class Incident(models.Model):
             and not self.notification_approved
         )
 
+    def most_recent_approval_outcome_for_role(self, approval_type, role):
+
+        approvals = sorted([x for x in self.approvals.all() if x.type == approval_type and x.role == role], key=lambda x: x.time_modified, reverse=True)
+        if len(approvals) == 0:
+            return None
+        return approvals[0].outcome
+
     @cached_property
     def rca_report_rejected(self):
         if not self.significant:
             return False
 
+        if self.rca_report_time_approved:
+            return False
+
+        if not self.rca_report_time_published:
+            return False
+
+        sam_rejected = self.most_recent_approval_outcome_for_role(approval_type=Approval.RCA, role=Approval.SENIOR_ASSET_MANAGER) == Approval.REJECTED
+        sem_rejected = self.most_recent_approval_outcome_for_role(approval_type=Approval.RCA, role=Approval.SECTION_ENGINEERING_MANAGER) == Approval.REJECTED
+
+        return sam_rejected or sem_rejected
+
+
+    @cached_property
+    def rca_report_approved_by_senior_asset_manager(self):
+        if not self.significant:
+            return False
+
         return (
             self.rca_report_time_published
-            and self.approvals.filter(type=Approval.RCA).exclude(outcome="").count() > 0
-            and not self.rca_report_time_approved
+            and self.approvals.filter(type=Approval.RCA, role=Approval.SENIOR_ASSET_MANAGER, outcome=Approval.ACCEPTED).count() > 0
         )
+
 
     @cached_property
     def close_out_rejected(self):
@@ -574,12 +606,31 @@ class Incident(models.Model):
             actions.append(
                 TimelineEntry(
                     icon="clock",
-                    title="Publish RCA Report",
+                    title="Publish RCA Report and Submit for Senior Asset Manager (SnrAM) approval",
+                    text=self.rca_notice_text,
                     time=self.notification_time_approved + timedelta(minutes=1),
                     links=[
                         Link(
                             url=reverse("incident_rca_publish", args=[self.pk]),
                             text="Publish & Submit For Review",
+                            attrs="up-layer=new",
+                            cls="secondary",
+                        ),
+                    ],
+                )
+            )
+
+        if self.rca_report_time_published and not Approval.objects.filter(type=Approval.RCA, role=Approval.SENIOR_ASSET_MANAGER, outcome=Approval.ACCEPTED).exists() and not self.rca_report_time_approved:
+            # RCA has been approved by SAM but not yet by SEM
+            actions.append(
+                TimelineEntry(
+                    icon="clock",
+                    title="Submit RCA Report for SEM approval",
+                    time=self.notification_time_approved + timedelta(minutes=1),
+                    links=[
+                        Link(
+                            url=reverse("incident_rca_publish", args=[self.pk]),
+                            text="Submit For Review",
                             attrs="up-layer=new",
                             cls="secondary",
                         ),

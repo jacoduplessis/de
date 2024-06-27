@@ -10,7 +10,7 @@ from django.contrib.auth.models import User
 from django.db import transaction
 from django.db.models import Q, Prefetch, OuterRef, Subquery, Value
 from django.db.models.aggregates import Count
-from django.forms import modelformset_factory, modelform_factory, Textarea
+from django.forms import modelformset_factory, modelform_factory, Textarea, Select
 from django.http import HttpResponseRedirect, JsonResponse, HttpResponse, HttpResponseForbidden, HttpResponseBadRequest
 from django.shortcuts import render, get_object_or_404
 from django.template.loader import render_to_string
@@ -616,23 +616,21 @@ def approval_detail(request, pk):
                 if obj.outcome == Approval.ACCEPTED and obj.type == Approval.NOTIFICATION:
                     obj.incident.notification_time_approved = now()
                     obj.incident.save()
+
                 if obj.outcome == Approval.ACCEPTED and obj.type == Approval.RCA:
 
-                    se_approved = obj.incident.approvals.filter(outcome=Approval.ACCEPTED, type=Approval.RCA, role=Approval.SECTION_ENGINEER).exists()
+                    sam_approved = obj.incident.approvals.filter(outcome=Approval.ACCEPTED, type=Approval.RCA, role=Approval.SENIOR_ASSET_MANAGER).exists()
                     sem_approved = obj.incident.approvals.filter(outcome=Approval.ACCEPTED, type=Approval.RCA, role=Approval.SECTION_ENGINEERING_MANAGER).exists()
 
-                    if se_approved and sem_approved:
+                    if sam_approved and sem_approved:
                         obj.incident.rca_report_time_approved = now()
                         obj.incident.save()
 
-                if obj.type == Approval.CLOSE_OUT:
+                if obj.outcome == Approval.ACCEPTED and obj.type == Approval.CLOSE_OUT and obj.role == Approval.SECTION_ENGINEERING_MANAGER:
 
-                    se_approved = obj.incident.approvals.filter(outcome=Approval.ACCEPTED, type=Approval.CLOSE_OUT, role=Approval.SECTION_ENGINEER).exists()
-                    sem_approved = obj.incident.approvals.filter(outcome=Approval.ACCEPTED, type=Approval.CLOSE_OUT, role=Approval.SECTION_ENGINEERING_MANAGER).exists()
-
-                    if se_approved and sem_approved:
-                        obj.incident.close_out_time_approved = now()
-                        obj.incident.save()
+                    obj.incident.close_out_time_approved = now()
+                    obj.incident.close_out_confidence = obj.score
+                    obj.incident.save()
 
             messages.success(request, "Approval outcome has been saved.")
             return HttpResponseRedirect(reverse("home"))
@@ -720,6 +718,10 @@ def incident_solution_create(request, pk):
     """
     incident = Incident.objects.get(pk=pk)
 
+    section_engineer_choices = [
+        (x.username, x.username) for x in User.objects.filter(groups__name__in=["section_engineer"]).distinct()
+    ]
+
     Form = modelform_factory(
         Solution,
         fields=[
@@ -730,10 +732,15 @@ def incident_solution_create(request, pk):
             "planned_completion_date",
             "remarks",
         ],
+        widgets={
+            "person_responsible": Select(choices=section_engineer_choices)
+        }
     )
 
     if request.method == "GET":
-        form = Form()
+        form = Form(initial={
+            "planned_completion_date": now() + timedelta(days=90),
+        })
         context = {
             "incident": incident,
             "form": form,
@@ -998,8 +1005,12 @@ def incident_rca_approval_request(request, pk):
 
     incident = Incident.objects.select_related("section", "created_by", "section_engineer", "equipment").prefetch_related("images").get(pk=pk)
 
+    role = Approval.SENIOR_ASSET_MANAGER
+    if Approval.objects.filter(inciden=incident, role=Approval.SENIOR_ASSET_MANAGER, outcome=Approval.ACCEPTED).exists():
+        role = Approval.SECTION_ENGINEERING_MANAGER
+
     if request.method == "GET":
-        form = IncidentRCAApprovalSendForm()
+        form = IncidentRCAApprovalSendForm(role=role)
 
         context = {
             "incident": incident,
@@ -1009,7 +1020,7 @@ def incident_rca_approval_request(request, pk):
         return render(request, template_name="defects/incident_rca_approval_request.html", context=context)
 
     if request.method == "POST":
-        form = IncidentRCAApprovalSendForm(request.POST)
+        form = IncidentRCAApprovalSendForm(request.POST, role=role)
 
         if not form.is_valid():
             context = {
@@ -1019,25 +1030,15 @@ def incident_rca_approval_request(request, pk):
             return render(request, template_name="defects/incident_rca_approval_request.html", context=context)
 
         else:
-            sem_user = form.cleaned_data["sem_user"]
-            se_user = form.cleaned_data["se_user"]
+            user = form.cleaned_data["user"]
 
             with transaction.atomic():
-                # create an approval object for SEM
-                Approval.objects.create(
+                # create an approval object
+                approval = Approval.objects.create(
                     created_by=request.user,
-                    name=sem_user.username,
-                    user=sem_user,
-                    role=Approval.SECTION_ENGINEERING_MANAGER,
-                    type=Approval.RCA,
-                    incident=incident,
-                )
-
-                Approval.objects.create(
-                    created_by=request.user,
-                    name=se_user.username,
-                    user=se_user,
-                    role=Approval.SECTION_ENGINEER,
+                    name=user.username,
+                    user=user,
+                    role=role,
                     type=Approval.RCA,
                     incident=incident,
                 )
@@ -1045,5 +1046,5 @@ def incident_rca_approval_request(request, pk):
                 incident.rca_report_time_published = now()
                 incident.save()
 
-            messages.success(request, "RCA report has be sent to SE & SEM for approval.")
+            messages.success(request, f"RCA report has be sent to {approval.get_role_display()} for approval.")
             return HttpResponseRedirect(reverse("incident_detail", args=[incident.pk]))
