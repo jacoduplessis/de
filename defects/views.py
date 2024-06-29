@@ -907,12 +907,10 @@ def solution_update(request, pk):
             "planned_completion_date",
             "actual_completion_date",
             "remarks",
-            "dr_number",
             "date_verified",
             "verification_comment",
         ],
         labels={
-            "dr_number": "DR Number",
             "date_verified": "Date Verified",
         },
         help_texts={"date_verified": "Add a date here to mark the solution as verified. Format: YYYY-MM-DD"},
@@ -1016,7 +1014,7 @@ def incident_rca_approval_request(request, pk):
     incident = Incident.objects.select_related("section", "created_by", "section_engineer", "equipment").prefetch_related("images").get(pk=pk)
 
     role = Approval.SENIOR_ASSET_MANAGER
-    if Approval.objects.filter(inciden=incident, role=Approval.SENIOR_ASSET_MANAGER, outcome=Approval.ACCEPTED).exists():
+    if Approval.objects.filter(incident=incident, role=Approval.SENIOR_ASSET_MANAGER, outcome=Approval.ACCEPTED).exists():
         role = Approval.SECTION_ENGINEERING_MANAGER
 
     if request.method == "GET":
