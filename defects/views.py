@@ -996,6 +996,7 @@ def incident_close_approval_request(request, pk):
                     role=Approval.SECTION_ENGINEER,
                     type=Approval.CLOSE_OUT,
                     incident=incident,
+                    score=incident.close_out_confidence,
                 )
 
                 incident.close_out_time_published = now()

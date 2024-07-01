@@ -242,7 +242,7 @@ class ApprovalForm(forms.ModelForm):
         if self.instance.type in [Approval.NOTIFICATION, Approval.RCA]:
             del self.fields["score"]
         if self.instance.type == Approval.CLOSE_OUT and self.instance.role == Approval.SECTION_ENGINEER:
-            del self.fields["score"]
+            del self.fields["outcome"]
 
     def clean(self):
         super().clean()
