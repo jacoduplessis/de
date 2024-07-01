@@ -14,6 +14,7 @@
       <a href="{% url 'incident_detail' incident.pk %}" class="btn btn-secondary btn-sm">Back to Incident</a>
       {% if perms.defects.change_reliabilityincident %}
         <a href="{% url 'incident_update' incident.pk %}" class="btn btn-sm btn-primary" up-layer="new" up-size="large">Edit Info</a>
+        <a href="{% url 'incident_images' incident.pk %}" class="btn btn-sm btn-primary" up-layer="new" up-size="large">Edit Images</a>
       {% endif %}
       {% if perms.defects.request_notification_approval %}
         <a href="{% url 'incident_notification_publish' incident.pk %}" up-layer="new" class="btn btn-primary btn-sm">Request Approval</a>
