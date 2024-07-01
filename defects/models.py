@@ -818,10 +818,10 @@ class Approval(models.Model):
         (SENIOR_ASSET_MANAGER, "Senior AM"),
     )
 
-    incident = models.ForeignKey(Incident, on_delete=models.SET_NULL, null=True, related_name="approvals")
+    incident = models.ForeignKey(Incident, on_delete=models.CASCADE, null=True, related_name="approvals")
     time_created = models.DateTimeField(auto_now_add=True)
     time_modified = models.DateTimeField(auto_now=True)
-    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="+")
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name="+")
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="+")
     name = models.CharField(max_length=200)
     role = models.CharField(max_length=200, choices=ROLE_CHOICES)
