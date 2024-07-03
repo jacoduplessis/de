@@ -153,45 +153,46 @@
           </div>
         </div>
 
+        <p class="small text-muted mb-0">Date indicates Planned Completion Date</p>
 
         <table class="table table-bordered mt-2">
           <tbody>
           <tr>
             <th colspan="2">Short-Term Actions (complete in 3 months)</th>
-            <th>Priority</th>
+            <th>Date</th>
           </tr>
           {% for solution in incident.solutions.all %}
             {% if solution.timeframe == solution.SHORT_TERM %}
               <tr>
                 <td><span class="badge text-bg-{{ solution.status_class }}">{{ solution.get_status_display }}</span></td>
                 <td>{{ solution.description }}</td>
-                <td>{{ solution.get_priority_display }}</td>
+                <td>{{ solution.planned_completion_date|date:"Y-m-d" }}</td>
               </tr>
             {% endif %}
           {% endfor %}
           <tr>
             <th colspan="2">Medium-Term Actions (complete in 3-6 months)</th>
-            <th>Priority</th>
+            <th>Date</th>
           </tr>
           {% for solution in incident.solutions.all %}
             {% if solution.timeframe == solution.MEDIUM_TERM %}
               <tr>
                 <td><span class="badge text-bg-{{ solution.status_class }}">{{ solution.get_status_display }}</span></td>
                 <td>{{ solution.description }}</td>
-                <td>{{ solution.get_priority_display }}</td>
+                <td>{{ solution.planned_completion_date|date:"Y-m-d" }}</td>
               </tr>
             {% endif %}
           {% endfor %}
           <tr>
             <th colspan="2">Long-Term Actions (complete in 6-12 months)</th>
-            <th>Priority</th>
+            <th>Date</th>
           </tr>
           {% for solution in incident.solutions.all %}
             {% if solution.timeframe == solution.LONG_TERM %}
               <tr>
                 <td><span class="badge text-bg-{{ solution.status_class }}">{{ solution.get_status_display }}</span></td>
                 <td>{{ solution.description }}</td>
-                <td>{{ solution.get_priority_display }}</td>
+                <td>{{ solution.planned_completion_date|date:"Y-m-d" }}</td>
               </tr>
             {% endif %}
           {% endfor %}

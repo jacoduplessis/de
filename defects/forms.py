@@ -6,6 +6,7 @@ from .models import Incident, Approval, Area, Operation, Section, Solution, Reso
 from django.contrib.auth.models import User
 from django.db.models.query_utils import Q
 from decimal import Decimal
+from collections import defaultdict
 
 EFFECT_CHOICES = (
     ("repair", "Estimated cost of Repair > R 250K"),
@@ -337,3 +338,31 @@ class IncidentCloseOutForm(forms.ModelForm):
                 choices=[(f"{x}", f"{x}") for x in range(1, 6)],
             )
         }
+
+
+def conditional_forms_payload():
+    """
+    This data is used to dynamically alter the available options
+    when selecting the "area" and "section" when creating a new incident.
+
+    All keys and values are cast to string as it will be used in a browser HTML context
+    """
+
+    sections_qs = Section.objects.all().only("id", "area_id")
+    areas_qs = Area.objects.all().only("id", "operation_id")
+
+    sections = defaultdict(list)
+    areas = defaultdict(list)
+
+    for section in sections_qs:
+        key = "" if section.area_id is None else str(section.area_id)
+        sections[key].append(str(section.id))
+
+    for area in areas_qs:
+        key = "" if area.operation_id is None else str(area.operation_id)
+        areas[key].append(str(area.id))
+
+    return {
+        "areas": dict(areas),
+        "sections": dict(sections)
+    }

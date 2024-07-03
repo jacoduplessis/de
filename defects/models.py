@@ -35,6 +35,7 @@ class Operation(models.Model):
 class Area(models.Model):
     name = models.CharField(max_length=200)
     order_index = models.PositiveIntegerField(default=0)
+    operation = models.ForeignKey(Operation, on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -47,6 +48,7 @@ class Section(models.Model):
     name = models.CharField(max_length=200)
     code = models.CharField(max_length=100, blank=True)
     order_index = models.PositiveIntegerField(default=0)
+    area = models.ForeignKey(Area, on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -537,7 +539,7 @@ class Incident(models.Model):
 
     @property
     def close_out_confidence_empty_stars(self):
-        return range(self.close_out_rating, 1, -1)
+        return range(5, self.close_out_rating, -1)
 
     @property
     def anniversary_date(self):

@@ -48,9 +48,13 @@ class SolutionAdmin(ImportExportModelAdmin):
 class AreaAdmin(admin.ModelAdmin):
     list_display = [
         "name",
-        "order_index"
+        "order_index",
+        "operation",
     ]
     ordering = ["order_index"]
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related("operation")
 
 
 @admin.register(Section)
@@ -58,10 +62,14 @@ class SectionAdmin(admin.ModelAdmin):
     list_display = [
         "name",
         "code",
-        "order_index"
+        "order_index",
+        "area",
     ]
 
     ordering = ["order_index"]
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related("area")
 
 
 @admin.register(Operation)

@@ -31,6 +31,7 @@ from .forms import (
     IncidentCloseOutForm,
     IncidentCloseApprovalSendForm,
     IncidentRCAApprovalSendForm,
+    conditional_forms_payload,
 )
 from .models import Solution, Incident, Section, Equipment, IncidentImage, Approval, Area, Feedback, Operation, ResourcePrice
 from .actions import get_user_actions
@@ -214,7 +215,7 @@ def incident_create(request):
         form = IncidentCreateForm(request.POST, request.FILES)
         if not form.is_valid():
             messages.error(request, "Please correct the form inputs and submit again.")
-            context = {"form": form}
+            context = {"form": form, "conditionals": conditional_forms_payload()}
             return render(request, template_name, context=context, status=422)
         obj = form.save(commit=False)
 
@@ -235,7 +236,10 @@ def incident_create(request):
 
     if request.method == "GET":
         context = {
-            "form": IncidentCreateForm(initial={"time_start": now() - timedelta(hours=2), "time_end": now()}),
+            "form": IncidentCreateForm(
+                initial={"time_start": now() - timedelta(hours=2), "time_end": now()}
+            ),
+            "conditionals": conditional_forms_payload()
         }
         return render(request, template_name, context)
 
@@ -252,7 +256,7 @@ def incident_update(request, pk):
         form = IncidentUpdateForm(request.POST, request.FILES, instance=incident)
         if not form.is_valid():
             messages.error(request, "Please correct the form inputs and submit again.")
-            context = {"form": form}
+            context = {"form": form, "conditionals": conditional_forms_payload() }
             return render(request, template_name, context)
         obj = form.save()
 
@@ -267,6 +271,7 @@ def incident_update(request, pk):
     if request.method == "GET":
         context = {
             "form": IncidentUpdateForm(instance=incident),
+            "conditionals": conditional_forms_payload(),
         }
         return render(request, template_name, context)
 
@@ -740,7 +745,6 @@ def incident_solution_create(request, pk):
             "description",
             "person_responsible",
             "planned_completion_date",
-            "remarks",
         ],
         widgets={
             "person_responsible": Select(choices=section_engineer_choices)

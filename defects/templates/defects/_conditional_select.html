@@ -1,0 +1,45 @@
+{{ conditionals|json_script:"form_conditionals" }}
+
+<script>
+    (function () {
+
+      function clearSelection(node) {
+        node.selectedIndex = 0
+      }
+
+      const operationSelect = document.querySelector(`select[name="operation"]`)
+      const areaSelect = document.querySelector(`select[name="area"]`)
+      const sectionSelect = document.querySelector(`select[name="section"]`)
+      const conditional = JSON.parse(document.getElementById("form_conditionals").textContent)
+
+      function limitAreaOptions(event) {
+        clearSelection(areaSelect)
+        clearSelection(sectionSelect)
+
+        const selectedOperation = operationSelect.value
+        const unassignedAreas = conditional["areas"][""] || []
+        const allowedAreas = conditional["areas"][selectedOperation]
+        const allAllowed = [...allowedAreas, ...unassignedAreas]
+        Array.from(areaSelect.options).forEach(el => {
+          el.disabled = !allAllowed.includes(el.value)
+        })
+      }
+
+      function limitSectionOptions(event) {
+        clearSelection(sectionSelect)
+
+        const selectedArea = areaSelect.value
+        const unassignedSections = conditional["sections"][""] || []
+        const allowedSections = conditional["sections"][selectedArea]
+        const allAllowed = [...allowedSections, ...unassignedSections]
+        Array.from(sectionSelect.options).forEach(el => {
+          el.disabled = !allAllowed.includes(el.value)
+        })
+      }
+
+      operationSelect.addEventListener("change", limitAreaOptions)
+      areaSelect.addEventListener("change", limitSectionOptions)
+    })()
+
+
+  </script>

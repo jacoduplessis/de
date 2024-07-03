@@ -37,6 +37,7 @@
           <th>Person Responsible</th>
           <th>Planned Completion Date</th>
           <th>Actual Completion Date</th>
+          <th>Date Verified</th>
           {#          <th>Remarks</th>#}
         </tr>
         </thead>
@@ -52,6 +53,7 @@
             <td class="text-nowrap">{{ solution.person_responsible }}</td>
             <td class="text-nowrap">{{ solution.planned_completion_date|date:'Y-m-d' }}</td>
             <td class="text-nowrap">{{ solution.actual_completion_date|date:'Y-m-d' }}</td>
+            <td class="text-nowrap">{{ solution.date_verified|date:"Y-m-d" }}</td>
             {#            <td class="text-nowrap">{{ solution.remarks }}</td>#}
           </tr>
         {% endfor %}
