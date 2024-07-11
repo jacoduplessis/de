@@ -477,6 +477,7 @@ def incident_close_form(request, pk):
 def anniversary_list(request):
     incidents = (
         Incident.objects.prefetch_related("solutions")
+        .select_related("area", "operation")
         .filter(time_start__lt=now() - timedelta(days=360))
         .filter(time_anniversary_reviewed=None)
     )

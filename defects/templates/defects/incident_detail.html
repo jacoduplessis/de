@@ -135,10 +135,14 @@
             </td>
           </tr>
 
+          <tr>
+              <th>1-Year Anniversary Planned</th>
+              <td>{{ incident.anniversary_date|date:"Y-m-d" }}</td>
+            </tr>
           {% if incident.time_anniversary_reviewed %}
             <tr>
-              <th>1-Year Anniversary Reviewed</th>
-              <td>{{ incident.time_anniversary_reviewed|date:"Y-m-d" }}</td>
+              <th>1-Year Anniversary Completed</th>
+              <td>{{ incident.time_anniversary_reviewed|date:"Y-m-d" }} <a href="{% url 'incident_anniversary_pdf' incident.pk %}" class="btn btn-primary btn-small" target="_blank">Download PDF</a> </td>
             </tr>
           {% endif %}
           </tbody>
@@ -153,13 +157,11 @@
           </div>
         </div>
 
-        <p class="small text-muted mb-0">Date indicates Planned Completion Date</p>
-
         <table class="table table-bordered mt-2">
           <tbody>
           <tr>
             <th colspan="2">Short-Term Actions (complete in 3 months)</th>
-            <th>Date</th>
+            <th>Planned Date</th>
           </tr>
           {% for solution in incident.solutions.all %}
             {% if solution.timeframe == solution.SHORT_TERM %}
@@ -172,7 +174,7 @@
           {% endfor %}
           <tr>
             <th colspan="2">Medium-Term Actions (complete in 3-6 months)</th>
-            <th>Date</th>
+            <th>Planned Date</th>
           </tr>
           {% for solution in incident.solutions.all %}
             {% if solution.timeframe == solution.MEDIUM_TERM %}
@@ -185,7 +187,7 @@
           {% endfor %}
           <tr>
             <th colspan="2">Long-Term Actions (complete in 6-12 months)</th>
-            <th>Date</th>
+            <th>Planned Date</th>
           </tr>
           {% for solution in incident.solutions.all %}
             {% if solution.timeframe == solution.LONG_TERM %}

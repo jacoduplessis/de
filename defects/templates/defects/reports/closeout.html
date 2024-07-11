@@ -107,12 +107,11 @@
 </style>
 
 <div style="display: flex; flex-direction: row; align-items: center; justify-content: space-between">
-  <img src="static:anglo-american-logo-colour.png" style="width: 200px; padding-bottom: 0.5rem">
-  <h1 style="color: #021795; font-weight: bold; font-size: 1.7rem" class="uppercase">Reliability Incident Close-Out</h1>
+  <img src="static:close-out-header.png" style="width: 350px; padding-bottom: 0.5rem">
 </div>
 
-<div class="header" style="text-align: center; margin-bottom: 1rem;">
-  <span style="color: white">{{ incident.code }} – {{ incident.short_description }} – {{ incident.time_start|date:"Y-m-d" }}</span>
+<div style="text-align: center; margin-bottom: 1rem;">
+  <h2 style="font-size: 18px">{{ incident.code }} – {{ incident.short_description }} – {{ incident.time_start|date:"Y-m-d" }}</h2>
 </div>
 
 <div style="display: flex;">

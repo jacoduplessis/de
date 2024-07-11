@@ -147,6 +147,9 @@ class Incident(models.Model):
 
     def calculate_status(self):
 
+        if self.time_anniversary_reviewed:
+            return self.COMPLETE
+
         if not self.notification_time_published:
             return self.ACTIVE
 
@@ -549,6 +552,10 @@ class Incident(models.Model):
     def actions(self):
         actions = []
 
+        # no more actions once a anniversary review has been completed
+        if self.time_anniversary_reviewed:
+            return []
+
         if not self.notification_time_published:
             actions.append(
                 TimelineEntry(
@@ -623,7 +630,10 @@ class Incident(models.Model):
                 )
             )
 
-        if self.rca_report_time_published and not Approval.objects.filter(type=Approval.RCA, role=Approval.SENIOR_ASSET_MANAGER, outcome=Approval.ACCEPTED).exists() and not self.rca_report_time_approved:
+        if (self.rca_report_time_published
+            and Approval.objects.filter(type=Approval.RCA, role=Approval.SENIOR_ASSET_MANAGER, outcome=Approval.ACCEPTED).exists()
+            and not Approval.objects.filter(type=Approval.RCA, role=Approval.SECTION_ENGINEERING_MANAGER, outcome=Approval.ACCEPTED).exists()
+            and not self.rca_report_time_approved):
             # RCA has been approved by SAM but not yet by SEM
             actions.append(
                 TimelineEntry(

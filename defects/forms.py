@@ -244,6 +244,8 @@ class ApprovalForm(forms.ModelForm):
             del self.fields["score"]
         if self.instance.type == Approval.CLOSE_OUT and self.instance.role == Approval.SECTION_ENGINEER:
             del self.fields["outcome"]
+            # todo: add RE score as initial value for SE close-out approval
+
 
     def clean(self):
         super().clean()
@@ -253,6 +255,7 @@ class ApprovalForm(forms.ModelForm):
         if outcome == Approval.REJECTED and comment == "":
             self.add_error("comment", "A comment must be provided when an approval request is rejected.")
 
+        # todo: if SE close-out, comment must be given if score not equal to RE score
 
 class IncidentFilterForm(forms.Form):
     section = forms.ModelChoiceField(Section.objects.all(), required=False)

@@ -20,9 +20,9 @@
           <th>RI No.</th>
           <th>Completed Solutions</th>
           <th>Date</th>
+          <th>Operation</th>
+          <th>Area</th>
           <th>Section</th>
-          <th>Section Engineer</th>
-          <th>Functional Location</th>
           <th>Description</th>
         </tr>
         </thead>
@@ -33,10 +33,10 @@
               <a class="text-black" href="{% url 'incident_anniversary_detail' incident.pk %}" up-layer="new" up-history="false">{{ incident.code }}</a>
             </td>
             <td>{{ incident.num_completed_solutions }} / {{ incident.solutions.all|length }}</td>
-            <td class="font-monospace text-nowrap">{{ incident.time_start|date:'Y-m-d' }}</td>
+            <td class="text-nowrap">{{ incident.anniversary_date|date:'Y-m-d' }}</td>
+            <td class="text-nowrap">{{ incident.operation.name }}</td>
+            <td class="text-nowrap">{{ incident.area.name }}</td>
             <td class="text-nowrap">{{ incident.section }}</td>
-            <td class="text-nowrap">{{ incident.section_engineer }}</td>
-            <td class="text-nowrap">{{ incident.equipment }}</td>
             <td class="text-nowrap">{{ incident.description }}</td>
           </tr>
         {% endfor %}

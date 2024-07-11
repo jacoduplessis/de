@@ -88,14 +88,13 @@ def reliability_engineer_actions(user_id) -> List[UserAction]:
         if i.rca_report_rejected and not i.has_pending_approval(Approval.RCA):
             actions.append(UserAction(message=message, time_required=now(), urgency=Urgency.DANGER, incident=i))
 
+    message = "Publish Close-Out Slide"
     for i in incidents:
         if i.close_out_time_published is not None:
             continue
         if i.close_out_time_approved:
             continue
         if (i.significant and i.rca_report_time_approved) or (not i.significant):
-
-            print(i.code, i.id, i.notification_time_published)
             time_required = i.notification_time_published + timedelta(days=14)
             time_remaining = time_required - now()
             if time_remaining < timedelta(hours=0):
@@ -105,7 +104,7 @@ def reliability_engineer_actions(user_id) -> List[UserAction]:
             else:
                 urgency = Urgency.INFO
 
-            actions.append(UserAction(message="Publish Close-Out Slide", incident=i, urgency=urgency, time_required=time_required))
+            actions.append(UserAction(message=message, incident=i, urgency=urgency, time_required=time_required))
 
     message = "Resubmit Rejected Close-Out Slide"
     for i in incidents:
