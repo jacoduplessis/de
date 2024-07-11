@@ -142,7 +142,7 @@
           {% if incident.time_anniversary_reviewed %}
             <tr>
               <th>1-Year Anniversary Completed</th>
-              <td>{{ incident.time_anniversary_reviewed|date:"Y-m-d" }} <a href="{% url 'incident_anniversary_pdf' incident.pk %}" class="btn btn-primary btn-small" target="_blank">Download PDF</a> </td>
+              <td>{{ incident.time_anniversary_reviewed|date:"Y-m-d" }} <a href="{% url 'incident_anniversary_pdf' incident.pk %}" target="_blank">Download PDF</a> </td>
             </tr>
           {% endif %}
           </tbody>

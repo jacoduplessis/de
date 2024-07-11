@@ -4,7 +4,7 @@
   /* page */
 
   @page {
-    size: A4; /* Change from the default size of A4 */
+    size: A4 landscape; /* Change from the default size of A4 */
     margin: 1cm; /* Set margin on each page */
   }
 
@@ -89,6 +89,25 @@
 <div class="header" style="text-align: center; margin-bottom: 1rem">
   {{ incident.code }} – {{ incident.short_description }} – {{ incident.time_start|date:"Y-m-d" }}
 </div>
+
+<table style="margin-bottom: 2rem">
+  <thead>
+    <tr>
+      <th>Operation</th>
+      <th>Area</th>
+      <th>Section</th>
+      <th>Functional Location</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>{{ incident.operation.name }}</td>
+      <td>{{ incident.area.name }}</td>
+      <td>{{ incident.section.name }}</td>
+      <td>{{ incident.equipment }}</td>
+    </tr>
+  </tbody>
+</table>
 
 <table>
   <thead>

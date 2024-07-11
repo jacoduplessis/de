@@ -2,14 +2,21 @@
   <h2>{{ incident.code }} Anniversary</h2>
   <hr>
 
-  <p><strong>Actions</strong></p>
+  <p>Please review the anniversary of the following RI:</p>
+
+  <p>
+  <a href="{% url 'incident_detail' incident.pk %}" up-follow up-layer="parent" class="btn btn-secondary me-2">View RI</a> <a href="{% url 'incident_anniversary_pdf' incident.pk %}" target="_blank" class="btn btn-primary me-2">View Anniversary PDF</a>
+  </p>
+
+  <p>Was the root cause of the RI accurately identified and adequately addressed by implementing all the solutions in the Solution Tracker? Select the appropriate button below.</p>
+
+  <p><strong>NB:</strong> <em>Your selection is final and cannot be changed afterwards. Please make sure to select the correct button. If you are unsure, please Speak to a Senior Reliability Engineer.</em></p>
 
   <div class="d-flex">
-      <a href="{% url 'incident_detail' incident.pk %}" up-follow up-layer="parent" class="btn btn-secondary me-2">View Incident</a>
-      <a href="{% url 'incident_anniversary_pdf' incident.pk %}" target="_blank" class="btn btn-primary me-2">View Anniversary PDF</a>
       <form method="post" action="{% url 'incident_anniversary_detail' incident.pk %}" up-submit up-layer="parent">
         {% csrf_token %}
-        <input type="submit" class="btn btn-danger" value="Mark as Reviewed">
+        <input type="submit" class="btn btn-success" value="Yes, Mark as Reviewed">
       </form>
+      <button class="btn btn-danger ms-2" up-dismiss>No, dismiss</button>
   </div>
 </main>
