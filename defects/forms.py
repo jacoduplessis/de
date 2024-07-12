@@ -244,7 +244,6 @@ class ApprovalForm(forms.ModelForm):
             del self.fields["score"]
         if self.instance.type == Approval.CLOSE_OUT and self.instance.role == Approval.SECTION_ENGINEER:
             del self.fields["outcome"]
-            # todo: add RE score as initial value for SE close-out approval
 
 
     def clean(self):
