@@ -83,6 +83,13 @@ def reliability_engineer_actions(user_id) -> List[UserAction]:
             urgency = Urgency.INFO
         actions.append(UserAction(message=message, urgency=urgency, incident=i, time_required=time_required))
 
+    message = "Submit RCA Report to SnrAM"
+    # todo: implement
+
+    message = "Submit RCA Report to SnrAM"
+    # todo: implement
+
+
     message = "Resubmit Rejected RCA Report"
     for i in incidents:
         if i.rca_report_rejected and not i.has_pending_approval(Approval.RCA):

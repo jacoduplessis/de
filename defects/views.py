@@ -403,13 +403,13 @@ def incident_close_pdf(request, pk):
 
     incident = get_object_or_404(Incident, pk=pk)
 
-    se_approval = Approval.objects.select_related("user").order_by("-time_modified").filter(incident=incident, role=Approval.SECTION_ENGINEER, type=Approval.CLOSE_OUT).first()
-    sem_approval = Approval.objects.select_related("user").order_by("-time_modified").filter(incident=incident, role=Approval.SECTION_ENGINEERING_MANAGER, type=Approval.CLOSE_OUT).first()
+    se_approval = Approval.objects.select_related("user").order_by("-time_modified").filter(incident=incident, role=Approval.SECTION_ENGINEER, type=Approval.CLOSE_OUT, score__gt=0).first()
+    sem_approval = Approval.objects.select_related("user").order_by("-time_modified").filter(incident=incident, role=Approval.SECTION_ENGINEERING_MANAGER, type=Approval.CLOSE_OUT, score__gt=0).first()
 
     # ["name", 1, <date>|<datetime>]
     ratings = {
         "re": [incident.created_by.username, incident.close_out_confidence, incident.close_out_time_published],
-        "se": ["---", 0, None] if se_approval is None else [se_approval.user.username, se_approval.score, sem_approval.time_modified],
+        "se": ["---", 0, None] if se_approval is None else [se_approval.user.username, se_approval.score, se_approval.time_modified],
         "sem": ["---", 0, None] if sem_approval is None else [sem_approval.user.username, sem_approval.score, sem_approval.time_modified],
     }
 

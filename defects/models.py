@@ -632,7 +632,7 @@ class Incident(models.Model):
 
         if (self.rca_report_time_published
             and Approval.objects.filter(incident=self, type=Approval.RCA, role=Approval.SENIOR_ASSET_MANAGER, outcome=Approval.ACCEPTED).exists()
-            and not Approval.objects.filter(incident=self, type=Approval.RCA, role=Approval.SECTION_ENGINEERING_MANAGER, outcome=Approval.ACCEPTED).exists()
+            and not Approval.objects.filter(incident=self, type=Approval.RCA, role=Approval.SECTION_ENGINEERING_MANAGER).exists()
             and not self.rca_report_time_approved):
             # RCA has been approved by SAM but not yet by SEM
             actions.append(
