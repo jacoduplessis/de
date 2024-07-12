@@ -606,10 +606,17 @@ def approval_detail(request, pk):
         return HttpResponseForbidden("Not Allowed.")
 
     if request.method == "GET":
+
+        # in the special case where the role=SE and type=CLOSE_OUT
+        # the default score should be the score that the RE configured
+        initial_score = 0
+        if approval.type == Approval.CLOSE_OUT and approval.role == Approval.SECTION_ENGINEER:
+            initial_score = approval.incident.close_out_confidence
+
         context = {
             "approval": approval,
             "incident": approval.incident,
-            "form": ApprovalForm(instance=approval),
+            "form": ApprovalForm(instance=approval, initial={"score": initial_score}),
         }
 
         return render(request, "defects/approval.html", context=context)
@@ -1001,7 +1008,6 @@ def incident_close_approval_request(request, pk):
                     role=Approval.SECTION_ENGINEER,
                     type=Approval.CLOSE_OUT,
                     incident=incident,
-                    score=incident.close_out_confidence,
                 )
 
                 incident.close_out_time_published = now()
