@@ -48,28 +48,22 @@ MS WSL
 - should user actions be dismissible
 - fonts / Arial? ATM it uses dejavu sans on the server
 
-## TODO
+## Ideas
 
 - audit logging
 - application logging
 - edit locks
 - background tasks
-- add pagination to list views ?
+- add pagination to list views
 - add ordering, searching to list views
 - custom error templates
-- setup logging
-- figure out incident status
-- permission checks
 - indicator that results are filtered.
 - email links
-- install fonts in container
 - add test case that generates pdf
 - global list of issues with incident data
 - maps SRS permissions into concrete db permission / group entries
 - indication that filters are active
 - clear filters button
-- mark solution as verified
-- add solution verification comment
 
 ## Key Features
 
@@ -144,14 +138,11 @@ MS WSL
 - close-out process
 
 
-## todo
+## TODO
 
-- conditional select on RI edit screen must validate on load
-
-
-
-- add upload for prelim findings
--
+- value graph filtering + calc
+- compliance dashboard calc
+- PPTX generation for compliance report
 
 
 ## Notes on CSS gradient
