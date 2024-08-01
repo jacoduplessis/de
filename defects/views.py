@@ -20,6 +20,7 @@ from django.utils.timezone import now
 from django.views.decorators.http import require_POST, require_GET
 
 from .exports import export_table_csv
+from .stats import get_ri_count_per_section
 from .forms import (
     IncidentCreateForm,
     IncidentNotificationApprovalSendForm,
@@ -518,9 +519,28 @@ def value_dashboard(request):
 
 @login_required
 def compliance_dashboard(request):
-    grouping = request.GET.get("grouping")
+    area_filter_id = request.GET.get("area")
 
-    return render(request, "defects/compliance_dashboard.html")
+    areas = Area.objects.all().order_by("name")
+
+    sections = Section.objects.all()
+    if area_filter_id and area_filter_id != "all":
+        sections = sections.filter(area_id=area_filter_id)
+
+    stats = {}
+    for section in sections:
+        stats[str(section.id)] = {
+            "name": section.name,
+            "ri_count": get_ri_count_per_section(section_id=section.id)
+        }
+
+    context = {
+        "areas": areas,
+        "sections": sections,
+        "stats": stats,
+    }
+
+    return render(request, "defects/compliance_dashboard.html", context=context)
 
 
 @login_required
