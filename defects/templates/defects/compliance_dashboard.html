@@ -6,19 +6,19 @@
 
   <main>
     <div class="d-flex justify-content-between mb-3">
-      <h2>Compliance Dashboard</h2>
+      <h2>Compliance Dashboard {{ request.GET.area }}</h2>
       <div>
         <div class="btn-group">
-          <a href="#" class="btn btn-secondary btn-sm">Tumela</a>
-          <a href="#" class="btn btn-secondary btn-sm">Dishaba</a>
-          <a href="#" class="btn btn-primary btn-sm active">Concentrators</a>
-          <a href="#" class="btn btn-secondary btn-sm">All Sections</a>
+          <a href="?area=all" class="btn btn-secondary btn-sm {% if not request.GET.area or request.GET.area == "all" %} active {% endif %}">All Areas</a>
+          {% for area in areas %}
+            <a href="?area={{ area.id }}" class="btn btn-secondary btn-sm {% if request.GET.area == area.id|slugify %}active {% endif %}">{{ area.name }}</a>
+          {% endfor %}
         </div>
 
       </div>
     </div>
 
-    <p>Reliability Statistics for Amandelbult Mine, Section Concentrators, for the past 25 weeks.</p>
+    <p>Reliability Statistics for the past 25 weeks.</p>
 
     <div class="row">
       <div class="col-12 col-lg-6">
@@ -28,79 +28,41 @@
           <thead>
           <tr>
             <th>Description</th>
-            <th>UG2 #1</th>
-            <th>UG2 #2</th>
-            <th>Merensky</th>
+            {% for section in sections %}
+            <th>{{ section.name }}</th>
+            {% endfor %}
           </tr>
           </thead>
           <tbody>
           <tr>
             <td>Free days</td>
+             {% for section in sections %}
             <td>x</td>
-            <td>x</td>
-            <td>x</td>
+            {% endfor %}
           </tr>
           <tr>
             <td>To date</td>
+            {% for section in sections %}
             <td>x</td>
-            <td>x</td>
-            <td>x</td>
+            {% endfor %}
           </tr>
           <tr>
             <td>Closed out</td>
+            {% for section in sections %}
             <td>x</td>
-            <td>x</td>
-            <td>x</td>
+            {% endfor %}
           </tr>
           <tr>
             <td>Outstanding</td>
+            {% for section in sections %}
             <td>x</td>
-            <td>x</td>
-            <td>x</td>
+            {% endfor %}
           </tr>
           <tr>
             <td>% Closed out</td>
+            {% for section in sections %}
             <td>x</td>
-            <td>x</td>
-            <td>x</td>
-          </tr>
-          </tbody>
-        </table>
-
-        <h6>HIPOs</h6>
-        <table class="table table-sm table-striped">
-          <thead>
-          <tr>
-            <th>Description</th>
-            <th>UG2 #1</th>
-            <th>UG2 #2</th>
-            <th>Merensky</th>
-          </tr>
-          </thead>
-          <tbody>
-          <tr>
-            <td>To date</td>
-            <td>x</td>
-            <td>x</td>
-            <td>x</td>
-          </tr>
-          <tr>
-            <td>Closed out</td>
-            <td>x</td>
-            <td>x</td>
-            <td>x</td>
-          </tr>
-          <tr>
-            <td>Outstanding</td>
-            <td>x</td>
-            <td>x</td>
-            <td>x</td>
-          </tr>
-          <tr>
-            <td>% Closed out</td>
-            <td>x</td>
-            <td>x</td>
-            <td>x</td>
+            {% endfor %}
           </tr>
           </tbody>
         </table>
@@ -110,35 +72,35 @@
           <thead>
           <tr>
             <th>Description</th>
-            <th>UG2 #1</th>
-            <th>UG2 #2</th>
-            <th>Merensky</th>
+            {% for section in sections %}
+            <th>{{ section.name }}</th>
+            {% endfor %}
           </tr>
           </thead>
           <tbody>
           <tr>
             <td>To date</td>
+            {% for section in sections %}
             <td>x</td>
-            <td>x</td>
-            <td>x</td>
+            {% endfor %}
           </tr>
           <tr>
             <td>Completed</td>
+            {% for section in sections %}
             <td>x</td>
-            <td>x</td>
-            <td>x</td>
+            {% endfor %}
           </tr>
           <tr>
             <td>In-Progress</td>
+            {% for section in sections %}
             <td>x</td>
-            <td>x</td>
-            <td>x</td>
+            {% endfor %}
           </tr>
           <tr>
             <td>Outstanding</td>
+            {% for section in sections %}
             <td>x</td>
-            <td>x</td>
-            <td>x</td>
+            {% endfor %}
           </tr>
           </tbody>
         </table>
@@ -156,7 +118,12 @@
       </div>
     </div>
 
-
+    {{ stats|json_script:"section-stats" }}
+    <script>
+        console.log(
+          JSON.parse(document.getElementById("section-stats").textContent)
+        )
+    </script>
     <script defer src="{% static 'scripts/compliance-dashboard.js' %}"></script>
   </main>
 
