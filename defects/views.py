@@ -1,4 +1,5 @@
 import json
+import random
 from datetime import timedelta
 
 from auditlog.models import LogEntry
@@ -20,7 +21,7 @@ from django.utils.timezone import now
 from django.views.decorators.http import require_POST, require_GET
 
 from .exports import export_table_csv
-from .stats import get_ri_count_per_section
+from .stats import get_weekly_ri_count_per_section, get_monthly_ri_value_per_area, get_weekly_ri_value_per_area
 from .forms import (
     IncidentCreateForm,
     IncidentNotificationApprovalSendForm,
@@ -36,6 +37,7 @@ from .forms import (
 )
 from .models import Solution, Incident, Section, Equipment, IncidentImage, Approval, Area, Feedback, Operation, ResourcePrice
 from .actions import get_user_actions
+from .reports import render_pptx
 
 
 def index(request):
@@ -389,9 +391,10 @@ def incident_anniversary_detail(request, pk):
         return render(request, "defects/incident_anniversary_detail.html", context={"incident": incident})
 
     if request.method == "POST":
-        "this marks the anniversary as reviewed"
         incident.time_anniversary_reviewed = now()
         incident.anniversary_reviewed_by = request.user
+        if "success" in request.POST:
+            incident.anniversary_success = True
         incident.save()
         messages.success(request, "Anniversary has been marked as reviewed.")
         return HttpResponseRedirect(reverse("anniversary_list"))
@@ -514,7 +517,43 @@ def solution_completion(request):
 
 @login_required
 def value_dashboard(request):
-    return render(request, "defects/value_dashboard.html")
+    area_filter_id = request.GET.get("area")
+
+    areas = Area.objects.all().order_by("name").order_by("name")
+
+    incidents = Incident.objects.all()
+
+    area_id = None if (not area_filter_id or area_filter_id == "all") else area_filter_id
+
+    week_stats = get_weekly_ri_value_per_area(area_id=area_id, weeks=52)
+    month_stats = get_monthly_ri_value_per_area(area_id=area_id, months=36)
+
+    week_deltas = []
+    week_labels = []
+
+    month_deltas = []
+    month_labels = []
+
+    for row in week_stats:
+        week_labels.append(row["label"])
+        week_deltas.append(row["rand_value"])
+
+    for row in month_stats:
+        month_labels.append(row["label"])
+        month_deltas.append(row["rand_value"])
+
+    context = {
+        "areas": areas,
+        "graph_data": {
+            "week_labels": week_labels,
+            "week_deltas": week_deltas,
+            "month_labels": month_labels,
+            "month_deltas": month_deltas,
+        }
+
+    }
+
+    return render(request, "defects/value_dashboard.html", context=context)
 
 
 @login_required
@@ -531,7 +570,7 @@ def compliance_dashboard(request):
     for section in sections:
         stats[str(section.id)] = {
             "name": section.name,
-            "ri_count": get_ri_count_per_section(section_id=section.id)
+            "ri_count": get_weekly_ri_count_per_section(section_id=section.id)
         }
 
     context = {
@@ -1088,3 +1127,12 @@ def incident_rca_approval_request(request, pk):
 
             messages.success(request, f"RCA report has be sent to {approval.get_role_display()} for approval.")
             return HttpResponseRedirect(reverse("incident_detail", args=[incident.pk]))
+
+@login_required
+def anniversary_report(request):
+
+    response = HttpResponse()
+    response['Content-Type'] = 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+    response['Content-Disposition'] = 'attachment; filename="report.pptx"'
+    render_pptx(response)
+    return response

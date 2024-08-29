@@ -1,6 +1,9 @@
 from weasyprint import default_url_fetcher
 from django.core.files.storage import default_storage
 from django.contrib.staticfiles.finders import find
+import importlib.resources
+from pptx import Presentation
+from django.utils.timezone import now
 
 
 def url_fetcher(url, timeout=5, ssl_context=None):
@@ -17,3 +20,13 @@ def url_fetcher(url, timeout=5, ssl_context=None):
         return {"file_obj": open(abs_path, "rb")}
 
     return default_url_fetcher(url, timeout=timeout, ssl_context=ssl_context)
+
+
+def render_pptx(target):
+    prs = Presentation(importlib.resources.open_binary('defects.data', 'anniversaries-report.pptx'))
+
+    prs.slides[0].placeholders[0].text = "Defect Elimination\n\nSignificant Incident Anniversaries"
+    prs.slides[0].placeholders[1].text = now().strftime("%B %Y")
+
+
+    prs.save(target)

@@ -15,8 +15,9 @@
   <div class="d-flex">
       <form method="post" action="{% url 'incident_anniversary_detail' incident.pk %}" up-submit up-layer="parent">
         {% csrf_token %}
-        <input type="submit" class="btn btn-success" value="Yes, Mark as Reviewed">
+        <input name="success" type="submit" class="btn btn-success me-2" value="Yes">
+        <input type="submit" class="btn btn-danger" value="No">
       </form>
-      <button class="btn btn-danger ms-2" up-dismiss>No, dismiss</button>
+
   </div>
 </main>

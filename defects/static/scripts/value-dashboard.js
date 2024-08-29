@@ -1,63 +1,18 @@
     (() => {
       // Graphs
-      const ctx = document.getElementById('myChart')
-      const ctxYear = document.getElementById('myChartYear')
 
+      const ctxWeek = document.getElementById('weekChart')
+      const ctxMonth = document.getElementById('monthChart')
+      const graphData = JSON.parse(document.getElementById("graph-data").textContent)
 
-      const labels = Array(52).fill(0).map((x, ix) => {
-        return 'Week ' + ix
-      })
-      labels.push('Total')
+      const weekLabels = graphData.week_labels
+      weekLabels.push("Total")
 
-      const monthLabels = [
-        '2021-01',
-        '2021-02',
-        '2021-03',
-        '2021-04',
-        '2021-05',
-        '2021-06',
-        '2021-07',
-        '2021-08',
-        '2021-09',
-        '2021-10',
-        '2021-11',
-        '2021-12',
-        '2022-01',
-        '2022-02',
-        '2022-03',
-        '2022-04',
-        '2022-05',
-        '2022-06',
-        '2022-07',
-        '2022-08',
-        '2022-09',
-        '2022-10',
-        '2022-11',
-        '2022-12',
-        '2023-01',
-        '2023-02',
-        '2023-03',
-        '2023-04',
-        '2023-05',
-        '2023-06',
-        '2023-07',
-        '2023-08',
-        '2023-09',
-        '2023-10',
-        '2023-11',
-        '2023-12',
+      const monthLabels = graphData.month_labels
+      monthLabels.push("Total")
 
-
-      ]
-
-      const randInt = function (min, max) {
-        const val = min + (max - min) * Math.random()
-        return Math.floor(val)
-      }
-
-
-      function waterfallSeries(n, min, max) {
-        const deltas = Array(n).fill(0).map(x => randInt(min, max))
+      function waterfallSeries(deltas) {
+        const n = deltas.length
         const totals = Array(n).fill(0)
         const series = deltas.map((d, ix) => {
           if (ix === 0) {
@@ -73,15 +28,15 @@
         return series
       }
 
-      const myChart = new Chart(ctx, {
+      const weekChart = new Chart(ctxWeek, {
         type: 'bar',
         data: {
-          labels: labels,
+          labels: weekLabels,
           datasets: [{
             label: 'Value',
-            data: waterfallSeries(labels.length - 1, -100, 200),
+            data: waterfallSeries(graphData.week_deltas),
             backgroundColor: function (ctx) {
-              if (ctx.dataIndex === labels.length - 1) return 'blue'
+              if (ctx.dataIndex === weekLabels.length - 1) return 'blue'
               const [begin, end] = ctx.raw
               if (begin > end) return 'red'
               return 'green'
@@ -89,13 +44,6 @@
           }]
         },
         options: {
-          /* scales: {
-             yAxes: [{
-               ticks: {
-                 beginAtZero: false
-               }
-             }]
-           }, */
           plugins: {
             legend: {
               display: false,
@@ -104,13 +52,13 @@
         }
       })
 
-      const yearChart = new Chart(ctxYear, {
+      const monthChart = new Chart(ctxMonth, {
         type: 'bar',
         data: {
           labels: monthLabels,
           datasets: [{
             label: 'Value',
-            data: waterfallSeries(monthLabels.length - 1, -100, 200),
+            data: waterfallSeries(graphData.month_deltas),
             backgroundColor: function (ctx) {
               if (ctx.dataIndex === monthLabels.length - 1) return 'blue'
               const [begin, end] = ctx.raw
@@ -120,13 +68,6 @@
           }]
         },
         options: {
-          /* scales: {
-             yAxes: [{
-               ticks: {
-                 beginAtZero: false
-               }
-             }]
-           }, */
           plugins: {
             legend: {
               display: false,
@@ -134,6 +75,4 @@
           }
         }
       })
-
-
     })()

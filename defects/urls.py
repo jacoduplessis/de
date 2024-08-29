@@ -58,6 +58,7 @@ urlpatterns = [
     path("about/users/", views.about_users, name="about_users"),
     path("feedback/", views.feedback, name="feedback"),
     path("anniversaries/", views.anniversary_list, name="anniversary_list"),
+    path("anniversaries/report/", views.anniversary_report, name="anniversary_report"),
     path("compliance/", views.compliance_dashboard, name="compliance_dashboard"),
     path("value/", views.value_dashboard, name="value_dashboard"),
     path("login/", views.LoginView.as_view(), name="login"),

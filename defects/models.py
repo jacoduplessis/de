@@ -92,6 +92,8 @@ class Incident(models.Model):
         (SHIFT_LOSS, "Loss of Full Production shift or Evacuation of shift"),
     )
 
+
+
     code = models.CharField(unique=True, max_length=200)  # also known as RI_Number
     time_created = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="+")
@@ -121,6 +123,7 @@ class Incident(models.Model):
     remaining_risk = models.TextField(blank=True)
     time_anniversary_reviewed = models.DateTimeField(null=True, blank=True, help_text="Records when the 1-year anniversary review was completed.")
     anniversary_reviewed_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    anniversary_success = models.BooleanField(default=False, help_text="Indicates whether the RI root cause was resolved")
 
     close_out_immediate_cause = models.TextField(blank=True)
     close_out_root_cause = models.TextField(blank=True)
