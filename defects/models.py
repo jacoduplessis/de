@@ -441,8 +441,10 @@ class Incident(models.Model):
 
         return sorted(entries, key=lambda x: x.time)
 
-    def has_pending_approval(self, approval_type):
+    def has_pending_approval(self, approval_type, role=None):
         for approval in self.approvals.all():
+            if role is not None and approval.role != role:
+                continue
             if approval.type == approval_type:
                 if approval_type in (Approval.RCA, Approval.NOTIFICATION) and approval.outcome == "":
                     return True
