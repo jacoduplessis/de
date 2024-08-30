@@ -33,7 +33,6 @@ dev = [
   "coverage",
 ]
 
-
 [tool.setuptools]
 packages = ["defects"]
 include-package-data = true
