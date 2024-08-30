@@ -3,7 +3,7 @@ stages:
   - build
 
 test:
-  image: python:3.12-slim-bookworm
+  image: python:3.12-bookworm
   stage: test
   variables:
     DATABASE_URL: "sqlite://:memory:"
