@@ -1,4 +1,6 @@
 from django.db import connections
+from .models import Incident
+from django.utils.timezone import now
 
 
 def _dictfetchall(cursor):
@@ -21,7 +23,7 @@ def get_monthly_ri_value_per_area(area_id=None, months=36):
 
     sql = f"""
        WITH RECURSIVE dates(date) AS (
-    SELECT DATE('now', 'start of month', CONCAT('-', %s, ' months'))
+    SELECT DATE('now', 'start of month', '-' || %s || ' months'))
     UNION ALL
     SELECT DATE(DATE, '+1 months')
     FROM dates
@@ -99,3 +101,11 @@ def get_weekly_ri_count_per_section(section_id, weeks=52):
         dates.date;
     """
     return execute_sql_query(sql, params=[weeks, section_id])
+
+
+def get_section_ri_free_days(section_id):
+
+    last_ri = Incident.objects.filter(section_id=section_id).order_by("-time_end").first()
+    if not last_ri:
+        return 0
+    return (now() - last_ri.time_end).days

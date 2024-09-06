@@ -570,7 +570,8 @@ def compliance_dashboard(request):
     for section in sections:
         stats[str(section.id)] = {
             "name": section.name,
-            "ri_count": get_weekly_ri_count_per_section(section_id=section.id)
+            "ri_count": get_weekly_ri_count_per_section(section_id=section.id),
+            "ri_free_days": 0
         }
 
     context = {
