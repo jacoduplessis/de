@@ -23,7 +23,7 @@ def get_monthly_ri_value_per_area(area_id=None, months=36):
 
     sql = f"""
        WITH RECURSIVE dates(date) AS (
-    SELECT DATE('now', 'start of month', '-' || %s || ' months'))
+    SELECT DATE('now', 'start of month', '-' || %s || ' months')
     UNION ALL
     SELECT DATE(DATE, '+1 months')
     FROM dates
