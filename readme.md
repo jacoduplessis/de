@@ -148,3 +148,9 @@ MS WSL
 ## Notes on CSS gradient
 
   <span style="color: transparent; background-clip: text; background: linear-gradient(90deg, #FE0000 0%, #031794 30.98%, #1E7CFF 100%)">{{ incident.code }} – {{ incident.short_description }} – {{ incident.time_start|date:"Y-m-d" }}</span>
+
+
+## Anglo
+
+AISABUDEAPP01 - 10.196.250.62
+AISABUDEDB01 - 10.196.250.63

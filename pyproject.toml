@@ -6,19 +6,19 @@ dependencies = [
   "django==5.1.1",
   "python-dotenv==1.0.1",
   "whitenoise==6.7.0",
-  "gunicorn==23.0.0",
   "dj-database-url==2.2.0",
   "django-auditlog==3.0.0",
-  "redis==5.0.8",
   "sentry_sdk==2.13.0",
   "django-import-export==4.1.1",
   "django-crispy-forms==2.3",
   "crispy-bootstrap5==2024.2",
   "pillow==10.4.0",
-  "huey==2.5.1",
   "python-pptx==1.0.2",
-  "waitress>=3.0.2",
 ]
+
+[project.optional-dependencies]
+windows = ["waitress>=3.0.2"]
+linux = ["gunicorn>=23.0.0"]
 
 [tool.coverage.run]
 omit = [
