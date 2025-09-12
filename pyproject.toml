@@ -14,11 +14,12 @@ dependencies = [
   "crispy-bootstrap5==2024.2",
   "pillow==10.4.0",
   "python-pptx==1.0.2",
+  "gunicorn>=23.0.0",
+  "weasyprint>=66.0",
 ]
 
 [project.optional-dependencies]
 windows = ["waitress>=3.0.2"]
-linux = ["gunicorn>=23.0.0"]
 
 [tool.coverage.run]
 omit = [
