@@ -1,6 +1,6 @@
 [project]
 name = "anglo-defects"
-version = "25.9.122"
+version = "25.9.123"
 requires-python = ">=3.13,<3.14"
 dependencies = [
   "django==5.1.1",
