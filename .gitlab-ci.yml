@@ -3,15 +3,13 @@ stages:
   - build
 
 test:
-  image: python:3.12-bookworm
+  image: ghcr.io/astral-sh/uv:python3.13-bookworm-slim
   stage: test
   variables:
     DATABASE_URL: "sqlite://:memory:"
   script:
-    - pip install -U pip
-    - pip install -r requirements.txt
-    - python manage.py collectstatic
-    - PYTHONDEVMODE=1 python manage.py test
+    - uv run -- manage.py collectstatic
+    - PYTHONDEVMODE=1 DEBUG=1 LOG_LEVEL=CRITICAL uv run -- python manage.py test
   only:
     - tags
 

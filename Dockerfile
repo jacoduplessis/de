@@ -1,22 +1,19 @@
-FROM python:3.12-bookworm as builder
+FROM python:3.13-bookworm
+
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/
+
+ENV UV_COMPILE_BYTECODE=1 STATIC_ROOT=/app/static/
 
 WORKDIR /app
 
-# Copying requirements.txt first for better cache on rebuilds
-COPY requirements.txt /app/
+COPY pyproject.toml uv.lock /app/
 
-# Install pip requirements
-RUN pip install --no-cache-dir -r requirements.txt
-
-FROM python:3.12-bookworm
-
-ENV STATIC_ROOT /app/static/
-WORKDIR /app
-
-COPY --from=builder /usr/local /usr/local
+RUN uv sync --no-dev --frozen
 
 COPY . /app
-RUN python manage.py collectstatic --no-input
+ENV PATH="/app/.venv/bin:$PATH"
+
+RUN uv run -- manage.py collectstatic --no-input
 
 EXPOSE 8000
 CMD ["gunicorn", "-b", "0.0.0.0:8000", "--capture-output", "--timeout", "60", "defects.wsgi"]
