@@ -3,8 +3,8 @@ from import_export.admin import ImportExportModelAdmin
 from import_export.resources import ModelResource
 from .models import Solution, Incident, Equipment, Section, Area, Operation, Feedback, ResourcePrice
 
-admin.site.site_header = "Anglo DE Tool Admin"
-admin.site.site_title = "Anglo DE Tool"
+admin.site.site_header = "DE Tool Admin"
+admin.site.site_title = "DE Tool"
 admin.site.index_title = "Administration"
 
 

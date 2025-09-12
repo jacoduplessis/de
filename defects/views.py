@@ -259,7 +259,7 @@ def incident_update(request, pk):
         form = IncidentUpdateForm(request.POST, request.FILES, instance=incident)
         if not form.is_valid():
             messages.error(request, "Please correct the form inputs and submit again.")
-            context = {"form": form, "conditionals": conditional_forms_payload() }
+            context = {"form": form, "conditionals": conditional_forms_payload()}
             return render(request, template_name, context)
         obj = form.save()
 
@@ -407,8 +407,10 @@ def incident_close_pdf(request, pk):
 
     incident = get_object_or_404(Incident, pk=pk)
 
-    se_approval = Approval.objects.select_related("user").order_by("-time_modified").filter(incident=incident, role=Approval.SECTION_ENGINEER, type=Approval.CLOSE_OUT, score__gt=0).first()
-    sem_approval = Approval.objects.select_related("user").order_by("-time_modified").filter(incident=incident, role=Approval.SECTION_ENGINEERING_MANAGER, type=Approval.CLOSE_OUT, score__gt=0).first()
+    se_approval = Approval.objects.select_related("user").order_by("-time_modified").filter(incident=incident, role=Approval.SECTION_ENGINEER, type=Approval.CLOSE_OUT,
+                                                                                            score__gt=0).first()
+    sem_approval = Approval.objects.select_related("user").order_by("-time_modified").filter(incident=incident, role=Approval.SECTION_ENGINEERING_MANAGER, type=Approval.CLOSE_OUT,
+                                                                                             score__gt=0).first()
 
     # ["name", 1, <date>|<datetime>]
     ratings = {
@@ -628,7 +630,10 @@ class LoginView(BaseLoginView):
 
 
 class LogoutView(BaseLogoutView):
-    pass
+    http_method_names = ["post", "get", "options"]
+
+    def get(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
 
 
 def login(request):
@@ -710,7 +715,6 @@ def approval_detail(request, pk):
                         obj.incident.save()
 
                 if obj.outcome == Approval.ACCEPTED and obj.type == Approval.CLOSE_OUT and obj.role == Approval.SECTION_ENGINEERING_MANAGER:
-
                     obj.incident.close_out_time_approved = now()
                     obj.incident.close_out_rating = obj.score
                     obj.incident.save()
@@ -877,6 +881,7 @@ def incident_rca_report_upload(request, pk):
         messages.success(request, "Incident RCA Report uploaded.")
         return HttpResponseRedirect(reverse("incident_detail", args=[incident.pk]))
 
+
 @login_required
 def incident_findings_upload(request, pk):
     """
@@ -908,6 +913,7 @@ def incident_findings_upload(request, pk):
         form.save()
         messages.success(request, "Incident preliminary findings uploaded.")
         return HttpResponseRedirect(reverse("incident_detail", args=[incident.pk]))
+
 
 @login_required
 def incident_list_export(request):
@@ -1129,9 +1135,9 @@ def incident_rca_approval_request(request, pk):
             messages.success(request, f"RCA report has be sent to {approval.get_role_display()} for approval.")
             return HttpResponseRedirect(reverse("incident_detail", args=[incident.pk]))
 
+
 @login_required
 def anniversary_report(request):
-
     response = HttpResponse()
     response['Content-Type'] = 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
     response['Content-Disposition'] = 'attachment; filename="report.pptx"'
