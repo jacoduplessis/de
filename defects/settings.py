@@ -40,6 +40,12 @@ CSRF_TRUSTED_ORIGINS = [
     "http://10.196.250.62:8014",
 ]
 
+
+if os.environ.get("NO_HTTPS", "0") == "1":
+    CSRF_COOKIE_SECURE = False
+    SESSION_COOKIE_SECURE = False
+
+
 # Application definition
 
 INSTALLED_APPS = [
