@@ -32,10 +32,12 @@ ALLOWED_HOSTS = [
     ".localhost",
     "127.0.0.1",
     "[::1]",
+    "10.196.250.62",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     "https://*.hartebees.co.za",
+    "http://10.196.250.62:8014",
 ]
 
 # Application definition
