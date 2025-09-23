@@ -43,6 +43,7 @@
 {% block extra_scripts %}
   <script src="{% static 'tom-select.complete.min.js' %}"></script>
   {% include "defects/_select_equipment.html" %}
+  {% include "defects/_select_section.html" %}
   <script src="{% static 'flatpickr.js' %}"></script>
   <script>
     document.querySelectorAll('.datetimeinput').forEach(el => {
