@@ -50,6 +50,7 @@ class AreaAdmin(admin.ModelAdmin):
         "name",
         "order_index",
         "operation",
+        "code",
     ]
     ordering = ["order_index"]
 

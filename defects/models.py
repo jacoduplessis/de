@@ -36,6 +36,7 @@ class Area(models.Model):
     name = models.CharField(max_length=200)
     order_index = models.PositiveIntegerField(default=0)
     operation = models.ForeignKey(Operation, on_delete=models.SET_NULL, null=True, blank=True)
+    code = models.CharField(max_length=200, blank=True)
 
     def __str__(self):
         return self.name
@@ -175,8 +176,8 @@ class Incident(models.Model):
         super().save(*args, **kwargs)
 
     @classmethod
-    def generate_incident_code(cls, section_code, incident_type="RI", count=None):
-        prefix = f"{section_code}_{incident_type}_{now().strftime("%Y")}"
+    def generate_incident_code(cls, code, incident_type="RI", count=None):
+        prefix = f"{code}_{incident_type}_{now().strftime("%Y")}"
         if count is None:
             count = 1 + Incident.objects.filter(code__startswith=prefix).count()
         return f"{prefix}_{count}"

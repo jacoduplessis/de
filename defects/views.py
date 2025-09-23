@@ -222,16 +222,16 @@ def incident_create(request):
             return render(request, template_name, context=context, status=422)
         obj = form.save(commit=False)
 
-        section_id = obj.section_id
-        section_code = "XXX"
-        try:
-            assert section_id is not None
-            section_code = Section.objects.get(id=section_id).code
-            assert section_code != ""
-        except (AssertionError, Section.DoesNotExist):
-            pass
+        area_id = obj.area_id
+        code = "XXX"
+        if area_id is not None:
+            try:
+                area = Area.objects.get(id=area_id)
+                code = area.code or area.name
+            except Area.DoesNotExist:
+                pass
 
-        obj.code = Incident.generate_incident_code(section_code=section_code, incident_type="RI")
+        obj.code = Incident.generate_incident_code(code=code, incident_type="RI")
         obj.created_by = request.user
         obj.save()
         messages.success(request, f"Incident created with RI Number {obj.code}")
