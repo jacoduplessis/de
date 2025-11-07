@@ -1,4 +1,4 @@
-# Anglo AMB Defect Elimination Tool
+# Defect Elimination Tool
 
 ## Setup
 
@@ -154,3 +154,22 @@ MS WSL
 
 AISABUDEAPP01 - 10.196.250.62
 AISABUDEDB01 - 10.196.250.63
+
+## Customer Deployment
+
+Install UV and Python.
+
+In powershell:
+
+> $Env:HTTPS_PROXY="iitproxy.angloiit.net:8181"
+> cd 'C:\Program Files\DefectElimination\'
+> .\uv run python manage.py check
+
+Run the management commands:
+
+- migrate
+- collectstatic
+- loaddata
+
+
+XferCommand = /usr/bin/curl --proxy http://iitproxy.angloiit.net:8181 --insecure -L -o %o %u
