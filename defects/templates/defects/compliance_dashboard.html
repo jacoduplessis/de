@@ -6,7 +6,7 @@
 
   <main>
     <div class="d-flex justify-content-between mb-3">
-      <h2>Compliance Dashboard {{ request.GET.area }}</h2>
+      <h2>Compliance Dashboard: {{ dashboard_name }}</h2>
       <div>
         <div class="btn-group">
           <a href="?area=all" class="btn btn-secondary btn-sm {% if not request.GET.area or request.GET.area == "all" %} active {% endif %}">All Areas</a>
@@ -18,9 +18,58 @@
       </div>
     </div>
 
-    <p>Reliability Statistics for the past 25 weeks.</p>
-
     <div class="row">
+
+      <div class="col-12">
+
+        <table class="table table-striped table-sm table-bordered">
+          <thead>
+          <tr>
+            <th></th>
+            <th colspan="5" class="text-center table-primary">Reliability Incidents</th>
+            <th colspan="4" class="text-center table-success">Solutions</th>
+          </tr>
+          <tr>
+            <th>Section</th>
+            <th class="table-primary">Last RI</th>
+            <th class="table-primary">RIFD</th>
+            <th class="table-primary">No RI</th>
+            <th class="table-primary">Closed</th>
+            <th class="table-primary">%</th>
+            <th class="table-success">No Solutions</th>
+            <th class="table-success">Complete</th>
+            <th class="table-success">Scheduled</th>
+            <th class="table-success">%</th>
+          </tr>
+          </thead>
+          <tbody>
+          {% for section in sections %}
+            <tr>
+
+              {# incidents #}
+              <th>{{ section.name }}</th>
+              <td>{{ section.last_ri_date }}</td>
+              <td>{{ section.ri_free_days }}</td>
+              <td>{{ section.ri_count }}</td>
+              <td>{{ section.ri_count_closed }}</td>
+              <td>{{ section.ri_closed_percentage }}%</td>
+
+              {# solutions #}
+
+              <td>{{ section.solution_count }}</td>
+              <td>{{ section.solution_count_closed }}</td>
+              <td>{{ section.solution_count_scheduled }}</td>
+              <td>{{ section.solution_closed_percentage }}%</td>
+
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+
+      </div>
+
+      <div class="col-12 my-3"></div>
+
       <div class="col-12 col-lg-6">
 
         <h6>RIs</h6>
@@ -29,39 +78,39 @@
           <tr>
             <th>Description</th>
             {% for section in sections %}
-            <th>{{ section.name }}</th>
+              <th>{{ section.name }}</th>
             {% endfor %}
           </tr>
           </thead>
           <tbody>
           <tr>
             <td>Free days</td>
-             {% for section in sections %}
-            <td>x</td>
+            {% for section in sections %}
+              <td>{{ section.ri_free_days }}</td>
             {% endfor %}
           </tr>
           <tr>
             <td>To date</td>
             {% for section in sections %}
-            <td>x</td>
+              <td>{{ section.ri_count }}</td>
             {% endfor %}
           </tr>
           <tr>
             <td>Closed out</td>
             {% for section in sections %}
-            <td>x</td>
+              <td>{{ section.ri_count_closed }}</td>
             {% endfor %}
           </tr>
           <tr>
             <td>Outstanding</td>
             {% for section in sections %}
-            <td>x</td>
+              <td>{{ section.ri_count_outstanding }}</td>
             {% endfor %}
           </tr>
           <tr>
             <td>% Closed out</td>
             {% for section in sections %}
-            <td>x</td>
+              <td>{{ section.ri_closed_percentage }}%</td>
             {% endfor %}
           </tr>
           </tbody>
@@ -73,7 +122,7 @@
           <tr>
             <th>Description</th>
             {% for section in sections %}
-            <th>{{ section.name }}</th>
+              <th>{{ section.name }}</th>
             {% endfor %}
           </tr>
           </thead>
@@ -81,25 +130,19 @@
           <tr>
             <td>To date</td>
             {% for section in sections %}
-            <td>x</td>
+              <td>{{ section.solution_count }}</td>
             {% endfor %}
           </tr>
           <tr>
             <td>Completed</td>
             {% for section in sections %}
-            <td>x</td>
-            {% endfor %}
-          </tr>
-          <tr>
-            <td>In-Progress</td>
-            {% for section in sections %}
-            <td>x</td>
+              <td>{{ section.solution_count_closed }}</td>
             {% endfor %}
           </tr>
           <tr>
             <td>Outstanding</td>
             {% for section in sections %}
-            <td>x</td>
+              <td>{{ section.solution_count_scheduled }}</td>
             {% endfor %}
           </tr>
           </tbody>
@@ -120,9 +163,9 @@
 
     {{ stats|json_script:"section-stats" }}
     <script>
-        console.log(
-          JSON.parse(document.getElementById("section-stats").textContent)
-        )
+      console.log(
+        JSON.parse(document.getElementById("section-stats").textContent)
+      )
     </script>
     <script defer src="{% static 'scripts/compliance-dashboard.js' %}"></script>
   </main>

@@ -21,7 +21,7 @@ from django.utils.timezone import now
 from django.views.decorators.http import require_POST, require_GET
 
 from .exports import export_table_csv
-from .stats import get_weekly_ri_count_per_section, get_monthly_ri_value_per_area, get_weekly_ri_value_per_area
+from .stats import get_weekly_ri_count_per_section, get_monthly_ri_value_per_area, get_weekly_ri_value_per_area, get_section_ri_free_days
 from .forms import (
     IncidentCreateForm,
     IncidentNotificationApprovalSendForm,
@@ -564,22 +564,59 @@ def compliance_dashboard(request):
 
     areas = Area.objects.all().order_by("name")
 
-    sections = Section.objects.all()
+    dashboard_name = "All"
+
+    sections_qs = Section.objects.all()
     if area_filter_id and area_filter_id != "all":
-        sections = sections.filter(area_id=area_filter_id)
+        area = Area.objects.get(pk=area_filter_id)
+        sections_qs = sections_qs.filter(area_id=area_filter_id)
+        dashboard_name = area.name
 
     stats = {}
-    for section in sections:
-        stats[str(section.id)] = {
+
+    sections = []
+
+    for section in sections_qs:
+
+        qs = Incident.objects.filter(section=section)
+
+        last_ri = Incident.objects.filter(section=section).order_by("-time_start").first()
+
+        ri_count = qs.count()
+        ri_count_closed = qs.filter(status=Incident.COMPLETE).count()
+        ri_closed_percentage = 0 if ri_count == 0 else int(100 * ri_count_closed / ri_count)
+
+        solution_qs = Solution.objects.filter(incident__section=section)
+
+        solution_count = solution_qs.count()
+        solution_count_closed = solution_qs.filter(status=Solution.COMPLETED).count()
+        solution_count_scheduled = solution_qs.filter(status=Solution.SCHEDULED).count()
+        solution_closed_percentage = 0 if solution_count == 0 else int(100 * solution_count_closed / solution_count)
+
+        rv = {
             "name": section.name,
-            "ri_count": get_weekly_ri_count_per_section(section_id=section.id),
-            "ri_free_days": 0
+            "ri_count": ri_count,
+            "ri_count_closed": ri_count_closed,
+            "ri_count_outstanding": ri_count - ri_count_closed,
+            "ri_closed_percentage": ri_closed_percentage,
+            "ri_count_by_week": get_weekly_ri_count_per_section(section_id=section.id),
+            "ri_free_days": get_section_ri_free_days(section_id=section.id),
+            "last_ri_date": "" if last_ri is None else last_ri.time_start.strftime("%Y-%m-%d"),
+            "solution_count": solution_count,
+            "solution_count_closed": solution_count_closed,
+            "solution_count_scheduled": solution_count_scheduled,
+            "solution_closed_percentage": solution_closed_percentage,
+
         }
+
+        sections.append(rv)
+        stats[str(section.id)] = rv
 
     context = {
         "areas": areas,
         "sections": sections,
         "stats": stats,
+        "dashboard_name": dashboard_name,
     }
 
     return render(request, "defects/compliance_dashboard.html", context=context)

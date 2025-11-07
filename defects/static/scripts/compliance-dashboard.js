@@ -1,32 +1,18 @@
 
-    const weeks = Array(25).fill(0).map((v, i) => 'Week ' + (i + 1))
+    const weeks = Array(52).fill(0).map((v, i) => 'Week ' + (i + 1))
 
-    const randInt = function (min, max) {
-      const val = min + (max - min) * Math.random()
-      return Math.floor(val)
-    }
+    const sectionStats = JSON.parse(document.getElementById("section-stats").textContent)
+
+    const riDatasets = Object.values(sectionStats).map(section => {
+      return {
+        label: section.name,
+        data: section.ri_count_by_week.map(row => row.cnt)
+      }
+    })
 
     const lineData = {
       labels: weeks,
-      datasets: [{
-        label: 'UG 2 #1',
-        data: Array(weeks.length).fill(0).map(() => randInt(0, 50)),
-        backgroundColor: 'red',
-        borderColor: 'red',
-      },
-        {
-          label: 'UG 2 #2',
-          data: Array(weeks.length).fill(0).map(() => randInt(0, 50)),
-          backgroundColor: 'blue',
-          borderColor: 'blue',
-        },
-        {
-          label: 'Merensky',
-          data: Array(weeks.length).fill(0).map(() => randInt(0, 50)),
-          backgroundColor: 'purple',
-          borderColor: 'purple',
-        }
-      ]
+      datasets: riDatasets
     }
 
     const ctx = document.getElementById('line-chart')
@@ -52,28 +38,18 @@
 
 
     const barData = {
-      labels: [
-        'UG2 #1',
-        'UG2 #2',
-        'Merensky',
-      ],
+      labels: Object.values(sectionStats).map(section => section.name),
 
       datasets: [
         {
-          label: 'In Progress',
-          data: [14, 28, 20],
-          borderColor: 'blue',
-          backgroundColor: 'blue'
-        },
-        {
           label: 'Completed',
-          data: [30, 12, 24],
+          data: Object.values(sectionStats).map(s => s.solution_count_closed),
           borderColor: 'green',
           backgroundColor: 'green',
         },
         {
-          label: 'Outstanding',
-          data: [4, 2, 7],
+          label: 'Scheduled',
+          data: Object.values(sectionStats).map(s => s.solution_count_scheduled),
           borderColor: 'red',
           backgroundColor: 'red'
         }
