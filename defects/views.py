@@ -960,6 +960,52 @@ def incident_list_export(request):
 
     return export_table_csv(response, Incident._meta.db_table)
 
+@login_required
+def incident_reassign(request):
+
+    if request.method == "GET":
+
+        ids = request.GET.get("ids", "")
+        ids = ids.split(",")
+
+        incidents = Incident.objects.filter(id__in=ids)
+
+        se_options = []
+        for user in User.objects.filter(groups__name__in=["section_engineer"]).distinct():
+            se_options.append({
+                "value": user.id,
+                "name": user.email,
+            })
+
+        context = {
+            "incidents": incidents,
+            "se_options": se_options,
+        }
+
+        return render(request, "defects/incident_reassign.html", context=context)
+
+
+    if request.method == "POST":
+
+        ids = request.GET.get("ids", "")
+        ids = ids.split(",")
+
+        new_owner_id = request.POST.get("new_owner_id")
+
+        if new_owner_id is None:
+            return HttpResponseBadRequest("No new owner id provided.")
+
+        qs = Incident.objects.filter(id__in=ids)
+
+        print(qs.count())
+
+        qs.update(section_engineer_id=new_owner_id)
+
+        messages.success(request, "Incidents reassigned successfully.")
+
+        return HttpResponseRedirect(reverse("admin:defects_incident_changelist"))
+
+
 
 @login_required
 def solution_list_export(request):

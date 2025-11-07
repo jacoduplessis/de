@@ -28,6 +28,7 @@ urlpatterns = [
     path("incidents/filter/", views.incident_list_filter, name="incident_list_filter"),
     path("incidents/create/", views.incident_create, name="incident_create"),
     path("incidents/export/", views.incident_list_export, name="incident_list_export"),
+    path("incidents/reassign/", views.incident_reassign, name="incident_reassign" ),
     path("incidents/<int:pk>/", views.incident_detail, name="incident_detail"),
     path("incidents/<int:pk>/edit/", views.incident_update, name="incident_update"),
     path("incidents/<int:pk>/images/", views.incident_images, name="incident_images"),

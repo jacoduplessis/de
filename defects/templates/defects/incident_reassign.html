@@ -1,0 +1,38 @@
+{% extends 'defects/base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+  <main>
+    <div class="d-flex justify-content-between mb-3">
+      <h2>Reassign RIs</h2>
+      <div>
+      </div>
+    </div>
+
+  </main>
+
+  <div>
+    <p>The following RIs will be re-assigned to the chosen user.</p>
+
+    <ul>
+      {% for incident in incidents %}
+      <li>{{ incident }}</li>
+      {% endfor %}
+    </ul>
+
+    <form method="post">
+      {% csrf_token %}
+
+      <select name="new_owner_id" class="form-select">
+        {% for option in se_options %}
+          <option value="{{ option.value }}">{{ option.name }}</option>
+        {% endfor %}
+      </select>
+
+      <input type="submit" class="btn btn-primary mt-3">
+    </form>
+  </div>
+
+{% endblock %}

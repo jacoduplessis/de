@@ -2,6 +2,9 @@ from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
 from import_export.resources import ModelResource
 from .models import Solution, Incident, Equipment, Section, Area, Operation, Feedback, ResourcePrice
+from django.urls import reverse
+from django.http.response import HttpResponseRedirect
+
 
 admin.site.site_header = "DE Tool Admin"
 admin.site.site_title = "DE Tool"
@@ -10,7 +13,35 @@ admin.site.index_title = "Administration"
 
 @admin.register(Incident)
 class ReliabilityIncidentAdmin(ImportExportModelAdmin):
-    pass
+
+    actions = [
+        "reassign"
+    ]
+
+    list_display = [
+        "code",
+        "area",
+        "section",
+        "section_engineer",
+        "time_start",
+        "time_end",
+    ]
+
+    list_filter = [
+        "section_engineer",
+    ]
+
+    ordering = [
+        "-time_start"
+    ]
+
+
+    @admin.action(description="Reassign")
+    def reassign(self, request, queryset):
+        return HttpResponseRedirect(
+            reverse('incident_reassign') + "?ids=" + ",".join(str(x.pk) for x in queryset)
+        )
+
 
 
 @admin.register(Equipment)
