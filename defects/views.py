@@ -1230,7 +1230,7 @@ def anniversary_report_detail(request):
         "section",
         "equipment",
     ).prefetch_related(
-        "solution"
+        "solutions"
     )
 
     month_name = f"{now().year} {calendar.month_name[int(month)]}"
