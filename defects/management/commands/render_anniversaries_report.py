@@ -17,8 +17,6 @@ class Command(BaseCommand):
             operation_name=operation_name,
             month=month,
             incidents=incidents,
-            actions=actions,
-            gaps=gaps
         )
 
 

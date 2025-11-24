@@ -39,6 +39,7 @@ from .models import Solution, Incident, Section, Equipment, IncidentImage, Appro
 from .actions import get_user_actions
 from .reports import render_anniversary_report_pptx
 
+
 def index(request):
     return HttpResponseRedirect(reverse("login"))
 
@@ -86,9 +87,9 @@ def home(request):
         "user_actions": get_user_actions(request.user),
         "approvals": (
             Approval.objects
-                .select_related("incident", "created_by")
-                .filter(user=request.user)
-                .filter(Q(outcome="", type__in=[Approval.RCA, Approval.NOTIFICATION]) | Q(score=0, type=Approval.CLOSE_OUT))
+            .select_related("incident", "created_by")
+            .filter(user=request.user)
+            .filter(Q(outcome="", type__in=[Approval.RCA, Approval.NOTIFICATION]) | Q(score=0, type=Approval.CLOSE_OUT))
         ),
         "anniversaries": anniversaries
     }
@@ -576,7 +577,6 @@ def compliance_dashboard(request):
     sections = []
 
     for section in sections_qs:
-
         qs = Incident.objects.filter(section=section)
 
         last_ri = Incident.objects.filter(section=section).order_by("-time_start").first()
@@ -959,9 +959,9 @@ def incident_list_export(request):
 
     return export_table_csv(response, Incident._meta.db_table)
 
+
 @login_required
 def incident_reassign(request):
-
     if request.method == "GET":
 
         ids = request.GET.get("ids", "")
@@ -983,7 +983,6 @@ def incident_reassign(request):
 
         return render(request, "defects/incident_reassign.html", context=context)
 
-
     if request.method == "POST":
 
         ids = request.GET.get("ids", "")
@@ -1001,7 +1000,6 @@ def incident_reassign(request):
         messages.success(request, "Incidents reassigned successfully.")
 
         return HttpResponseRedirect(reverse("admin:defects_incident_changelist"))
-
 
 
 @login_required
@@ -1218,7 +1216,6 @@ def incident_rca_approval_request(request, pk):
 
 @login_required
 def anniversary_report_detail(request):
-
     operation_id = request.GET.get("operation_id")
     month = request.GET.get("month")
     operation = Operation.objects.get(pk=operation_id)
@@ -1226,6 +1223,8 @@ def anniversary_report_detail(request):
     incidents = Incident.objects.filter(
         time_start__month=month,
         operation=operation,
+    ).exclude(
+        Q(section=None) | Q(time_start=None)
     ).select_related(
         "section",
         "equipment",
@@ -1235,9 +1234,6 @@ def anniversary_report_detail(request):
 
     month_name = f"{now().year} {calendar.month_name[int(month)]}"
 
-    actions = []
-    gaps = []
-
     response = HttpResponse()
     response['Content-Type'] = 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
     response['Content-Disposition'] = 'attachment; filename="report.pptx"'
@@ -1246,15 +1242,12 @@ def anniversary_report_detail(request):
         operation_name=operation.name,
         month=month_name,
         incidents=incidents,
-        actions=actions,
-        gaps=gaps,
-
     )
     return response
 
+
 @login_required
 def anniversary_report_list(request):
-
     months = calendar.month_name[1:13]
 
     context = {

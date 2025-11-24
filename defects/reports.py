@@ -24,7 +24,7 @@ def url_fetcher(url, timeout=5, ssl_context=None):
     return default_url_fetcher(url, timeout=timeout, ssl_context=ssl_context)
 
 
-def render_anniversary_report_pptx(target, operation_name, month, incidents, actions, gaps):
+def render_anniversary_report_pptx(target, operation_name, month, incidents):
     prs = Presentation()
 
     title_slide_layout = prs.slide_layouts[0]
@@ -77,7 +77,7 @@ def render_anniversary_report_pptx(target, operation_name, month, incidents, act
         solutions_tracked = len(solutions) > 0
         solutions_verified = all(solution.date_verified for solution in solutions)
 
-        table.cell(ix, 0).text = incident.section.name
+        table.cell(ix, 0).text = "" if incident.section is None else incident.section.name
         table.cell(ix, 1).text = incident.time_start.strftime("%Y-%m-%d")
         table.cell(ix, 2).text = incident.equipment.name
         table.cell(ix, 3).text = incident.short_description
@@ -122,7 +122,7 @@ def render_anniversary_report_pptx(target, operation_name, month, incidents, act
 
         for solution in incident.solutions.all():
             solutions.append({
-                "section": incident.section.name,
+                "section": "" if incident.section is None else incident.section.name,
                 "incident": incident.short_description,
                 "proposed_solution": solution.description,
                 "progress_status": solution.status,
@@ -173,7 +173,7 @@ def render_anniversary_report_pptx(target, operation_name, month, incidents, act
         cell.vertical_anchor = 1  # MSO_VERTICAL_ANCHOR.TOP (or use MIDDLE=2, BOTTOM=3)
 
     for ix, incident in enumerate(incidents, start=1):
-        table.cell(ix, 0).text = incident.section.name
+        table.cell(ix, 0).text = "" if incident.section is None else incident.section.name
         table.cell(ix, 1).text = incident.short_description
 
     prs.save(target)
