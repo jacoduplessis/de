@@ -1,6 +1,6 @@
+import calendar
 import json
-import random
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 from auditlog.models import LogEntry
 from auditlog.signals import accessed
@@ -37,8 +37,7 @@ from .forms import (
 )
 from .models import Solution, Incident, Section, Equipment, IncidentImage, Approval, Area, Feedback, Operation, ResourcePrice
 from .actions import get_user_actions
-from .reports import render_pptx
-
+from .reports import render_anniversary_report_pptx
 
 def index(request):
     return HttpResponseRedirect(reverse("login"))
@@ -997,8 +996,6 @@ def incident_reassign(request):
 
         qs = Incident.objects.filter(id__in=ids)
 
-        print(qs.count())
-
         qs.update(section_engineer_id=new_owner_id)
 
         messages.success(request, "Incidents reassigned successfully.")
@@ -1220,9 +1217,49 @@ def incident_rca_approval_request(request, pk):
 
 
 @login_required
-def anniversary_report(request):
+def anniversary_report_detail(request):
+
+    operation_id = request.GET.get("operation_id")
+    month = request.GET.get("month")
+    operation = Operation.objects.get(pk=operation_id)
+
+    incidents = Incident.objects.filter(
+        time_start__month=month,
+        operation=operation,
+    ).select_related(
+        "section",
+        "equipment",
+    ).prefetch_related(
+        "solution"
+    )
+
+    month_name = f"{now().year} {calendar.month_name[int(month)]}"
+
+    actions = []
+    gaps = []
+
     response = HttpResponse()
     response['Content-Type'] = 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
     response['Content-Disposition'] = 'attachment; filename="report.pptx"'
-    render_pptx(response)
+    render_anniversary_report_pptx(
+        target=response,
+        operation_name=operation.name,
+        month=month_name,
+        incidents=incidents,
+        actions=actions,
+        gaps=gaps,
+
+    )
     return response
+
+@login_required
+def anniversary_report_list(request):
+
+    months = calendar.month_name[1:13]
+
+    context = {
+        "operations": Operation.objects.all(),
+        "months": months,
+    }
+
+    return render(request, "defects/anniversary_report_list.html", context=context)

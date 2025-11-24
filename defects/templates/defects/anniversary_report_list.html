@@ -1,0 +1,43 @@
+{% extends 'defects/base.html' %}
+
+{% block content %}
+  <main>
+
+    <div class="d-flex justify-content-between align-items-center">
+      <h2>Anniversary Reports</h2>
+      <div>
+
+      </div>
+    </div>
+
+    <hr>
+
+    <div class="row">
+      <div class="col-12 col-lg-6">
+
+        <table class="table table-striped">
+          <thead>
+          <tr>
+            <th>Operation</th>
+            <th>Month</th>
+            <th>Report</th>
+          </tr>
+          </thead>
+          <tbody>
+          {% for operation in operations %}
+            {% for month in months %}
+              <tr>
+                <td>{{ operation.name }}</td>
+                <td>{{ month }}</td>
+                <td><a href="{% url 'anniversary_report_detail' %}?operation_id={{ operation.id }}&month={{ forloop.counter }}">View</a></td>
+              </tr>
+            {% endfor %}
+          {% endfor %}
+          </tbody>
+        </table>
+
+      </div>
+    </div>
+  </main>
+
+{% endblock content %}
